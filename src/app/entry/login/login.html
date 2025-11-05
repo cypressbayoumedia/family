@@ -1,0 +1,38 @@
+<div class="auth-container">
+    <div class="auth-card">
+      <h2>Welcome Back!</h2>
+      <p class="subtitle">Log in to continue to your account.</p>
+  
+      <!-- Login Form -->
+      <form (ngSubmit)="onLogin()">
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" [(ngModel)]="password" name="password" placeholder="••••••••" required>
+        </div>
+  
+        <!-- Error Message Display -->
+        @if (errorMessage()) {
+          <p class="error-message">{{ errorMessage() }}</p>
+        }
+  
+        <button type="submit" class="auth-button" [disabled]="isLoading()">
+          {{ isLoading() ? 'Logging In...' : 'Log In' }}
+        </button>
+      </form>
+  
+      <div class="separator">or</div>
+  
+      <!-- Google Sign-In Button -->
+      <button class="google-button" (click)="onGoogleLogin()" [disabled]="isLoading()">
+        Continue with Google
+      </button>
+      
+      <p class="footer-text">
+        Don't have an account? <a routerLink="/signup">Sign Up</a>
+      </p>
+    </div>
+  </div>

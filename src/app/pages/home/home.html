@@ -1,0 +1,30 @@
+<!-- First, check if the auth state is still loading to prevent flicker -->
+@if (authService.loading()) {
+    <!-- Optional: Show a loading spinner or skeleton screen here -->
+    <p class="loading-indicator">Loading...</p>
+  } @else {
+  
+    <!-- If loading is finished, check if a user is logged in -->
+    @if (authService.currentUser()) {
+      
+      <!-- ================================== -->
+      <!-- AUTHENTICATED VIEW (Your Original Code) -->
+      <!-- ================================== -->
+      <header class="app-header">
+        <h1>The Familee.</h1>
+        <nav>
+          <!-- Add a sign out button! -->
+          <a routerLink="/create-post" class="create-post-button">Create Post</a>
+          <button (click)="authService.signOut()" class="sign-out-button">Sign Out</button>
+        </nav>
+      </header>
+      <main>
+        <app-post-list />
+      </main>
+  
+    } @else {
+  
+      <app-landing />
+  
+    }
+  }

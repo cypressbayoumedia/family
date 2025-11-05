@@ -1,0 +1,33 @@
+<div class="record-audio-container">
+  <button class="close-button" (click)="close()">×</button>
+  <h2>Record Audio</h2>
+
+  <!-- Display error message if microphone access fails -->
+  @if (errorMessage(); as error) {
+    <p class="error-message">{{ error }}</p>
+  }
+
+  <!-- Initial state: Ready to record -->
+  @if (!isRecording() && !audioUrl()) {
+    <button (click)="startRecording()" class="record-button">Start Recording</button>
+  }
+
+  <!-- Recording state -->
+  @if (isRecording()) {
+    <button (click)="stopRecording()" class="stop-button">Stop Recording</button>
+    <!-- Display the recording timer -->
+    <p class="recording-indicator">Recording... {{ recordingTime() }}</p>
+  }
+
+  <!-- Playback/Save state -->
+  @if (audioUrl()) {
+    <div class="playback-container">
+      <audio [src]="audioUrl()" controls></audio>
+      <div class="button-group">
+        <!-- The startRecording function also handles re-recording -->
+        <button (click)="startRecording()" class="rerecord-button">Re-record</button>
+        <button (click)="saveAudio()" class="save-button">Save & Close</button>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,99 @@
+/* The main container for a single post, styled as a card. */
+.post-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem; /* Space between posts */
+  padding: 1.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- Header Section --- */
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Space between avatar and text */
+}
+
+/* A simple, circular avatar */
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #4f46e5; /* A nice brand color */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  flex-shrink: 0; /* Prevents the avatar from shrinking */
+}
+
+.author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.post-timestamp {
+  font-size: 0.8rem;
+  color: #6b7280; /* Gray text for the date */
+}
+
+/* --- Body Section --- */
+.post-body {
+  padding-top: 1rem; /* Space between header and content */
+}
+
+.post-content {
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.6;
+  /* Make links clickable and preserve line breaks from the textarea */
+  white-space: pre-wrap; 
+  word-wrap: break-word;
+}
+
+.post-media {
+  margin-top: 1rem;
+}
+
+.post-image {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.post-audio {
+  width: 100%;
+}
+
+/* --- Footer Section --- */
+.post-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f3f4f6; /* A very light separator line */
+}
+
+.action-button {
+  background: none;
+  border: none;
+  color: #4b5563;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover {
+  background-color: #f3f4f6;
+}

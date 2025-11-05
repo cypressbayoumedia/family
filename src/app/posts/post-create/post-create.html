@@ -1,0 +1,71 @@
+<!-- The main container for the component -->
+<div class="post-create-container">
+  
+  <!-- The main card where the user creates their post -->
+  <div class="post-create-card">
+    
+    <div class="header">
+      <button class="back-button" routerLink="">← Back to Feed</button>
+      <h2>Create a New Post</h2>
+    </div>
+
+    <!-- Text area for the post content -->
+    <textarea class="post-textarea" [(ngModel)]="content" placeholder="What's on your mind, family?"></textarea>
+    
+    <!-- PREVIEW SECTION: Shows selected image or recorded audio -->
+    <div class="previews-container">
+      @if (imagePreviewUrl(); as imageUrl) {
+        <div class="preview-item">
+          <div class="preview-wrapper">
+            <img [src]="imageUrl" alt="Image preview">
+            <button class="remove-media-button" (click)="removeImage()" title="Remove image">×</button>
+          </div>
+        </div>
+      }
+      @if (audioPreviewUrl(); as audioUrl) {
+        <div class="preview-item">
+          <div class="preview-wrapper">
+            <audio [src]="audioUrl" controls></audio>
+            <button class="remove-media-button" (click)="removeAudio()" title="Remove audio">×</button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- ACTIONS FOOTER: Groups all buttons together -->
+    <div class="actions-footer">
+      <div class="media-upload">
+        <label for="image-upload" class="media-label" title="Add Image">📷</label>
+        <input 
+          id="image-upload" 
+          type="file" 
+          (change)="onImageSelected($event)" 
+          (click)="$event.target.value = ''"
+          accept="image/*" 
+          hidden>
+        
+        <button (click)="toggleRecordAudio()" class="media-label" title="Record Audio">🎤</button>
+      </div>
+      
+      <!-- The main Post button with submitting state -->
+      <button class="submit-button" (click)="addPost()" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Posting...' : 'Post' }}
+      </button>
+    </div>
+
+    <!-- ERROR MESSAGE DISPLAY: Shows feedback if something goes wrong -->
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+  </div>
+</div>
+
+<!-- MODAL OVERLAY for the audio recorder -->
+@if (showRecordAudio()) {
+  <div class="modal-overlay">
+    <app-record-audio 
+      (audioSaved)="onAudioSaved($event)" 
+      (closed)="onAudioRecorderClosed()">
+    </app-record-audio>
+  </div>
+}

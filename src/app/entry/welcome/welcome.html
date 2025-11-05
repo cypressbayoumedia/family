@@ -1,0 +1,51 @@
+@if (!familiesService.isLoading() && !familiesService.currentFamilyId()) {
+    <div class="welcome-container">
+      <h2>Welcome to Family Hub!</h2>
+      <p>To get started, create a new family space or join one using an invite code.</p>
+      
+      <!-- =================================================== -->
+      <!-- NEW: Conditionally show the name input -->
+      <!-- This block will only appear for users who signed up with -->
+      <!-- email/password and therefore have no display name. -->
+      <!-- =================================================== -->
+      @if (!currentUser()?.displayName) {
+        <div class="name-prompt-card">
+          <h3>First, what should we call you?</h3>
+          <input 
+            [(ngModel)]="userName" 
+            placeholder="Enter your full name" 
+            class="name-input">
+        </div>
+      }
+  
+      <!-- Action Card for Creating a Family -->
+      <div class="action-card">
+        <h3>Create a New Family</h3>
+        <input 
+          [(ngModel)]="familyName" 
+          placeholder="e.g., The Smith Family">
+        <!-- Disable button if name is required but not filled in -->
+        <button 
+          (click)="create()" 
+          [disabled]="!currentUser()?.displayName && !userName().trim()">
+          Create Family
+        </button>
+      </div>
+  
+      <div class="separator">or</div>
+  
+      <!-- Action Card for Joining a Family -->
+      <div class="action-card">
+        <h3>Join an Existing Family</h3>
+        <input 
+          [(ngModel)]="familyId" 
+          placeholder="Enter Invite Code">
+        <!-- Disable button if name is required but not filled in -->
+        <button 
+          (click)="join()" 
+          [disabled]="!currentUser()?.displayName && !userName().trim()">
+          Join Family
+        </button>
+      </div>
+    </div>
+  }

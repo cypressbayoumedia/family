@@ -1,0 +1,39 @@
+<div class="post-card">
+  
+  <!-- HEADER: Shows who posted and when -->
+  <div class="post-header">
+    <div class="avatar">
+      <!-- A simple, clean avatar using the first letter of the author's name -->
+      <span>{{ post().authorName.charAt(0) }}</span>
+    </div>
+    <div class="author-info">
+      <span class="author-name">{{ post().authorName }}</span>
+      <!-- The ?.toDate() is a safety check in case createdAt is null before saving -->
+      <span class="post-timestamp">{{ post().createdAt?.toDate() | date:'short' }}</span>
+    </div>
+  </div>
+
+  <!-- BODY: Contains the main content and any media -->
+  <div class="post-body">
+    <!-- Only show the <p> tag if there is text content -->
+    @if (post().content) {
+      <p class="post-content">{{ post().content }}</p>
+    }
+    
+    <!-- A container for the media to control spacing -->
+    <div class="post-media">
+      @if (post().imageUrl) {
+        <img [src]="post().imageUrl" alt="Post image" class="post-image">
+      }
+      @if (post().audioUrl) {
+        <audio controls [src]="post().audioUrl" class="post-audio"></audio>
+      }
+    </div>
+  </div>
+
+  <!-- FOOTER: For actions like comments and likes (designed for the future) -->
+  <div class="post-footer">
+    <button class="action-button">Comment</button>
+  </div>
+
+</div>
