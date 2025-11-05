@@ -1,21 +1,9 @@
 import { Injectable, inject, signal, effect, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  Firestore,
-  doc,
-  docData,
-  setDoc,
-  collection,
-  addDoc,
-  updateDoc,
-  arrayUnion,
-  where,
-  query,
-  collectionData,
-  getDoc
-} from '@angular/fire/firestore';
-import { AuthService } from './auth'; // Adjust path as needed
-import { Subscription } from 'rxjs';
+import { Firestore, doc, docData, setDoc, collection, addDoc, updateDoc, arrayUnion, where, query, collectionData, getDoc, writeBatch } from '@angular/fire/firestore';
+import { AuthService } from './auth';
+import { Subscription, combineLatest, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { User } from '@angular/fire/auth';
 
 // Define an interface for a family member for type safety
@@ -26,6 +14,11 @@ export interface FamilyMember {
   birthday?: string; // Optional for now
   role?: 'admin' | 'member';
 }
+export interface Family {
+  id: string;
+  name: string;
+  members: { uid: string; role: string; }[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -35,27 +28,31 @@ export class Families implements OnDestroy {
   private readonly authService: AuthService = inject(AuthService);
   private readonly router: Router = inject(Router);
 
-  // --- Public Signals for Application State ---
-  public readonly currentFamilyId = signal<string | null>(null);
-  public readonly currentFamilyMembers = signal<FamilyMember[]>([]);
+  // --- RENAMED: `currentFamilyId` is now `activeFamilyId` for clarity ---
+  public readonly activeFamilyId = signal<string | null>(null);
+  public readonly activeFamily = signal<Family | null>(null);
+  public readonly activeFamilyMembers = signal<FamilyMember[]>([]);
+  
+  // --- NEW: A signal to hold the list of ALL families the user is in ---
+  public readonly allUserFamilies = signal<Family[]>([]);
+  
   public readonly isLoading = signal<boolean>(true);
 
-  // --- Private Subscriptions for Cleanup ---
   private userSub: Subscription | null = null;
+  private familySub: Subscription | null = null;
   private membersSub: Subscription | null = null;
+  private allFamiliesSub: Subscription | null = null; // New subscription
 
   constructor() {
     // This effect is the reactive core of the service.
     // It automatically runs whenever the authentication state changes.
     effect(() => {
-      this.cleanupSubscriptions(); // Clean up old subscriptions first
+      this.cleanupSubscriptions();
       const user = this.authService.currentUser();
 
       if (user) {
-        // User is logged in, fetch their profile to find their familyId
-        this.fetchUserProfile(user);
+        this.fetchUserProfileAndMemberships(user);
       } else {
-        // User is logged out, clear all family data
         this.resetFamilyState();
       }
     });
@@ -67,24 +64,28 @@ export class Families implements OnDestroy {
    */
   async createFamily(familyName: string, userName?: string): Promise<void> {
     const user = this.authService.currentUser();
-    if (!user) throw new Error("User must be logged in to create a family.");
+    if (!user) throw new Error("User must be logged in.");
+    if (userName) await this.authService.updateUserDisplayName(userName);
 
-    // If a user name was provided, update the profile first.
-    if (userName) {
-      await this.authService.updateUserDisplayName(userName);
-    }
-    
-    const familyCollection = collection(this.firestore, 'families');
-    const newFamilyRef = await addDoc(familyCollection, {
+    const batch = writeBatch(this.firestore);
+
+    // 1. Create the new family document
+    const familyRef = doc(collection(this.firestore, 'families'));
+    batch.set(familyRef, {
       name: familyName,
       createdAt: new Date(),
       members: [{ uid: user.uid, role: 'admin' }]
     });
 
-    const userDocRef = doc(this.firestore, `users/${user.uid}`);
-    await updateDoc(userDocRef, { familyId: newFamilyRef.id });
+    // 2. Update the user's profile with the new membership and set it as active
+    const userRef = doc(this.firestore, `users/${user.uid}`);
+    batch.update(userRef, {
+      activeFamilyId: familyRef.id,
+      familyMemberships: arrayUnion({ familyId: familyRef.id, role: 'admin' })
+    });
 
-    this.router.navigate(['']);
+    await batch.commit();
+    this.router.navigate(['/dashboard']);
   }
 
   /**
@@ -93,45 +94,69 @@ export class Families implements OnDestroy {
    */
   async joinFamily(familyId: string, userName?: string): Promise<void> {
     const user = this.authService.currentUser();
-    if (!user) throw new Error("User must be logged in to join a family.");
+    if (!user) throw new Error("User must be logged in.");
+    if (userName) await this.authService.updateUserDisplayName(userName);
 
-    // If a user name was provided, update the profile first.
-    if (userName) {
-      await this.authService.updateUserDisplayName(userName);
-    }
+    const familyRef = doc(this.firestore, `families/${familyId}`);
+    const familySnap = await getDoc(familyRef);
+    if (!familySnap.exists()) throw new Error("No family found with that ID.");
 
-    const familyDocRef = doc(this.firestore, `families/${familyId}`);
-    const familySnap = await getDoc(familyDocRef);
-    if (!familySnap.exists()) {
-      throw new Error("No family found with that ID. Please check the code.");
-    }
+    const batch = writeBatch(this.firestore);
 
-    await updateDoc(familyDocRef, {
+    // 1. Add user to the family's member list
+    batch.update(familyRef, {
       members: arrayUnion({ uid: user.uid, role: 'member' })
     });
+    
+    // 2. Add membership to user's profile and set it as active
+    const userRef = doc(this.firestore, `users/${user.uid}`);
+    batch.update(userRef, {
+      activeFamilyId: familyId,
+      familyMemberships: arrayUnion({ familyId: familyId, role: 'member' })
+    });
 
-    const userDocRef = doc(this.firestore, `users/${user.uid}`);
-    await updateDoc(userDocRef, { familyId: familyId }); // Corrected a small bug here
-
+    await batch.commit();
     this.router.navigate(['']);
   }
-  /**
+
+
+  /*
    * Fetches the user's own profile document to find their assigned familyId.
    */
-  private fetchUserProfile(user: User): void {
+  private fetchUserProfileAndMemberships(user: User): void {
     const userDocRef = doc(this.firestore, `users/${user.uid}`);
     this.userSub = docData(userDocRef).subscribe((userData: any) => {
-      if (userData && userData.familyId) {
-        this.currentFamilyId.set(userData.familyId);
-        // Now that we have the familyId, fetch all members of that family
-        this.fetchFamilyMembers(userData.familyId);
+      if (userData?.activeFamilyId) {
+        if (this.activeFamilyId() !== userData.activeFamilyId) {
+          this.activeFamilyId.set(userData.activeFamilyId);
+          this.fetchFamilyDetails(userData.activeFamilyId);
+          this.fetchFamilyMembers(userData.activeFamilyId);
+        }
+      }
+      
+      if (userData?.familyMemberships && userData.familyMemberships.length > 0) {
+        this.fetchAllUserFamilies(userData.familyMemberships.map((m: any) => m.familyId));
       } else {
-        // This user exists but isn't part of a family yet
         this.resetFamilyState();
       }
     });
   }
 
+  private fetchAllUserFamilies(familyIds: string[]): void {
+    const familiesCollection = collection(this.firestore, 'families');
+    const q = query(familiesCollection, where('__name__', 'in', familyIds));
+    
+    this.allFamiliesSub = collectionData(q, { idField: 'id' }).subscribe(families => {
+      this.allUserFamilies.set(families as Family[]);
+    });
+  }
+
+  private fetchFamilyDetails(familyId: string): void {
+    const familyDocRef = doc(this.firestore, `families/${familyId}`);
+    this.familySub = docData(familyDocRef, { idField: 'id' }).subscribe(familyData => {
+      this.activeFamily.set(familyData as Family);
+    });
+  }
   /**
    * Fetches all user documents that belong to a given familyId.
    */
@@ -140,7 +165,7 @@ export class Families implements OnDestroy {
     const q = query(usersCollection, where('familyId', '==', familyId));
     
     this.membersSub = collectionData(q, { idField: 'uid' }).subscribe(members => {
-      this.currentFamilyMembers.set(members as FamilyMember[]);
+      this.activeFamilyMembers.set(members as FamilyMember[]);
       this.isLoading.set(false);
     });
   }
@@ -149,19 +174,19 @@ export class Families implements OnDestroy {
    * Resets all family-related state and signals.
    */
   private resetFamilyState(): void {
-    this.currentFamilyId.set(null);
-    this.currentFamilyMembers.set([]);
+    this.activeFamilyId.set(null);
+    this.activeFamily.set(null);
+    this.activeFamilyMembers.set([]);
+    this.allUserFamilies.set([]); // Reset the new signal
     this.isLoading.set(false);
   }
 
-  /**
-   * Unsubscribes from all active Firestore listeners to prevent memory leaks.
-   */
   private cleanupSubscriptions(): void {
     this.userSub?.unsubscribe();
+    this.familySub?.unsubscribe();
     this.membersSub?.unsubscribe();
+    this.allFamiliesSub?.unsubscribe(); // Clean up the new subscription
   }
-
   ngOnDestroy(): void {
     this.cleanupSubscriptions();
   }

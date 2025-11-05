@@ -15,7 +15,7 @@ export class InviteMembers {
   private familiesService = inject(Families);
 
   // Expose the current family ID to the template
-  familyId = this.familiesService.currentFamilyId;
+  familyId = this.familiesService.activeFamilyId;
 
   // Signal to check if the Web Share API is available on this device
   canShare = signal<boolean>(!!navigator.share);

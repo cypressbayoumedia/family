@@ -46,5 +46,16 @@ export const routes: Routes = [
     loadComponent: () => import('./components/invite-members/invite-members').then(m => m.InviteMembers),
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },{
+    path: 'post/:postId', // The ':postId' is a dynamic parameter
+    loadComponent: () => import('./posts/post-details/post-details').then(m => m.PostDetails),
+    canActivate: [AuthGuard], // Protect this route
+    data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },
+  {
+    path: 'manage-hubs',
+    loadComponent: () => import('./pages/manage-families/manage-families').then(m => m.ManageFamilies),
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin }
   },
 ];

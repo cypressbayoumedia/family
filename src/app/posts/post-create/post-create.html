@@ -35,7 +35,9 @@
     <!-- ACTIONS FOOTER: Groups all buttons together -->
     <div class="actions-footer">
       <div class="media-upload">
-        <label for="image-upload" class="media-label" title="Add Image">📷</label>
+        <label for="image-upload" class="media-label" title="Add Image"><span class="material-symbols-rounded">
+          image
+          </span></label>
         <input 
           id="image-upload" 
           type="file" 
@@ -44,7 +46,9 @@
           accept="image/*" 
           hidden>
         
-        <button (click)="toggleRecordAudio()" class="media-label" title="Record Audio">🎤</button>
+        <button (click)="toggleRecordAudio()" class="media-label" title="Record Audio"><span class="material-symbols-rounded">
+          mic
+          </span></button>
       </div>
       
       <!-- The main Post button with submitting state -->

@@ -1,5 +1,5 @@
 import { inject, Injectable, computed } from '@angular/core';
-import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, doc } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, doc, docData } from '@angular/fire/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { Observable, of } from 'rxjs';
@@ -32,17 +32,14 @@ export class Posts {
   private readonly authService = inject(AuthService);
   private readonly familiesService = inject(Families);
 
-  // --- REACTIVE Posts Observable ---
-  // This is the primary public property. Components will subscribe to this.
+
   public readonly posts$: Observable<Post[]>;
 
   constructor() {
-    // Convert the familyId signal into an observable.
-    const familyId$ = toObservable(this.familiesService.currentFamilyId);
+    
+    const familyId$ = toObservable(this.familiesService.activeFamilyId);
 
-    // The magic is here: `switchMap` creates a reactive pipeline.
-    // If the familyId changes (e.g., user logs out and in), it will automatically
-    // cancel the old Firestore subscription and create a new one for the new family.
+
     this.posts$ = familyId$.pipe(
       switchMap(familyId => {
         if (!familyId) {
@@ -57,13 +54,17 @@ export class Posts {
     );
   }
 
-  /**
-   * Adds a new post to the current user's family feed.
-   * This is now much more secure and context-aware.
-   */
+  getPostById(familyId: string, postId: string): Observable<Post | undefined> {
+    if (!familyId || !postId) {
+      return of(undefined); // Return nothing if IDs are missing
+    }
+    const postDocRef = doc(this.afs, `families/${familyId}/posts/${postId}`);
+    return docData(postDocRef, { idField: 'id' }) as Observable<Post>;
+  }
+  
   async addPost(postContent: { content: string }, imageFile?: File | null, audioFile?: File | null): Promise<void> {
     const user = this.authService.currentUser();
-    const familyId = this.familiesService.currentFamilyId();
+    const familyId = this.familiesService.activeFamilyId();
 
     // --- Guard Clauses: Fail early if essential data is missing. ---
     if (!user) throw new Error('User must be logged in to create a post.');

@@ -97,3 +97,8 @@
 .action-button:hover {
   background-color: #f3f4f6;
 }
+
+.post-card-link {
+  text-decoration: none; /* Removes the default link underline */
+  color: inherit; /* Makes the text color normal */
+}

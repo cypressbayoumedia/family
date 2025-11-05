@@ -59,6 +59,15 @@ export class AuthService implements OnDestroy {
     }
   }
 
+
+  async switchActiveFamily(familyId: string): Promise<void> {
+    const user = this.currentUser();
+    if (!user) throw new Error("User must be logged in to switch families.");
+
+    const userDocRef = doc(this.firestore, `users/${user.uid}`);
+    await updateDoc(userDocRef, { activeFamilyId: familyId });
+  }
+
   /**
    * Signs in an existing user and navigates them to the main dashboard.
    */

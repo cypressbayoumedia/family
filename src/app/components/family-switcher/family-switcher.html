@@ -1,0 +1,11 @@
+@if (allFamilies().length > 1) {
+    <div class="switcher-container">
+    <select class="family-select" (change)="switchFamily($event)">
+    @for (family of allFamilies(); track family.id) {
+    <option [value]="family.id" [selected]="family.id === activeFamily()?.id">
+    {{ family.name }}
+    </option>
+    }
+    </select>
+    </div>
+    }

@@ -1,1 +1,57 @@
-<p>post-details works!</p>
+
+<div class="details-container">
+  @if (post$ | async; as post) {
+    <div class="post-details-card">
+      <header class="details-header">
+        <a routerLink="" class="back-button">← Back to Feed</a>
+        <div class="author-info">
+          <div class="avatar">{{ post.authorName.charAt(0) }}</div>
+          <div>
+            <span class="author-name">{{ post.authorName }}</span>
+            <span class="post-timestamp">{{ post.createdAt?.toDate() | date:'fullDate' }}</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="post-body">
+        @if (post.content) {
+          <p class="post-content">{{ post.content }}</p>
+        }
+        
+        <div class="post-media">
+          @if (post.imageUrl) {
+            <div class="image-container">
+              <img 
+                [src]="post.imageUrl" 
+                alt="Post image" 
+                class="post-image"
+                (click)="zoomIn()"
+                title="Click to zoom in">
+              <!-- The explicit Download button -->
+              <a [href]="post.imageUrl" download class="download-button">
+                Download Image
+              </a>
+            </div>
+          }
+          @if (post.audioUrl) {
+            <audio controls [src]="post.audioUrl" class="post-audio"></audio>
+          }
+        </div>
+      </div>
+    </div>
+  } @else {
+    <p>Loading post...</p>
+  }
+</div>
+
+<!-- ZOOM MODAL: This is hidden by default and appears on top of the page -->
+@if ((post$ | async)?.imageUrl; as imageUrl) {
+  @if (isImageZoomed()) {
+    <div class="modal-overlay" (click)="zoomOut()">
+      <div class="modal-content">
+        <button class="close-button" (click)="zoomOut()" title="Close">&times;</button>
+        <img [src]="imageUrl" alt="Zoomed post image">
+      </div>
+    </div>
+  }
+}

@@ -1,49 +1,158 @@
-/* Styles for the authenticated view */
+/* --- Main Header Layout --- */
 .app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background-color: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  
-  .app-header h1 {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #1f2937;
-    margin: 0;
-  }
-  
-  .app-header nav {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .create-post-button {
-    background-color: #4f46e5;
-    color: white;
-    padding: 0.6rem 1.2rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-  }
-  
-  .sign-out-button {
-    background-color: #e5e7eb;
-    color: #1f2937;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  
-  .loading-indicator {
-    text-align: center;
-    padding: 4rem;
-    font-size: 1.5rem;
-    color: #6b7280;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Added subtle shadow */
+}
+.family-indicator {
+  /* --- KEY PROPERTIES FOR ALIGNMENT --- */
+  display: flex;        /* This is the magic! It aligns child elements in a row. */
+  align-items: center;  /* This vertically centers the icon and the text. */
+  gap: 0.5rem;          /* This adds a nice, consistent space between the icon and text. */
+
+  /* --- Your existing styles for the "pill" look --- */
+  background-color: #f3f4f6;
+  color: #374151;
+  padding: 0.5rem 1rem;
+  border-radius: 20px; /* pill shape */
+  font-weight: 600;
+  border: 1px solid #e5e7eb;
+}
+
+/* Optional but recommended: Explicitly style the icon for consistent size and color */
+.family-indicator .material-symbols-rounded {
+  font-size: 20px; /* Controls the size of the icon */
+  color: #6b7280; /* A slightly muted color for the icon */
+}
+
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* Consistent spacing */
+}
+
+.logo {
+  font-size: 2rem; /* Slightly larger for more impact */
+  font-weight: 800; /* Bolder font weight */
+  color: #111827;
+  margin: 0;
+}
+
+/* --- Reusable Button Styles --- */
+.button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Primary button (e.g., "Create Post") */
+.button-primary {
+  background-color: #4f46e5; /* Your existing color */
+  color: white;
+}
+.button-primary:hover {
+  background-color: #4338ca;
+  transform: translateY(-2px);
+}
+
+/* Secondary button (e.g., "Invite") */
+.button-secondary {
+  background-color: #eef2ff; /* A light purple that matches your primary color */
+  color: #4338ca;
+}
+.button-secondary:hover {
+  background-color: #e0e7ff;
+}
+
+/* --- User Menu Dropdown --- */
+.user-menu {
+  position: relative; /* This is the anchor for the dropdown menu */
+}
+
+.user-menu-button {
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.user-menu-button .material-symbols-rounded {
+  font-size: 28px;
+  color: #4b5563;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px); /* Position it below the button with a small gap */
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  width: 200px;
+  padding: 0.5rem;
+  z-index: 100;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #374151;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600; /* Making dropdown items bold like your other buttons */
+}
+
+.dropdown-item:hover {
+  background-color: #f3f4f6;
+}
+
+.dropdown-item .material-symbols-rounded {
+  color: #6b7280;
+}
+
+/* --- Invite Members Modal --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* --- Loading Indicator --- */
+.loading-indicator {
+  text-align: center;
+  padding: 4rem;
+  font-size: 1.5rem;
+  color: #6b7280;
+}

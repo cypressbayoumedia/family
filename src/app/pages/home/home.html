@@ -1,34 +1,94 @@
-<!-- First, check if the auth state is still loading to prevent flicker -->
+<!-- This is the main conditional logic for the entire page -->
 @if (authService.loading()) {
-    <!-- Optional: Show a loading spinner or skeleton screen here -->
-    <p class="loading-indicator">Loading...</p>
-  } @else {
-  
-    <!-- If loading is finished, check if a user is logged in -->
-    @if (authService.currentUser()) {
-      
-      <!-- ================================== -->
-      <!-- AUTHENTICATED VIEW (Your Original Code) -->
-      <!-- ================================== -->
-      <header class="app-header">
-        <h1>The Familee.</h1>
-        <nav>
-          <!-- Add a sign out button! -->
-          <a routerLink="/create-post" class="create-post-button">Create Post</a>
-          <button (click)="authService.signOut()" class="sign-out-button">Sign Out</button>
-        </nav>
-      </header>
-      <main>
-        @if (familiesService.currentFamilyId()) {
-          <button routerLink="/invite-members">Invite Members</button>
-        }
-        
-        <app-post-list />
-      </main>
-  
-    } @else {
-  
-      <app-landing />
-  
+  <p class="loading-indicator">Loading...</p>
+} @else {
+
+  <!-- This block renders only when a user is logged in -->
+  @if (authService.currentUser()) {
+    @if (familiesService.activeFamily(); as family) {
+      <div class="family-indicator">
+        <!-- Using the material icon you requested -->
+        <span class="material-symbols-rounded">house</span>
+        <span>{{ family.name }}</span>
+      </div>
     }
+    <!-- AUTHENTICATED VIEW: The new, clean header -->
+    <header class="app-header">
+      
+      <!-- Left Side: Logo and the interactive family switcher -->
+      <div class="header-left">
+        <h1 class="logo">The Familee.</h1>
+        @if (familiesService.allUserFamilies().length > 1) {
+          <!-- If YES, show the interactive dropdown switcher -->
+          <app-family-switcher></app-family-switcher>
+        } @else {
+          <!-- If NO, show the simple, non-interactive name indicator -->
+          @if (familiesService.activeFamily(); as family) {
+            <div class="family-indicator">
+              <!-- Using the material icon you requested -->
+              <span class="material-symbols-rounded">house</span>
+              <span>{{ family.name }}</span>
+            </div>
+          }
+        }
+      </div>
+      
+      <!-- Right Side: All user actions -->
+      <div class="header-right">
+        
+        <!-- "Invite Members" Button (opens a modal) -->
+        <button class="button button-secondary" (click)="openInviteModal()">
+          <span class="material-symbols-rounded">group_add</span>
+          Invite
+        </button>
+        
+        <!-- "Create Post" Button (Primary Action) -->
+        <a routerLink="/create-post" class="button button-primary">
+          <span class="material-symbols-rounded">add</span>
+          Create Post
+        </a>
+        
+        <!-- User Menu Dropdown -->
+        <div class="user-menu">
+          <button class="user-menu-button" (click)="toggleUserMenu()">
+            <span class="material-symbols-rounded">account_circle</span>
+          </button>
+          
+          <!-- The dropdown menu itself, shown/hidden by a signal -->
+          @if (isUserMenuOpen()) {
+            <div class="dropdown-menu">
+              <!-- Your "Manage Families" link is now neatly inside the menu -->
+              <a routerLink="/manage-hubs" class="dropdown-item">
+                <span class="material-symbols-rounded">settings</span>
+                Manage Hubs
+              </a>
+              <button (click)="authService.signOut()" class="dropdown-item">
+                <span class="material-symbols-rounded">logout</span>
+                Sign Out
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </header>
+
+    <!-- The Invite Members component, now shown in a modal overlay -->
+    @if (isInviteModalOpen()) {
+      <div class="modal-overlay" (click)="closeInviteModal()">
+        <!-- This inner div prevents the modal from closing when you click inside it -->
+        <div (click)="$event.stopPropagation()">
+          <app-invite-members></app-invite-members>
+        </div>
+      </div>
+    }
+
+    <!-- The main content of the dashboard -->
+    <main>
+      <app-post-list />
+    </main>
+
+  } @else {
+    <!-- UNAUTHENTICATED VIEW: Renders the landing page -->
+    <app-landing />
   }
+}

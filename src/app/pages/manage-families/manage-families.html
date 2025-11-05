@@ -1,0 +1,39 @@
+<div class="manage-hubs-container">
+    <div class="manage-hubs-card">
+      <a routerLink="" class="back-button">← Back to Dashboard</a>
+      <h2>Manage Your Family Hubs</h2>
+      <p class="subtitle">Expand your circle by creating a new hub or joining another one.</p>
+  
+      <!-- Create a New Hub Section -->
+      <div class="action-section">
+        <h3>Create a New Family/Hub</h3>
+        <input 
+          [(ngModel)]="newFamilyName" 
+          placeholder="e.g., The Cousins Crew">
+        <button (click)="createHub()" [disabled]="isLoading()">
+          {{ isLoading() ? 'Creating...' : 'Create Hub' }}
+        </button>
+      </div>
+  
+      <div class="separator">or</div>
+  
+      <!-- Join an Existing Hub Section -->
+      <div class="action-section">
+        <h3>Join an Existing Family/Hub</h3>
+        <input 
+          [(ngModel)]="inviteCode" 
+          placeholder="Enter Invite Code">
+        <button (click)="joinHub()" [disabled]="isLoading()">
+          {{ isLoading() ? 'Joining...' : 'Join Hub' }}
+        </button>
+      </div>
+      
+      <!-- Display feedback messages to the user -->
+      @if (errorMessage()) {
+        <p class="feedback-message error">{{ errorMessage() }}</p>
+      }
+      @if (successMessage()) {
+        <p class="feedback-message success">{{ successMessage() }}</p>
+      }
+    </div>
+  </div>
