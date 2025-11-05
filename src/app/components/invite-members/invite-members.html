@@ -1,0 +1,28 @@
+<button routerLink="">back to feed</button>
+<div class="invite-card">
+
+    <h3>Invite Your Family</h3>
+    <p>Share this code with family members so they can join your hub.</p>
+    
+    <div class="invite-code-wrapper">
+      <!-- Display the family ID (the invite code) -->
+      <span class="invite-code">{{ familyId() }}</span>
+    </div>
+  
+    <!-- This section intelligently shows the best sharing option for the user's device -->
+    <div class="actions">
+      
+      <!-- If the native Share API is available (Mobile), show this button -->
+      @if (canShare()) {
+        <button class="share-button" (click)="nativeShare()">
+          Share Invite
+        </button>
+      } @else {
+        <!-- Otherwise (Desktop), show the "Copy" button as a fallback -->
+        <button class="share-button" (click)="copyToClipboard()">
+          <!-- The button text changes to give the user feedback -->
+          {{ copied() ? 'Copied!' : 'Copy Code' }}
+        </button>
+      }
+    </div>
+  </div>

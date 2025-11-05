@@ -40,5 +40,11 @@ export const routes: Routes = [
     loadComponent: () => import('./entry/welcome/welcome').then(m => m.Welcome),
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },{ 
+    path: 'invite-members',
+    // Use `loadComponent` with a dynamic import
+    loadComponent: () => import('./components/invite-members/invite-members').then(m => m.InviteMembers),
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin }
   },
 ];
