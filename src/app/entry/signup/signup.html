@@ -23,7 +23,7 @@
           <p class="error-message">{{ errorMessage() }}</p>
         }
   
-        <button type="submit" class="auth-button" [disabled]="isLoading()">
+        <button type="submit" class="auth-button" [disabled]="isLoading() || !name() || !email() || !password()">
           {{ isLoading() ? 'Creating Account...' : 'Create Account' }}
         </button>
       </form>
