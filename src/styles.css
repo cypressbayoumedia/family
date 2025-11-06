@@ -2,11 +2,12 @@
 body, html {
     margin: 0;
     padding: 0;
-    font-optical-sizing: auto;;
+    font-family: 'Roboto Mono', monospace !important;
+    font-optical-sizing: auto;
     
   }
   :root{
-    font-family: "Source Code Pro", monospace !important;
+    font-family: "Roboto Mono", monospace !important;
     background-color: #FDFBF7;
   }
   .material-symbols-rounded {
