@@ -1,18 +1,150 @@
-<div class="landing-container">
-    <div class="hero-section">
-    <h1>Welcome to The Familee.</h1>
-    <p class="subtitle">The private, secure place for your entire extended family to connect, share, and stay safe.</p>
-    <div class="cta-buttons">
-    <a routerLink="/signup" class="button-primary">Get Started for Free</a>
-    <a routerLink="/login" class="button-secondary">Log In</a>
-    </div>
-    </div>
-    <div class="features-section">
-    <h2>All Your Family Tools in One Place</h2>
-    <ul>
-    <li>✓ Private Family Feed for photos and updates</li>
-    <li>✓ Automated Birthday & Anniversary Reminders</li>
-    <li>✓ Secure 1-to-1 and Group Chat</li>
-    </ul>
-    </div>
-    </div>
+<!-- 
+  WIZ's NOTES:
+  This new structure is built around a narrative flow:
+  1.  Hero: Grab attention with the core value proposition — unifying family life.
+  2.  The Problem: Agitate the user's main pain point (digital fragmentation).
+  3.  The Solution (Features): Introduce the four key pillars of the app as the answer. This is the core of the pitch.
+  4.  Persona-Based Benefits: Show, don't just tell. Illustrate how the app specifically solves problems for each type of family member.
+  5.  Pricing: Be transparent and showcase the value of the premium plan. Highlighting "per family" is a key selling point.
+  6.  Final CTA: A last, confident call to action to get them to sign up.
+
+  The class names are descriptive and ready for modern CSS styling (like Flexbox or Grid) to bring the minimalist, "vintage paper and ink" brand aesthetic to life.
+-->
+
+<div class="landing-page-wrapper" style="background-color: #FDFBF7; color: #333333;">
+
+    <!-- HERO SECTION: The big promise -->
+    <section class="hero-section text-center">
+        <h1 class="hero-title">Tired of the family chaos across a dozen apps?</h1>
+        <p class="hero-subtitle">The Familee brings everyone together in one private, secure home for your most important connections. No ads. No public feeds. Just family.</p>
+        <div class="cta-buttons">
+            <a routerLink="/signup" class="button-primary">Start Your Family Hub for Free</a>
+            <a routerLink="/features" class="button-secondary">See How It Works</a>
+        </div>
+        <p class="trust-signal">Free forever plan available for up to 10 members.</p>
+    </section>
+
+    <!-- THE PROBLEM SECTION: A relatable pain point -->
+    <section class="problem-section text-center">
+        <h2 class="section-title">Your family life is scattered.</h2>
+        <p class="section-intro">Updates on Facebook, chats in WhatsApp, locations on Life360, planning in Google Calendar, gifts on Venmo... It's messy and impersonal.</p>
+        <div class="icon-chaos-display">
+            <!-- These would be logos of the apps you're replacing -->
+            <span>(Icon: Facebook)</span>
+            <span>(Icon: WhatsApp)</span>
+            <span>(Icon: Life360)</span>
+            <span>(Icon: Venmo)</span>
+            <span>(Icon: Calendar)</span>
+        </div>
+        <p class="solution-statement">The Familee brings it all home.</p>
+    </section>
+
+    <!-- FEATURES SECTION: The Four Pillars of the Solution -->
+    <section class="features-section">
+        <h2 class="section-title text-center">One App. Four Pillars. Total Connection.</h2>
+        <div class="features-grid">
+
+            <!-- Feature 1: The Family Circle (Social) -->
+            <div class="feature-card">
+                <span class="feature-icon">(Icon: Pen/Journal)</span>
+                <h3>The Family Circle: Your Private Journal</h3>
+                <p>Share life's moments in a space built only for you. From big announcements to quick "thinking of you" Doodles, this is your family's private story, safe from the outside world.</p>
+                <ul>
+                    <li>✓ Private feed for photos, videos, and updates</li>
+                    <li>✓ Fun "Doodle-Casts" for quick, personal notes</li>
+                    <li>✓ Share Prayer Requests, Recipes, and Verses</li>
+                    <li>✓ Secure 1-to-1 and group chat for everyone</li>
+                </ul>
+            </div>
+
+            <!-- Feature 2: The Family Map (Safety) -->
+            <div class="feature-card">
+                <span class="feature-icon">(Icon: Map Pin/Shield)</span>
+                <h3>The Family Map: Peace of Mind, Not a Tracker</h3>
+                <p>Get automatic alerts when loved ones arrive safely at school or home. Our map is built on trust, with granular controls that let everyone (especially teens) decide who sees their location and when.</p>
+                <ul>
+                    <li>✓ Opt-in private map of family members</li>
+                    <li>✓ Automated "Place Alerts" (Home, School, Work)</li>
+                    <li>✓ Granular controls for privacy "Circles"</li>
+                    <li>✓ Simple one-tap manual "I'm Safe!" check-ins</li>
+                </ul>
+            </div>
+
+            <!-- Feature 3: The Family Calendar (Planning) -->
+            <div class="feature-card">
+                <span class="feature-icon">(Icon: Calendar/Clock)</span>
+                <h3>The Family Calendar: Never Miss a Moment</h3>
+                <p>Finally, a single source of truth for every birthday, anniversary, and reunion. Get automatic reminders and easily coordinate the next big family potluck, all in one place.</p>
+                <ul>
+                    <li>✓ Automated Birthday & Anniversary Hub</li>
+                    <li>✓ Smart reminders so you never forget a card</li>
+                    <li>✓ Event planning with RSVPs</li>
+                    <li>✓ Shared "To-Bring" lists for potlucks</li>
+                </ul>
+            </div>
+
+            <!-- Feature 4: The Family Vault (Gifting) -->
+            <div class="feature-card">
+                <span class="feature-icon">(Icon: Gift/Vault)</span>
+                <h3>The Family Vault: Celebrate Instantly</h3>
+                <p>Turn a birthday reminder into a meaningful gift with a single tap. Securely send cash for graduations or chip in for a big group gift for mom, making generosity personal and effortless.</p>
+                <ul>
+                    <li>✓ Send secure cash gifts from a birthday notification</li>
+                    <li>✓ Create "Group Funds" for shared goals</li>
+                    <li>✓ Simple, encrypted wallet for each member</li>
+                    <li>✓ Powered by Stripe for bank-level security</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING SECTION: Clear, transparent value -->
+    <section class="pricing-section text-center">
+        <h2 class="section-title">A Simple Plan for Every Family</h2>
+        <p class="section-intro">Start for free and upgrade only when you need the full suite of powerful features.</p>
+        <div class="pricing-toggle">
+            <!-- This would be a toggle for Monthly/Yearly pricing -->
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Basic</h3>
+                <p class="price">Free</p>
+                <p class="price-desc">For getting started.</p>
+                <a routerLink="/signup" class="button-secondary">Get Started</a>
+                <ul class="pricing-features">
+                    <li>Up to 10 Family Members</li>
+                    <li>Full Family Circle (Feed & Chat)</li>
+                    <li>Full Family Calendar</li>
+                    <li>Basic Location Viewing</li>
+                    <li>1 Place Alert</li>
+                    <li>24-Hour Location History</li>
+                </ul>
+            </div>
+            <div class="pricing-card featured">
+                 <span class="featured-badge" style="background-color: #F6C0B5; color: #333333;">Best Value</span>
+                <h3>Plus</h3>
+                <p class="price">$9.99 <span class="price-period">/ month / family</span></p>
+                <p class="price-desc">Or $99 billed annually.</p>
+                <a routerLink="/signup-plus" class="button-primary">Upgrade Your Family</a>
+                <ul class="pricing-features">
+                    <li><strong>Everything in Basic, plus:</strong></li>
+                    <li><strong>Unlimited</strong> Family Members</li>
+                    <li><strong>Full Family Vault Access (Gifting)</strong></li>
+                    <li><strong>Unlimited</strong> Place Alerts</li>
+                    <li>30-Day Location History</li>
+                    <li>Advanced Safety Features (Coming Soon)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA SECTION -->
+    <section class="final-cta-section text-center">
+        <h2 class="hero-title">Reconnect your family today.</h2>
+        <p class="hero-subtitle">It takes less than 60 seconds to create your private family hub. Why wait?</p>
+        <div class="cta-buttons">
+            <a routerLink="/signup" class="button-primary">Get Started for Free</a>
+        </div>
+    </section>
+
+</div>
