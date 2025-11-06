@@ -31,7 +31,7 @@ export class Welcome {
     // This effect correctly redirects users who are already in a family
     effect(() => {
       if (this.familiesService.activeFamilyId() && !this.familiesService.isLoading()) {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['']);
       }
     });
   }
