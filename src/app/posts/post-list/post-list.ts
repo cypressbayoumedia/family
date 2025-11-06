@@ -6,7 +6,7 @@ import { PostItem } from '../post-item/post-item';
 
 @Component({
   selector: 'app-post-list',
-  imports: [CommonModule, PostItem, DatePipe],
+  imports: [CommonModule, PostItem],
   templateUrl: './post-list.html',
   styleUrl: './post-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
