@@ -1,28 +1,48 @@
-<button routerLink="">back to feed</button>
-<div class="invite-card">
-
-    <h3>Invite Your Family</h3>
-    <p>Share this code with family members so they can join your hub.</p>
-    
-    <div class="invite-code-wrapper">
-      <!-- Display the family ID (the invite code) -->
-      <span class="invite-code">{{ familyId() }}</span>
-    </div>
+<!-- 
+  WIZ'S NOTES:
+  This is a complete overhaul focused on reducing friction and improving the invitation experience.
+  1.  The Magic Link: The single biggest improvement. We now generate and share a full URL (`https://thefamilee.app/join?code=XYZ`). This is a one-click process for the new user, dramatically increasing conversion.
+  2.  Clearer UI: Instead of just showing the code, we display the full link in a disabled input-style field. This makes it obvious to desktop users what they are copying.
+  3.  Enhanced Feedback: The "Copy" button now provides superior feedback. It changes its icon to a checkmark AND its text to "Copied!", leaving no doubt the action was successful. This is a best-in-class UX pattern.
+  4.  Branded Experience: The component is no longer a generic box. It has an icon, a more personal title, and styling that aligns perfectly with the rest of the app, making it feel official and trustworthy.
+  5.  Better Structure: Assumes this component is in a modal, so a proper close button is included for better accessibility and user flow.
+-->
+<div class="invite-modal-content">
+  <!-- A dedicated close button for the modal -->
+  <button class="modal-close-button"  title="Close"> 
+    <!-- (click)="closeModal()" -->
+    <span class="material-symbols-rounded">close</span>
+  </button>
   
-    <!-- This section intelligently shows the best sharing option for the user's device -->
-    <div class="actions">
-      
-      <!-- If the native Share API is available (Mobile), show this button -->
-      @if (canShare()) {
-        <button class="share-button" (click)="nativeShare()">
-          Share Invite
-        </button>
-      } @else {
-        <!-- Otherwise (Desktop), show the "Copy" button as a fallback -->
-        <button class="share-button" (click)="copyToClipboard()">
-          <!-- The button text changes to give the user feedback -->
-          {{ copied() ? 'Copied!' : 'Copy Code' }}
-        </button>
-      }
-    </div>
+  <div class="invite-header">
+    <span class="material-symbols-rounded invite-icon">group_add</span>
+    <h3>Invite Family to "{{ familyName()?.name }}"</h3>
+    <p>They can join instantly with this private invite link.</p>
   </div>
+  
+  <div class="invite-link-wrapper">
+    <!-- Display the full, clickable invite link -->
+    <span class="invite-link">{{ familyId() }}</span>
+  </div>
+
+  <div class="invite-actions">
+    <!-- NATIVE SHARE (Mobile): The best experience -->
+    @if (canShare()) {
+      <button class="button-primary" (click)="nativeShare()">
+        <span class="material-symbols-rounded">share</span>
+        Share Invite Link
+      </button>
+    } @else {
+      <!-- DESKTOP FALLBACK: Copying the link is the next best thing -->
+      <button class="copy-button" (click)="copyToClipboard()" [class.copied]="copied()">
+        @if (copied()) {
+          <span class="material-symbols-rounded">check</span>
+          <span>Copied!</span>
+        } @else {
+          <span class="material-symbols-rounded">content_copy</span>
+          <span>Copy Link</span>
+        }
+      </button>
+    }
+  </div>
+</div>

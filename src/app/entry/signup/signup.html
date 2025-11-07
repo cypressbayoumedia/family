@@ -2,7 +2,9 @@
     <div class="auth-card">
       <h2>Create an Account</h2>
       <p class="subtitle">Get started by creating your account.</p>
-  
+      @if (inviteId()) {
+        <p class="invite-message">You've been invited to join a family! Create an account to accept.</p>
+      }
       <!-- Signup Form -->
       <form (ngSubmit)="onSignup()">
         <div class="input-group">

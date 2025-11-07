@@ -1,147 +1,153 @@
+/*
+  CSS for the Post Details page and its new features
+*/
+
 .details-container {
-    padding: 2rem 1rem;
-    background-color: #f3f4f6;
-    min-height: 100vh;
-  }
-  
-  .post-details-card {
-    max-width: 700px;
-    margin: auto;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    overflow: hidden; /* Ensures content stays within the card's rounded corners */
-  }
-  
-  .details-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  
-  .back-button {
-    display: inline-block;
-    margin-bottom: 1.5rem;
-    color: #4f46e5;
-    font-weight: 600;
-    text-decoration: none;
-  }
-  
-  .author-info {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  
-  .avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background-color: #4f46e5;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-  
-  .author-name {
-    display: block;
-    font-weight: 600;
-    color: #111827;
-  }
-  
-  .post-timestamp {
-    font-size: 0.9rem;
-    color: #6b7280;
-  }
-  
-  .post-body {
-    padding: 1.5rem;
-  }
-  
-  .post-content {
-    font-size: 1.1rem;
-    line-height: 1.7;
-    color: #374151;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-  
-  .post-media {
-    margin-top: 1.5rem;
-  }
-  
-  .image-container {
-    position: relative;
-  }
-  
-  .post-image {
-    width: 100%;
-    border-radius: 10px;
-    cursor: zoom-in;
-    border: 1px solid #e5e7eb;
-  }
-  
-  .download-button {
-    display: inline-block;
-    margin-top: 1rem;
-    background-color: #f3f4f6;
-    color: #374151;
-    padding: 0.6rem 1.2rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    border: 1px solid #d1d5db;
-    transition: background-color 0.2s;
-  }
-  
-  .download-button:hover {
-    background-color: #e5e7eb;
-  }
-  
-  .post-audio {
-    width: 100%;
-    margin-top: 1rem;
-  }
-  
-  /* --- ZOOM MODAL STYLES --- */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    padding: 1rem;
-    box-sizing: border-box;
-  }
-  
-  .modal-content {
-    position: relative;
-    max-width: 90vw;
-    max-height: 90vh;
-  }
-  
-  .modal-content img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  
-  .close-button {
-    position: absolute;
-    top: -40px;
-    right: -20px;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 3rem;
-    font-weight: 300;
-    cursor: pointer;
-    line-height: 1;
-  }
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.post-details-card {
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.details-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Re-using the back-link style for consistency */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.post-body {
+  padding: 1.5rem;
+}
+
+/* Author info is styled similarly to the post card for consistency */
+.author-info { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background-color: var(--accent-color); display: flex; align-items: center; justify-content: center; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-fallback { font-family: var(--font-heading); font-weight: 700; font-size: 1.5rem; color: var(--text-color); }
+.author-info > div:last-child { display: flex; flex-direction: column; }
+.author-name { font-weight: 700; font-size: 1.1rem; }
+.post-timestamp { font-size: 0.9rem; color: #666; }
+
+.post-content {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.image-container {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.post-image {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.download-button {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background-color: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+.download-button:hover {
+  background-color: rgba(0,0,0,0.8);
+}
+
+.post-audio {
+  width: 100%;
+}
+
+/* === Comments Section Styling === */
+.comments-section {
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-top: 2rem;
+  padding: 1.5rem;
+}
+
+.comments-header h3 {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  margin: 0 0 1.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.comment-form-area {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.comment-form-area textarea {
+  width: 100%;
+  min-height: 80px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  font-family: var(--font-body);
+}
+
+/* === Zoom Modal Styling === */
+.zoom-modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000;
+  padding: 2rem;
+}
+
+.zoom-modal-content {
+  position: relative;
+}
+
+.zoom-modal-content img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.modal-close-button {
+  position: absolute;
+  top: -40px;
+  right: -10px;
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 36px;
+  cursor: pointer;
+}

@@ -1,0 +1,170 @@
+/*
+  WIZ'S NOTES:
+  This single, unified stylesheet is designed to handle both your Login
+  and Signup forms. By sharing the same classes, you ensure a perfectly
+  consistent, professional, and trustworthy experience for the user,
+  whether they are signing up for the first time or logging back in.
+*/
+
+/* 1. Full-page container to center the card */
+.auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    padding: 2rem;
+  }
+  
+  /* 2. The main card holding the form */
+  .auth-card {
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-color);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+  }
+  
+  .auth-card h2 {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  .auth-card .subtitle {
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  
+  /* 3. The special invite message */
+  .invite-message {
+    background-color: #e3f2fd; /* A soft, welcoming blue */
+    color: #1e88e5;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  /* 4. Form and Input Styling */
+  .input-group {
+    margin-bottom: 1.25rem;
+    text-align: left;
+  }
+  
+  .input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    background-color: var(--bg-color);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  /* A clear, on-brand focus state for accessibility */
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(246, 192, 181, 0.5);
+  }
+  
+  /* 5. Error Message */
+  .error-message {
+    color: #D8000C;
+    background-color: #FFD2D2;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  /* 6. Buttons */
+  .auth-button, .google-button {
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    display: flex; /* For aligning icons if you add them */
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  
+  .auth-button {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    margin-top: 1.5rem; /* Space above the button */
+  }
+  .auth-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .google-button {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid var(--border-color);
+  }
+  .google-button:hover {
+    background-color: #f7f7f7;
+  }
+  /* For best results, add a Google SVG icon inside this button */
+  .google-button svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  
+  /* 7. The "or" separator */
+  .separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #999;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  .separator::before, .separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .separator:not(:empty)::before {
+    margin-right: .5em;
+  }
+  .separator:not(:empty)::after {
+    margin-left: .5em;
+  }
+  
+  /* 8. Footer Link */
+  .footer-text {
+    margin-top: 2rem;
+    color: #666;
+    font-size: 0.95rem;
+  }
+  .footer-text a {
+    color: var(--text-color);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .footer-text a:hover {
+    text-decoration: underline;
+  }

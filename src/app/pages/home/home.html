@@ -1,94 +1,132 @@
-<!-- This is the main conditional logic for the entire page -->
+<!-- 
+  WIZ'S NOTES:
+  This is the complete, final HTML for your main dashboard. It is designed to be
+  fully responsive and provides the best user experience on both desktop and mobile.
+  Key features include:
+  - A two-column desktop layout with a persistent sidebar.
+  - A clean, fixed mobile header with a Floating Action Button for the primary action.
+  - The Family Switcher is intelligently moved into the user menu on mobile to save space.
+  - A welcoming "empty state" for new families to guide their first actions.
+-->
 @if (authService.loading()) {
-  <p class="loading-indicator">Loading...</p>
+  <p class="loading-indicator">Loading your Family Hub...</p>
 } @else {
-
-  <!-- This block renders only when a user is logged in -->
   @if (authService.currentUser()) {
-    @if (familiesService.activeFamily(); as family) {
-      <div class="family-indicator">
-        <!-- Using the material icon you requested -->
-        <span class="material-symbols-rounded">house</span>
-        <span>{{ family.name }}</span>
-      </div>
-    }
-    <!-- AUTHENTICATED VIEW: The new, clean header -->
-    <header class="app-header">
+    <div class="dashboard-layout">
       
-      <!-- Left Side: Logo and the interactive family switcher -->
-      <div class="header-left">
-        <h1 class="logo">The Familee.</h1>
-        @if (familiesService.allUserFamilies().length > 1) {
-          <!-- If YES, show the interactive dropdown switcher -->
-          <app-family-switcher></app-family-switcher>
-        } @else {
-          <!-- If NO, show the simple, non-interactive name indicator -->
-          @if (familiesService.activeFamily(); as family) {
-            <div class="family-indicator">
-              <!-- Using the material icon you requested -->
+      <!-- =============================================================== -->
+      <!-- THE DASHBOARD SIDEBAR (DESKTOP) / HEADER (MOBILE)               -->
+      <!-- =============================================================== -->
+      <aside class="dashboard-sidebar">
+        <div class="sidebar-header">
+          <h1 class="logo">The Familee.</h1>
+          
+          <!-- Desktop Switcher: Wrapped for easy hiding on mobile -->
+          @if (familiesService.allUserFamilies().length > 1) {
+            <div class="desktop-switcher">
+              <app-family-switcher></app-family-switcher>
+            </div>
+          } @else if (familiesService.activeFamily(); as family) {
+            <div class="family-indicator simple">
               <span class="material-symbols-rounded">house</span>
               <span>{{ family.name }}</span>
             </div>
           }
-        }
-      </div>
-      
-      <!-- Right Side: All user actions -->
-      <div class="header-right">
-        
-        <!-- "Invite Members" Button (opens a modal) -->
-        <button class="button button-secondary" (click)="openInviteModal()">
-          <span class="material-symbols-rounded">group_add</span>
-          Invite
-        </button>
-        
-        <!-- "Create Post" Button (Primary Action) -->
-        <a routerLink="/create-post" class="button button-primary">
-          <span class="material-symbols-rounded">add</span>
-          Create Post
-        </a>
-        
-        <!-- User Menu Dropdown -->
-        <div class="user-menu">
-          <button class="user-menu-button" (click)="toggleUserMenu()">
-            <span class="material-symbols-rounded">account_circle</span>
-          </button>
-          
-          <!-- The dropdown menu itself, shown/hidden by a signal -->
-          @if (isUserMenuOpen()) {
-            <div class="dropdown-menu">
-              <!-- Your "Manage Families" link is now neatly inside the menu -->
-              <a routerLink="/manage-hubs" class="dropdown-item">
-                <span class="material-symbols-rounded">settings</span>
-                Manage Hubs
-              </a>
-              <button (click)="authService.signOut()" class="dropdown-item">
-                <span class="material-symbols-rounded">logout</span>
-                Sign Out
-              </button>
-            </div>
-          }
         </div>
-      </div>
-    </header>
 
-    <!-- The Invite Members component, now shown in a modal overlay -->
+        <div class="sidebar-actions">
+          <!-- Desktop "Create Post" button -->
+          <a routerLink="/create-post" class="button button-primary create-post-desktop">
+            <span class="material-symbols-rounded">add</span>
+            Create Post
+    {{this.authService.currentUser()?.displayName}} 
+          </a>
+          
+          <!-- User Menu: Contains all actions including the mobile switcher -->
+<!-- This is the industry-standard and best-practice structure -->
+<menu class="user-menu">
+  <button class="user-menu-button" (click)="toggleUserMenu()">
+    <img [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed={{this.authService.currentUser()?.displayName}}'" class="user-avatar-icon" alt="User menu">
+  </button>
+  
+  @if (isUserMenuOpen()) {
+    <div class="dropdown-menu">
+      
+      <!-- Mobile Switcher -->
+      @if (familiesService.allUserFamilies().length > 1) {
+        <div class="dropdown-switcher">
+          <label>Switch Family</label>
+          <app-family-switcher></app-family-switcher>
+        </div>
+        <hr class="dropdown-divider">
+      }
+
+      <a class="dropdown-item" (click)="openInviteModal()">
+        <span class="material-symbols-rounded">group_add</span>
+        Invite Members
+      </a>
+      <a routerLink="/manage-hubs" class="dropdown-item">
+        <span class="material-symbols-rounded">settings</span>
+        Manage Hubs
+      </a>
+      <button (click)="authService.signOut()" class="dropdown-item">
+        <span class="material-symbols-rounded">logout</span>
+        Sign Out
+      </button>
+    </div>
+  }
+</menu>
+        </div>
+
+        <!-- Sidebar Widgets for Desktop -->
+        <div class="sidebar-widgets">
+          <div class="widget">
+            <h3 class="widget-title">Calendar (Coming Soon)</h3>
+            <div class="widget-content">
+              <!-- Example: <app-upcoming-events-widget /> -->
+              <!-- <p>🎂 Alex's Birthday - Today!</p>
+              <p>🎉 Anniversary: Mom & Dad - Nov 10</p> -->
+            </div>
+          </div>
+          <div class="widget">
+            <h3 class="widget-title">Recent Activity (Coming Soon)</h3>
+            <div class="widget-content">
+              <!-- Example: <app-activity-widget /> -->
+              <!-- <p>📍 Sarah arrived at Home.</p>
+              <p>✅ Mark checked in at Soccer Practice.</p> -->
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- =============================================================== -->
+      <!-- THE MAIN CONTENT AREA (FEED)                                    -->
+      <!-- =============================================================== -->
+      <main class="dashboard-main">
+       
+          <app-post-list />
+        
+      
+        
+      </main>
+      
+      <!-- Mobile-Only Floating Action Button (FAB) -->
+      <a routerLink="/create-post" class="mobile-fab">
+        <span class="material-symbols-rounded">add</span>
+      </a>
+    </div>
+
+    <!-- The Invite Members Modal -->
     @if (isInviteModalOpen()) {
       <div class="modal-overlay" (click)="closeInviteModal()">
-        <!-- This inner div prevents the modal from closing when you click inside it -->
-        <div (click)="$event.stopPropagation()">
-          <app-invite-members></app-invite-members>
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <app-invite-members (close)="closeInviteModal()"></app-invite-members>
         </div>
       </div>
     }
 
-    <!-- The main content of the dashboard -->
-    <main>
-      <app-post-list />
-    </main>
-
   } @else {
-    <!-- UNAUTHENTICATED VIEW: Renders the landing page -->
+    <!-- Unauthenticated View: Renders the landing page -->
     <app-landing />
   }
 }

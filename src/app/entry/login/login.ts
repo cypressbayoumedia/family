@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/auth'; // Adjust path as needed
@@ -14,7 +14,7 @@ import { AuthService } from '../../core/auth'; // Adjust path as needed
 export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-
+  private route = inject(ActivatedRoute);
   // Form state signals
   email = signal('');
   password = signal('');
@@ -22,7 +22,7 @@ export class Login {
   // UI state signals
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
-
+  inviteId = signal<string | null>(null);
   /**
    * Handles the email/password login process.
    */
@@ -31,7 +31,7 @@ export class Login {
     this.errorMessage.set(null);
 
     try {
-      await this.authService.signInWithEmail(this.email(), this.password());
+      await this.authService.signInWithEmail(this.email(), this.password(),this.inviteId() ?? undefined);
     } catch (error: any) {
       this.errorMessage.set(this.formatFirebaseError(error.code));
     } finally {
@@ -47,7 +47,7 @@ export class Login {
     this.errorMessage.set(null);
 
     try {
-      await this.authService.signInWithGoogle();
+      await this.authService.signInWithGoogle(this.inviteId() ?? undefined);
       
     } catch (error: any) {
       this.errorMessage.set(this.formatFirebaseError(error.code));
@@ -56,6 +56,11 @@ export class Login {
     }
   }
   
+  ngOnInit(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      this.inviteId.set(params.get('inviteId'));
+    });
+  }
   /**
    * A helper to format common Firebase auth errors into user-friendly messages.
    */

@@ -1,51 +1,104 @@
-@if (!familiesService.isLoading() && !familiesService.activeFamilyId()) {
-    <div class="welcome-container">
-      <h2>Welcome to Family Hub!</h2>
-      <p>To get started, create a new family space or join one using an invite code.</p>
-      
-      <!-- =================================================== -->
-      <!-- NEW: Conditionally show the name input -->
-      <!-- This block will only appear for users who signed up with -->
-      <!-- email/password and therefore have no display name. -->
-      <!-- =================================================== -->
-      @if (!currentUser()?.displayName) {
-        <div class="name-prompt-card">
-          <h3>First, what should we call you?</h3>
-          <input 
-            [(ngModel)]="userName" 
-            placeholder="Enter your full name" 
-            class="name-input">
+<!-- 
+  WIZ'S NOTES:
+  This new structure transforms a simple form into a guided choice.
+  1.  Unified Flow: The "What's your name?" prompt is now nested *inside* each choice. This makes the user's intent (Create vs. Join) the primary focus and only asks for details in the context of that choice.
+  2.  Brand-Aligned Copy: The language is warmer and more descriptive ("Start a New Family Circle," "Join with an Invite Code").
+  3.  Primed for Design: The structure uses a two-column grid layout (on desktop) to present "Create" and "Join" as two clear, equally-weighted paths. Icons are added for visual reinforcement.
+  4.  Better UX: Adding (keyup.enter) to the last input in each card allows for keyboard submission, a small but important quality-of-life improvement.
+-->
+
+@if (!familiesService.isLoading() && !familiesService.activeFamilyId()) { 
+  <!--  -->
+  <div class="welcome-page-container">
+    <div class="welcome-header">
+      <h1 class="welcome-title">Welcome to The Familee.</h1>
+      <p class="welcome-subtitle">Your private family space is just a step away. Create a new circle for your family or join one that's already started.</p>
+    </div>
+
+    <div class="welcome-choices-grid">
+      <!-- ACTION CARD 1: CREATE A FAMILY -->
+      <div class="welcome-choice-card">
+        <span class="material-symbols-rounded icon-large">group_add</span>
+        <h3>Start a New Family Circle</h3>
+        <p class="card-description">Create a private, secure home for your family's updates, calendar, and memories.</p>
+        
+        <div class="form-steps">
+          <!-- Step 1 (Conditional): Ask for user's name if not present -->
+          @if (!currentUser()?.displayName) {
+            <div class="form-group">
+              <label for="userName">First, what should we call you?</label>
+              <input 
+                id="userName"
+                type="text"
+                class="form-input"
+                [(ngModel)]="userName" 
+                placeholder="e.g., Aunt Sarah" />
+            </div>
+          }
+          
+          <!-- Step 2: Ask for the new family's name -->
+          <div class="form-group">
+            <label for="familyName">What is your family's name?</label>
+            <input 
+              id="familyName"
+              type="text"
+              class="form-input"
+              [(ngModel)]="familyName" 
+              placeholder="e.g., The Miller Family"
+              (keyup.enter)="create()" />
+          </div>
         </div>
-      }
-  
-      <!-- Action Card for Creating a Family -->
-      <div class="action-card">
-        <h3>Create a New Family</h3>
-        <input 
-          [(ngModel)]="familyName" 
-          placeholder="e.g., The Smith Family">
-        <!-- Disable button if name is required but not filled in -->
+
         <button 
+          class="button-primary"
           (click)="create()" 
-          [disabled]="!currentUser()?.displayName && !userName().trim()">
-          Create Family
+          [disabled]="(!currentUser()?.displayName && !userName().trim()) || !familyName().trim()">
+          Create My Family Circle
         </button>
       </div>
-  
+
       <div class="separator">or</div>
-  
-      <!-- Action Card for Joining a Family -->
-      <div class="action-card">
-        <h3>Join an Existing Family</h3>
-        <input 
-          [(ngModel)]="familyId" 
-          placeholder="Enter Invite Code">
-        <!-- Disable button if name is required but not filled in -->
+
+      <!-- ACTION CARD 2: JOIN A FAMILY -->
+      <div class="welcome-choice-card">
+        <span class="material-symbols-rounded icon-large">key</span>
+        <h3>Join with an Invite Code</h3>
+        <p class="card-description">Were you invited to a family? Enter the unique code your family member shared with you.</p>
+
+        <div class="form-steps">
+          <!-- Step 1 (Conditional): Ask for user's name if not present. Repetitive but necessary for component logic. -->
+           @if (!currentUser()?.displayName) {
+            <div class="form-group">
+              <label for="userNameJoin">First, what should we call you?</label>
+              <input 
+                id="userNameJoin"
+                type="text"
+                class="form-input"
+                [(ngModel)]="userName" 
+                placeholder="e.g., Cousin Alex" />
+            </div>
+          }
+
+          <!-- Step 2: Ask for the invite code -->
+          <div class="form-group">
+            <label for="familyId">What's the invite code?</label>
+            <input 
+              id="familyId"
+              type="text"
+              class="form-input"
+              [(ngModel)]="familyId" 
+              placeholder="Enter code"
+              (keyup.enter)="join()" />
+          </div>
+        </div>
+
         <button 
+          class="button-secondary"
           (click)="join()" 
-          [disabled]="!currentUser()?.displayName && !userName().trim()">
-          Join Family
+          [disabled]="(!currentUser()?.displayName && !userName().trim()) || !familyId().trim()">
+          Join With Code
         </button>
       </div>
     </div>
-  }
+  </div>
+}

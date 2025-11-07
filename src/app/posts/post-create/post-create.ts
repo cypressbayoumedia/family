@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 // Import the NEW, family-aware PostsService
 import { Posts } from '../../core/posts'; // Adjust path if needed
 import { RecordAudio } from '../../components/record-audio/record-audio';
+import { AuthService } from '../../core/auth';
 
 @Component({
   selector: 'app-post-create',
@@ -17,6 +18,7 @@ import { RecordAudio } from '../../components/record-audio/record-audio';
 export class PostCreate implements OnDestroy {
   // Inject the new PostsService
   private postsService = inject(Posts);
+  private authService = inject(AuthService); // <-- Inject AuthService
 
   // --- All your existing signals for content and media are perfect ---
   content = signal('');
@@ -29,7 +31,7 @@ export class PostCreate implements OnDestroy {
   // --- UI state signals for robust user feedback ---
   isSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
-
+  currentUser = this.authService.currentUser;
   /**
    * The new, robust addPost method that relies on the service to handle author info.
    */

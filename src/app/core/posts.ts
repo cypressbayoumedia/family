@@ -17,6 +17,7 @@ export interface Post {
   familyId: string;
   authorId: string; // The UID of the user who created it
   authorName: string; // Denormalized for easy display
+  authorPhotoURL: string; // Denormalized for easy display
   content: string;
   imageUrl?: string;
   audioUrl?: string;
@@ -84,6 +85,7 @@ export class Posts {
       familyId: familyId,
       authorId: user.uid,
       authorName: user.displayName || 'Unknown User', // Get name from auth state
+      authorPhotoURL: user.photoURL || '', // Get photo from auth state
       createdAt: serverTimestamp(),
     };
 

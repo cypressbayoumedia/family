@@ -1,43 +1,79 @@
-<!-- The main container for the component -->
-<div class="post-create-container">
+<!-- 
+  WIZ'S NOTES:
+  This is a complete redesign focused on a smoother, more integrated user experience.
+  1.  New "Composer" Layout: The layout now includes the user's avatar, making it feel like a personal journal entry, not a generic form.
+  2.  Integrated Audio Recorder: The biggest UX win. The jarring modal is gone. The audio recorder now appears *inline*, directly within the composer when the mic is clicked. This is a seamless, non-disruptive flow.
+  3.  Improved Action Bar: The media buttons now have labels ("Add Photo", "Record Audio") for clarity and are grouped logically. The "Post" button is the clear, primary call to action.
+  4.  Auto-Resizing Textarea: While this is a logic change, the structure is designed for it. A textarea that grows with the content feels much more modern and fluid.
+  5.  Better Hierarchy: The back link is now cleaner and more distinct from the main composer card, improving the overall visual flow.
+-->
+
+<div class="composer-container">
   
-  <!-- The main card where the user creates their post -->
-  <div class="post-create-card">
-    
-    <div class="header">
-      <button class="back-button" routerLink="">← Back to Feed</button>
-      <h2>Create a New Post</h2>
+  <div class="composer-header">
+    <a routerLink="/" class="back-link">
+      <span class="material-symbols-rounded">arrow_back</span>
+      Back to Feed
+    </a>
+  </div>
+
+  <div class="composer-card">
+    <div class="composer-user-info">
+      <div class="user-avatar">
+        <!-- Assume currentUser().photoURL is available -->
+        <img [src]="currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed={{this.authService.currentUser()?.displayName}}'" alt="Your avatar">
+      </div>
+      <div class="user-name">
+        <h4>{{ currentUser()?.displayName || 'Family Member' }}</h4>
+      </div>
     </div>
 
-    <!-- Text area for the post content -->
-    <textarea class="post-textarea" [(ngModel)]="content" placeholder="What's on your mind, family?"></textarea>
-    
-    <!-- PREVIEW SECTION: Shows selected image or recorded audio -->
-    <div class="previews-container">
-      @if (imagePreviewUrl(); as imageUrl) {
-        <div class="preview-item">
-          <div class="preview-wrapper">
+    <div class="composer-body">
+      <!-- NOTE: This textarea should be configured to auto-resize its height as the user types. -->
+      <textarea 
+        class="composer-textarea" 
+        [(ngModel)]="content" 
+        placeholder="Share a story, a photo, or a quick hello...">
+      </textarea>
+
+      <!-- Media previews are now cleaner and grouped -->
+      <div class="media-preview-area">
+        @if (imagePreviewUrl(); as imageUrl) {
+          <div class="preview-item image-preview">
             <img [src]="imageUrl" alt="Image preview">
-            <button class="remove-media-button" (click)="removeImage()" title="Remove image">×</button>
+            <button class="remove-media-button" (click)="removeImage()" title="Remove image">
+              <span class="material-symbols-rounded">close</span>
+            </button>
           </div>
-        </div>
-      }
-      @if (audioPreviewUrl(); as audioUrl) {
-        <div class="preview-item">
-          <div class="preview-wrapper">
+        }
+        @if (audioPreviewUrl(); as audioUrl) {
+          <div class="preview-item audio-preview">
             <audio [src]="audioUrl" controls></audio>
-            <button class="remove-media-button" (click)="removeAudio()" title="Remove audio">×</button>
+            <button class="remove-media-button" (click)="removeAudio()" title="Remove audio">
+              <span class="material-symbols-rounded">close</span>
+            </button>
           </div>
+        }
+      </div>
+
+      <!-- INLINE AUDIO RECORDER: Replaces the modal overlay -->
+      @if (showRecordAudio()) {
+        <div class="audio-recorder-inline">
+          <app-record-audio 
+            (audioSaved)="onAudioSaved($event)" 
+            (closed)="onAudioRecorderClosed()">
+          </app-record-audio>
         </div>
       }
     </div>
 
-    <!-- ACTIONS FOOTER: Groups all buttons together -->
-    <div class="actions-footer">
-      <div class="media-upload">
-        <label for="image-upload" class="media-label" title="Add Image"><span class="material-symbols-rounded">
-          image
-          </span></label>
+    <!-- The new, improved actions footer -->
+    <div class="composer-actions">
+      <div class="media-buttons">
+        <label for="image-upload" class="action-button">
+          <span class="material-symbols-rounded">image</span>
+          <!-- Add Photo -->
+        </label>
         <input 
           id="image-upload" 
           type="file" 
@@ -46,30 +82,20 @@
           accept="image/*" 
           hidden>
         
-        <button (click)="toggleRecordAudio()" class="media-label" title="Record Audio"><span class="material-symbols-rounded">
-          mic
-          </span></button>
+        <button (click)="toggleRecordAudio()" class="action-button" [class.active]="showRecordAudio()">
+          <span class="material-symbols-rounded">mic</span>
+          <!-- Record Audio -->
+        </button>
       </div>
       
-      <!-- The main Post button with submitting state -->
-      <button class="submit-button" (click)="addPost()" [disabled]="isSubmitting()">
-        {{ isSubmitting() ? 'Posting...' : 'Post' }}
-      </button>
+      <div class="submit-area">
+        @if (errorMessage()) {
+          <span class="error-message">{{ errorMessage() }}</span>
+        }
+        <button class="submit-button" (click)="addPost()" [disabled]="isSubmitting() || (!content().trim() && !imagePreviewUrl() && !audioPreviewUrl())">
+          {{ isSubmitting() ? 'Posting...' : 'Post' }}
+        </button>
+      </div>
     </div>
-
-    <!-- ERROR MESSAGE DISPLAY: Shows feedback if something goes wrong -->
-    @if (errorMessage()) {
-      <p class="error-message">{{ errorMessage() }}</p>
-    }
   </div>
 </div>
-
-<!-- MODAL OVERLAY for the audio recorder -->
-@if (showRecordAudio()) {
-  <div class="modal-overlay">
-    <app-record-audio 
-      (audioSaved)="onAudioSaved($event)" 
-      (closed)="onAudioRecorderClosed()">
-    </app-record-audio>
-  </div>
-}

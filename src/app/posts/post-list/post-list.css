@@ -1,6 +1,28 @@
 .post-list-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: 1rem;
+
+  max-width: 680px;
+  
+  margin: 0 auto;
+}
+
+.empty-feed-message {
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px; /* Consistent with post-card styling */
+  padding: 3rem 2rem;
+  margin-top: 1.5rem; /* Give it some space from the top */
+  text-align: center;
+}
+
+.empty-feed-message p {
+  color: #666; /* Softer text color for the sub-text */
+  line-height: 1.6;
+}
+
+/* Make the first line of the message act as a welcoming headline */
+.empty-feed-message p:first-child {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
 }

@@ -1,25 +1,74 @@
+/*
+  WIZ'S NOTES:
+  This CSS transforms a basic <select> into a custom-branded dropdown.
+  The magic lies in styling a container and using `appearance: none`
+  on the select element itself, allowing us to add our own arrow.
+*/
+
+/* 1. The main container that holds the select element */
+/* This div will provide the visual styling of the "button" */
 .switcher-container {
-    position: relative;
-  }
+  position: relative; /* Crucial for positioning the custom arrow */
+  display: inline-block; /* Takes up only the necessary width */
+}
+
+/* 2. The <select> element itself */
+.family-select {
+  /* Reset and Custom Appearance */
+  -webkit-appearance: none; /* For Safari/Chrome */
+  -moz-appearance: none;    /* For Firefox */
+  appearance: none;          /* Standard */
   
-  .family-select {
-    appearance: none;
-    background-color: #f3f4f6;
-    border: 1px solid #e5e7eb;
-    padding: 0.5rem 2rem 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 600;
-    color: #374151;
-    cursor: pointer;
-  }
+  /* Make it look like our brand's input fields/indicators */
+  background-color: #f7f7f7;
+  border: 1px solid var(--border-color);
+  border-radius: 20px; /* Pill shape */
+  padding: 0.5rem 2.5rem 0.5rem 1rem; /* Right padding makes room for the arrow */
   
-  /* Custom dropdown arrow */
-  .switcher-container::after {
-    content: '▼';
-    font-size: 0.6rem;
-    position: absolute;
-    right: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-  }
+  /* Typography */
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--font-body); /* Or var(--font-heading) if you prefer */
+  color: var(--text-color);
+  
+  /* Behavior */
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%; /* Ensures it fills the container if needed */
+}
+
+/* Remove the default focus outline that comes with <select> */
+.family-select:focus {
+  outline: none;
+}
+
+/* 3. A better focus state using the container */
+/* This applies a style to the container when the select inside is focused */
+.switcher-container:focus-within {
+  /* Use the brand's accent color for a consistent focus ring */
+  box-shadow: 0 0 0 3px rgba(246, 192, 181, 0.5);
+  border-radius: 20px; /* Ensures the shadow follows the border radius */
+}
+.switcher-container:focus-within .family-select {
+  border-color: var(--accent-color);
+}
+
+/* 4. The custom dropdown arrow */
+/* We add this using a pseudo-element on the container */
+.switcher-container::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 1rem; /* Position it inside the right padding of the select */
+  transform: translateY(-50%);
+  
+  /* The SVG for a clean, sharp chevron arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='%23555555'%3E%3Cpath d='M480-345 240-585l43-43 197 198 197-198 43 43-240 240Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 20px;
+  
+  width: 20px;
+  height: 20px;
+  
+  pointer-events: none; /* IMPORTANT: Allows clicks to pass through to the select */
+}

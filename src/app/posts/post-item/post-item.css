@@ -1,104 +1,121 @@
-/* The main container for a single post, styled as a card. */
+/*
+  CSS for the improved Post Card Component
+*/
+
 .post-card {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: #fff;
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  margin-bottom: 1.5rem; /* Space between posts */
-  padding: 1.5rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-bottom: 1.5rem;
+  overflow: hidden; /* Ensures child elements respect the border radius */
+  transition: box-shadow 0.2s ease-in-out;
 }
 
-/* --- Header Section --- */
+.post-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+/* === Header === */
 .post-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.75rem; /* Space between avatar and text */
+  padding: 1rem 1.25rem;
 }
 
-/* A simple, circular avatar */
+.author-details { display: flex; align-items: center; gap: 0.75rem; }
+
 .avatar {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background-color: #4f46e5; /* A nice brand color */
-  color: white;
+  overflow: hidden;
+  background-color: var(--accent-color);
   display: flex;
-  justify-content: center;
   align-items: center;
-  font-size: 1.2rem;
-  font-weight: 600;
-  flex-shrink: 0; /* Prevents the avatar from shrinking */
+  justify-content: center;
 }
 
-.author-info {
-  display: flex;
-  flex-direction: column;
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.avatar-fallback {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--text-color);
 }
 
-.author-name {
-  font-weight: 600;
-  color: #111827;
-}
+.author-info { display: flex; flex-direction: column; }
+.author-name { font-weight: 700; }
+.post-timestamp { font-size: 0.8rem; color: #666; }
+.options-button { background: none; border: none; cursor: pointer; color: #666; }
 
-.post-timestamp {
-  font-size: 0.8rem;
-  color: #6b7280; /* Gray text for the date */
-}
-
-/* --- Body Section --- */
+/* === Body === */
 .post-body {
-  padding-top: 1rem; /* Space between header and content */
+  padding: 0 1.25rem;
+  cursor: pointer;
 }
 
 .post-content {
-  color: #374151;
-  font-size: 1rem;
+  color: var(--text-color);
   line-height: 1.6;
-  /* Make links clickable and preserve line breaks from the textarea */
-  white-space: pre-wrap; 
-  word-wrap: break-word;
+  white-space: pre-wrap; /* Respects line breaks in user input */
+  margin-bottom: 1rem;
 }
 
-.post-media {
-  margin-top: 1rem;
-}
-
-.post-image {
+.image-container {
   width: 100%;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  aspect-ratio: 16 / 9; /* Prevents layout jump as images load */
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+}
+.post-image { width: 100%; height: 100%; object-fit: cover; }
+.post-audio { width: 100%; }
+
+/* === Special Doodle-Post Styling === */
+.post-card.doodle-post {
+  /* Makes Doodles feel special */
+  background-color: #FFFDF5; 
+  border-left: 4px solid var(--accent-color);
+}
+.doodle-prompt {
+  font-family: var(--font-heading);
+  color: #555;
+  margin-bottom: 0.5rem;
+  font-style: italic;
 }
 
-.post-audio {
-  width: 100%;
-}
-
-/* --- Footer Section --- */
+/* === Footer === */
 .post-footer {
+  padding: 0.5rem 1.25rem;
+  border-top: 1px solid var(--border-color);
   margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #f3f4f6; /* A very light separator line */
+}
+
+.footer-actions {
+  display: flex;
+  gap: 1.5rem;
 }
 
 .action-button {
   background: none;
   border: none;
-  color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #555;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 6px;
-  transition: background-color 0.2s;
+  padding: 0.25rem;
 }
 
 .action-button:hover {
-  background-color: #f3f4f6;
+  color: var(--text-color);
 }
 
-.post-card-link {
-  text-decoration: none; /* Removes the default link underline */
-  color: inherit; /* Makes the text color normal */
+.action-button .material-symbols-rounded {
+  font-size: 20px;
 }

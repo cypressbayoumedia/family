@@ -6,7 +6,7 @@ import {
 } from '@angular/fire/auth-guard';
 import { Login } from './entry/login/login';
 import { Signup } from './entry/signup/signup';
-
+import { JoinHub } from './entry/join-hub/join-hub';
 // A pipe function for redirecting unauthorized users to the login page.
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
 
@@ -57,5 +57,9 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/manage-families/manage-families').then(m => m.ManageFamilies),
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },
+  { 
+    path: 'invited-to-join/:inviteId', 
+    component: JoinHub,
   },
 ];

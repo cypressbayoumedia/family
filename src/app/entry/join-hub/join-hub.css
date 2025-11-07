@@ -1,0 +1,91 @@
+.join-page-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    padding: 2rem;
+  }
+  
+  /* 2. The main card holding all content */
+  .join-card {
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-color);
+    padding: 3rem;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+  }
+  
+  .join-header {
+    margin-bottom: 2.5rem;
+  }
+  
+  .join-header .logo {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--text-color);
+  }
+  
+  .join-state-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .join-title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  .join-subtitle {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 350px;
+    margin-bottom: 2.5rem;
+  }
+  
+  /* 3. Styling for icons in different states */
+  .state-icon {
+    font-size: 48px;
+    margin-bottom: 1.5rem;
+  }
+  .state-icon.success { color: #27ae60; }
+  .state-icon.error   { color: #c0392b; }
+  .state-icon.info    { color: var(--accent-color); }
+  
+  
+  /* 4. The loading spinner for the 'processing' state */
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #f3f3f3; /* Light grey track */
+    border-top: 5px solid var(--accent-color); /* The moving part */
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* 5. Action buttons area */
+  .join-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .join-actions .button-primary,
+  .join-actions .button-secondary {
+    width: 100%;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }

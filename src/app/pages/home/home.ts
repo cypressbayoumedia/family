@@ -15,7 +15,8 @@ import { FamilySwitcher } from '../../components/family-switcher/family-switcher
 export class Home {
   public authService = inject(AuthService);
   public familiesService = inject(Families);
-
+  
+  // --- SIGNALS to control the UI ---
   isUserMenuOpen = signal(false);
   isInviteModalOpen = signal(false);
 
@@ -24,10 +25,13 @@ export class Home {
   }
   
   openInviteModal(): void {
+    // We'll close the user menu if it's open when we open the invite modal
+    this.isUserMenuOpen.set(false);
     this.isInviteModalOpen.set(true);
   }
   
   closeInviteModal(): void {
     this.isInviteModalOpen.set(false);
   }
+
 }

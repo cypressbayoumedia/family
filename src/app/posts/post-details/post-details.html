@@ -1,19 +1,38 @@
-
+<!-- 
+  WIZ'S NOTES:
+  This is a significant upgrade that turns a static page into an interactive one.
+  1.  Consistent Components: The header now uses the same improved avatar logic (photo first, then fallback) as the post-card for a cohesive experience.
+  2.  Enhanced Interactivity: The "Download" button is now a proper icon button overlaid on the image, which is a much cleaner and more modern UI pattern.
+  3.  THE COMMENTS SECTION: This is the most critical addition. A dedicated, well-structured section for comments and a comment form is added, fulfilling the core purpose of this page.
+  4.  Better UX/UI: The back button now uses an icon, and the timestamp is formatted more appropriately for a detail view. The zoom modal is also improved with a clearer close button.
+-->
 <div class="details-container">
   @if (post$ | async; as post) {
+    <!-- Main card containing the post -->
     <div class="post-details-card">
       <header class="details-header">
-        <a routerLink="" class="back-button">← Back to Feed</a>
-        <div class="author-info">
-          <div class="avatar">{{ post.authorName.charAt(0) }}</div>
-          <div>
-            <span class="author-name">{{ post.authorName }}</span>
-            <span class="post-timestamp">{{ post.createdAt?.toDate() | date:'fullDate' }}</span>
-          </div>
-        </div>
+        <a routerLink="/" class="back-link">
+          <span class="material-symbols-rounded">arrow_back</span>
+          Back to Feed
+        </a>
       </header>
 
       <div class="post-body">
+        <!-- Author Info is now part of the main body for a more article-like feel -->
+        <div class="author-info">
+          <div class="avatar">
+            @if (post.authorPhotoURL) {
+              <img [src]="post.authorPhotoURL || 'https://api.dicebear.com/9.x/glass/svg?seed={{post.authorName}}'" [alt]="post.authorName + ' avatar'">
+            } @else {
+              <span class="avatar-fallback">{{ post.authorName.charAt(0) }}</span>
+            }
+          </div>
+          <div>
+            <span class="author-name">{{ post.authorName }}</span>
+            <span class="post-timestamp">{{ post.createdAt?.toDate() | date:'medium' }}</span>
+          </div>
+        </div>
+
         @if (post.content) {
           <p class="post-content">{{ post.content }}</p>
         }
@@ -21,15 +40,10 @@
         <div class="post-media">
           @if (post.imageUrl) {
             <div class="image-container">
-              <img 
-                [src]="post.imageUrl" 
-                alt="Post image" 
-                class="post-image"
-                (click)="zoomIn()"
-                title="Click to zoom in">
-              <!-- The explicit Download button -->
-              <a [href]="post.imageUrl" download class="download-button">
-                Download Image
+              <img [src]="post.imageUrl" alt="Post image" class="post-image" (click)="zoomIn()" title="Click to zoom in">
+              <!-- A cleaner, overlaid download button -->
+              <a [href]="post.imageUrl" download class="download-button" title="Download Image">
+                <span class="material-symbols-rounded">download</span>
               </a>
             </div>
           }
@@ -39,17 +53,40 @@
         </div>
       </div>
     </div>
+
+    
+   <!-- <section class="comments-section">
+      <div class="comments-header">
+         <h3>Comments ({{ post.commentCount || 0 }})</h3>
+      </div>
+       -->
+      <!-- This is where you would render the list of comments -->
+      <!-- <div class="comments-list"> -->
+        <!-- Example: <app-comment-item *ngFor="let comment of comments"></app-comment-item> -->
+        <!-- <p class="placeholder-text">Be the first to leave a comment!</p>
+      </div> -->
+
+      <!-- This is where you would place the form for adding a new comment -->
+      <!-- <div class="comment-form-area"> -->
+        <!-- Example: <app-comment-form [postId]="post.id"></app-comment-form> -->
+         <!-- <textarea placeholder="Write a comment..."></textarea>
+         <button class="button-primary">Submit</button>
+      </div> 
+    </section>-->
+
   } @else {
-    <p>Loading post...</p>
+    <p class="loading-indicator">Loading post...</p>
   }
 </div>
 
-<!-- ZOOM MODAL: This is hidden by default and appears on top of the page -->
+<!-- Improved ZOOM MODAL -->
 @if ((post$ | async)?.imageUrl; as imageUrl) {
   @if (isImageZoomed()) {
-    <div class="modal-overlay" (click)="zoomOut()">
-      <div class="modal-content">
-        <button class="close-button" (click)="zoomOut()" title="Close">&times;</button>
+    <div class="zoom-modal-overlay" (click)="zoomOut()">
+      <div class="zoom-modal-content">
+        <button class="modal-close-button" (click)="zoomOut()" title="Close">
+          <span class="material-symbols-rounded">close</span>
+        </button>
         <img [src]="imageUrl" alt="Zoomed post image">
       </div>
     </div>

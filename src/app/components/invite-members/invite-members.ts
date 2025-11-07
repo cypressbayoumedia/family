@@ -16,7 +16,7 @@ export class InviteMembers {
 
   // Expose the current family ID to the template
   familyId = this.familiesService.activeFamilyId;
-
+  familyName = this.familiesService.activeFamily
   // Signal to check if the Web Share API is available on this device
   canShare = signal<boolean>(!!navigator.share);
 
@@ -32,9 +32,8 @@ export class InviteMembers {
 
     const shareData = {
       title: 'Join our Familee!',
-      text: `You've been invited to join our family hub. Use this invite code to sign up: ${inviteCode}`,
-      // Optional: Add a URL to your app's homepage
-      // url: 'https://your-app-url.web.app' 
+      text: `You've been invited to join our family hub. Use this invite link to sign up`,
+       url: `https://thefamilee.app/invited-to-join/${inviteCode}` 
     };
 
     try {
@@ -50,7 +49,7 @@ export class InviteMembers {
    * The fallback method to copy the invite code to the clipboard.
    */
   copyToClipboard(): void {
-    const inviteCode = this.familyId();
+    const inviteCode = `https://thefamilee.app/invited-to-join/${this.familyId()}` 
     if (!inviteCode) return;
 
     navigator.clipboard.writeText(inviteCode).then(() => {

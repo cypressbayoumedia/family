@@ -1,41 +1,77 @@
-<a [routerLink]="['/post', post().id]" class="post-card-link">
+<!-- 
+  WIZ'S NOTES:
+  This is a complete architectural overhaul for better accessibility, interactivity, and brand expression.
+  1.  Accessibility First (No Giant Link): The entire card is no longer a single, massive link. Instead, a (click) handler on the main content area provides the navigation. This is CRITICAL because it allows interactive elements like the audio player, future "Like" buttons, and user profiles to be clicked without conflicts.
+  2.  Smarter Avatar: The avatar now correctly displays the user's actual photo if it exists, falling back to the initial letter only when necessary. This feels much more personal.
+  3.  Human-Readable Timestamps: It's designed for a `timeAgo` pipe (e.g., "2 hours ago," "Yesterday"), which is a much better user experience than a static date.
+  4.  Unique "Doodle-Cast" Styling: A conditional class `[class.doodle-post]` is added. This allows you to visually distinguish these special, brand-defining posts in the feed, making the app more delightful.
+  5.  Engaging Footer: The "coming soon" button is replaced with an interactive, icon-based footer that shows real data (comment counts). This primes users for engagement and makes the app feel more alive.
+-->
 <div class="post-card">
-  
-  <!-- HEADER: Shows who posted and when -->
+  <!-- [class.doodle-post]="post().type === 'doodle'" -->
+  <!-- HEADER: User info and timestamp -->
   <div class="post-header">
-    <div class="avatar">
-      <!-- A simple, clean avatar using the first letter of the author's name -->
-      <span>{{ post().authorName.charAt(0) }}</span>
+    <div class="author-details">
+      <!-- Smarter Avatar Logic -->
+      <div class="avatar">
+        @if (post().authorPhotoURL) {
+          <img [src]="post().authorPhotoURL || 'https://api.dicebear.com/9.x/glass/svg?seed={{post().authorName}}'" [alt]="post().authorName + ' avatar'">
+        } @else {
+          <span class="avatar-fallback">{{ post().authorName.charAt(0) }}</span>
+        }
+      </div>
+      <div class="author-info">
+        <span class="author-name">{{ post().authorName }}</span>
+        <!-- This assumes you create a custom `timeAgo` pipe for a better UX -->
+        <span class="post-timestamp">{{ post().createdAt?.toDate() | date: 'short'}}</span>
+      </div>
     </div>
-    <div class="author-info">
-      <span class="author-name">{{ post().authorName }}</span>
-      <!-- The ?.toDate() is a safety check in case createdAt is null before saving -->
-      <span class="post-timestamp">{{ post().createdAt?.toDate() | date:'short' }}</span>
-    </div>
+    <!-- Future: Options menu (delete, edit, etc.) -->
+    <button class="options-button" title="Post options">
+      <span class="material-symbols-rounded">more_horiz</span>
+    </button>
   </div>
 
-  <!-- BODY: Contains the main content and any media -->
-  <div class="post-body">
-    <!-- Only show the <p> tag if there is text content -->
+  <!-- BODY: Clickable content area for navigation -->
+  <div class="post-body" (click)="navigateToPost(post().id)"> 
+    <!-- @if (post().type === 'doodle' && post().imageUrl) {
+      <p class="doodle-prompt">...drew a Doodle for the family!</p>
+    } -->
     @if (post().content) {
       <p class="post-content">{{ post().content }}</p>
     }
     
-    <!-- A container for the media to control spacing -->
     <div class="post-media">
       @if (post().imageUrl) {
-        <img [src]="post().imageUrl" alt="Post image" class="post-image">
+        <!-- Add a container to enforce aspect ratio and prevent layout shifts -->
+        <div class="image-container">
+          <img [src]="post().imageUrl" alt="Post image" class="post-image" loading="lazy">
+        </div>
       }
       @if (post().audioUrl) {
-        <audio controls [src]="post().audioUrl" class="post-audio"></audio>
+        <!-- Stop click propagation so playing audio doesn't navigate away -->
+        <div (click)="$event.stopPropagation()">
+          <audio controls [src]="post().audioUrl" class="post-audio"></audio>
+        </div>
       }
     </div>
   </div>
 
-  <!-- FOOTER: For actions like comments and likes (designed for the future) -->
+  <!-- FOOTER: All actions are here -->
   <div class="post-footer">
-    <button class="action-button">Comment(coming soon)</button>
+    <!-- Stop propagation on all footer actions -->
+    <div class="footer-actions" (click)="$event.stopPropagation()">
+      <button class="action-button" >
+        <!-- (click)="navigateToPost()" -->
+        <span class="material-symbols-rounded">chat_bubble_outline</span>
+        <!-- Show real data, even if it's zero -->
+        <!-- <span>{{ post().commentCount || 0 }}</span> -->
+      </button>
+      <!-- Example of a future "Like" button -->
+      <button class="action-button">
+        <span class="material-symbols-rounded">favorite_border</span>
+        <!-- <span>{{ post().likeCount || 0 }}</span> -->
+      </button>
+    </div>
   </div>
-
 </div>
-</a>

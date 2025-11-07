@@ -1,39 +1,90 @@
-<div class="manage-hubs-container">
-    <div class="manage-hubs-card">
-      <a routerLink="" class="back-button">← Back to Dashboard</a>
-      <h2>Manage Your Family Hubs</h2>
-      <p class="subtitle">Expand your circle by creating a new hub or joining another one.</p>
-  
-      <!-- Create a New Hub Section -->
-      <div class="action-section">
-        <h3>Create a New Family/Hub</h3>
+<!-- 
+  WIZ'S NOTES:
+  This page is for an existing user, so we can be more direct. The goal is clarity and efficiency.
+  1.  Clear Hierarchy: A proper header with a prominent back link, title, and subtitle sets the context clearly.
+  2.  Parallel Choices: By placing the "Create" and "Join" actions in a side-by-side grid (on desktop), we present them as equal choices, making the page easier to scan and understand.
+  3.  Contextual Feedback: Error and success messages are now placed *inside* the respective action cards. This is much better UX, as the feedback appears directly next to the action the user just took. (This may require a small logic change to have separate error/success variables for each action, e.g., `createErrorMessage` and `joinErrorMessage`).
+  4.  Descriptive Copy: The titles and descriptions are more engaging and provide examples of *why* a user might create another hub ("Perfect for cousins, vacation planning...").
+  5.  Brand Reinforcement: Icons and consistent styling reinforce the app's visual identity.
+-->
+
+<div class="manage-page-container">
+  <div class="manage-header">
+    <a routerLink="/" class="back-link">
+      <span class="material-symbols-rounded">arrow_back</span>
+      Back to My Family
+    </a>
+    <h1 class="manage-title">Expand Your Family Circles</h1>
+    <p class="manage-subtitle">Create a new, separate hub for a different group, or join another family's circle with their invite code.</p>
+  </div>
+
+  <div class="manage-choices-grid">
+    <!-- ACTION CARD 1: CREATE A HUB -->
+    <div class="action-card">
+      <span class="material-symbols-rounded icon-medium">add_circle</span>
+      <h3>Create a New Hub</h3>
+      <p class="card-description">Perfect for the cousins' crew, a vacation planning group, or a different branch of the family.</p>
+
+      <div class="form-group">
+        <label for="newFamilyName">New Hub Name</label>
         <input 
+          id="newFamilyName"
+          class="form-input"
           [(ngModel)]="newFamilyName" 
-          placeholder="e.g., The Cousins Crew">
-        <button (click)="createHub()" [disabled]="isLoading()">
-          {{ isLoading() ? 'Creating...' : 'Create Hub' }}
-        </button>
+          placeholder="e.g., The Ski Trip Crew"
+          (keyup.enter)="createHub()">
       </div>
-  
-      <div class="separator">or</div>
-  
-      <!-- Join an Existing Hub Section -->
-      <div class="action-section">
-        <h3>Join an Existing Family/Hub</h3>
+
+      <!-- Contextual feedback for the Create action -->
+      <div class="feedback-container">
+        @if (errorMessage()) {
+          <p class="feedback-message error">{{ errorMessage() }}</p>
+        }
+        @if (successMessage()) {
+          <p class="feedback-message success">{{ successMessage() }}</p>
+        }
+      </div>
+
+      <button 
+        class="button-primary"
+        (click)="createHub()" 
+        [disabled]="isLoading() || !newFamilyName().trim()">
+        {{ isLoading() ? 'Creating...' : 'Create Hub' }}
+      </button>
+    </div>
+
+    <!-- ACTION CARD 2: JOIN A HUB -->
+    <div class="action-card">
+      <span class="material-symbols-rounded icon-medium">key</span>
+      <h3>Join an Existing Hub</h3>
+      <p class="card-description">Someone from another family hub must share their unique invite code with you.</p>
+
+      <div class="form-group">
+        <label for="inviteCode">Invite Code</label>
         <input 
+          id="inviteCode"
+          class="form-input"
           [(ngModel)]="inviteCode" 
-          placeholder="Enter Invite Code">
-        <button (click)="joinHub()" [disabled]="isLoading()">
-          {{ isLoading() ? 'Joining...' : 'Join Hub' }}
-        </button>
+          placeholder="Enter the code"
+          (keyup.enter)="joinHub()">
       </div>
-      
-      <!-- Display feedback messages to the user -->
-      @if (errorMessage()) {
-        <p class="feedback-message error">{{ errorMessage() }}</p>
-      }
-      @if (successMessage()) {
-        <p class="feedback-message success">{{ successMessage() }}</p>
-      }
+
+      <!-- Contextual feedback for the Join action -->
+      <div class="feedback-container">
+        @if (errorMessage()) {
+          <p class="feedback-message error">{{ errorMessage() }}</p>
+        }
+        @if (successMessage()) {
+          <p class="feedback-message success">{{ successMessage() }}</p>
+        }
+      </div>
+
+      <button 
+        class="button-secondary"
+        (click)="joinHub()" 
+        [disabled]="isLoading() || !inviteCode().trim()">
+        {{ isLoading() ? 'Joining...' : 'Join Hub' }}
+      </button>
     </div>
   </div>
+</div>

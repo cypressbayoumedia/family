@@ -1,8 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/auth'; // Adjust path as needed
+import { Families } from '../../core/families';
 
 @Component({
   selector: 'app-signup',
@@ -14,6 +15,8 @@ import { AuthService } from '../../core/auth'; // Adjust path as needed
 export class Signup {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private familiesService = inject(Families);
 
   // Form state signals
   name = signal('');
@@ -23,7 +26,7 @@ export class Signup {
   // UI state signals
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
-
+  inviteId = signal<string | null>(null);
   /**
    * Handles the email/password signup process.
    */
@@ -37,11 +40,12 @@ export class Signup {
     this.errorMessage.set(null);
 
     try {
-      await this.authService.signUpWithEmail(this.name(), this.email(), this.password());
+      await this.authService.signUpWithEmail(this.name(), this.email(), this.password(),this.inviteId() ?? undefined);
       // Navigate to a protected route on success
     } catch (error: any) {
       this.errorMessage.set(this.formatFirebaseError(error.code));
     } finally {
+      await this.familiesService.joinFamily(this.inviteId()?? '')
       this.isLoading.set(false);
     }
   }
@@ -54,15 +58,22 @@ export class Signup {
     this.errorMessage.set(null);
 
     try {
-      await this.authService.signInWithGoogle();
+      await this.authService.signInWithGoogle(this.inviteId() ?? undefined);
        // Navigate on success
     } catch (error: any) {
       this.errorMessage.set(this.formatFirebaseError(error.code));
     } finally {
+      await this.familiesService.joinFamily(this.inviteId()?? '')
       this.isLoading.set(false);
     }
   }
   
+  ngOnInit(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      this.inviteId.set(params.get('inviteId'));
+    });
+  }
+
   /**
    * A helper to format common Firebase auth errors into user-friendly messages.
    */

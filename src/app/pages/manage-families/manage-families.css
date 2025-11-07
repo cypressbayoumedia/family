@@ -1,98 +1,121 @@
-.manage-hubs-container {
-    display: flex;
-    justify-content: center;
-    padding: 2rem 1rem;
-    background-color: #f3f4f6;
-    min-height: 100vh;
+.manage-page-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.manage-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.manage-title {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.manage-subtitle {
+  font-size: 1.1rem;
+  color: #555;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.manage-choices-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.action-card {
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.icon-medium {
+  font-size: 40px;
+  margin: 0 auto 1rem auto;
+  color: var(--accent-color);
+}
+
+.action-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-description {
+  color: #666;
+  margin-bottom: 2rem;
+  min-height: 40px; /* Helps align cards */
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Reuses .form-input from previous styles */
+
+.feedback-container {
+  min-height: 24px; /* Prevents button jump when message appears */
+  margin-bottom: 1rem;
+}
+
+.feedback-message {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.feedback-message.error {
+  color: #D8000C;
+  background-color: #FFD2D2;
+}
+
+.feedback-message.success {
+  color: #270;
+  background-color: #DFF2BF;
+}
+
+.action-card .button-primary,
+.action-card .button-secondary {
+  width: 100%;
+  margin-top: auto; /* Pushes button to the bottom */
+}
+
+/* Media Query for side-by-side layout on larger screens */
+@media (min-width: 768px) {
+  .manage-choices-grid {
+    grid-template-columns: 1fr 1fr;
   }
-  
-  .manage-hubs-card {
-    width: 100%;
-    max-width: 500px;
-    background-color: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    text-align: center;
-  }
-  
-  .back-button {
-    display: block;
-    text-align: left;
-    margin-bottom: 1.5rem;
-    color: #4f46e5;
-    font-weight: 600;
-    text-decoration: none;
-  }
-  
-  h2 {
-    font-size: 1.8rem;
-    color: #111827;
-    margin: 0;
-  }
-  
-  .subtitle {
-    color: #6b7280;
-    margin: 0.5rem 0 2rem 0;
-  }
-  
-  .action-section {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    padding: 1.5rem;
-    border-radius: 8px;
-    text-align: left;
-  }
-  
-  .action-section h3 {
-    margin: 0 0 1rem 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-  }
-  
-  .action-section input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    box-sizing: border-box;
-    margin-bottom: 1rem;
-  }
-  
-  .action-section button {
-    width: 100%;
-    background-color: #4f46e5;
-    color: white;
-    padding: 0.8rem;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  
-  .action-section button:disabled {
-    background-color: #a5b4fc;
-    cursor: not-allowed;
-  }
-  
-  .separator {
-    margin: 1.5rem 0;
-    color: #9ca3af;
-  }
-  
-  .feedback-message {
-    margin-top: 1.5rem;
-    padding: 0.75rem;
-    border-radius: 8px;
-    font-weight: 500;
-  }
-  
-  .feedback-message.error {
-    color: #b91c1c;
-    background-color: #fee2e2;
-  }
-  
-  .feedback-message.success {
-    color: #065f46;
-    background-color: #d1fae5;
-  }
+}

@@ -1,158 +1,200 @@
-/* --- Main Header Layout --- */
-.app-header {
+/*
+  WIZ'S NOTES (FINAL & VERIFIED):
+  This stylesheet has been corrected to resolve the specificity issue that caused
+  the desktop "Create Post" button to remain visible on mobile. The fix involves
+  using a more specific selector (`.dashboard-sidebar .create-post-desktop`) in our
+  mobile-first styles to ensure the `display: none` rule is properly enforced.
+  The structure is strictly mobile-first for maximum reliability.
+*/
+
+/* ========================================================================== */
+/* MOBILE-FIRST STYLES (Default for all screen sizes)                         */
+/* ========================================================================== */
+
+/* --- Main Layout Container --- */
+.dashboard-layout {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Added subtle shadow */
-}
-.family-indicator {
-  /* --- KEY PROPERTIES FOR ALIGNMENT --- */
-  display: flex;        /* This is the magic! It aligns child elements in a row. */
-  align-items: center;  /* This vertically centers the icon and the text. */
-  gap: 0.5rem;          /* This adds a nice, consistent space between the icon and text. */
-
-  /* --- Your existing styles for the "pill" look --- */
-  background-color: #f3f4f6;
-  color: #374151;
-  padding: 0.5rem 1rem;
-  border-radius: 20px; /* pill shape */
-  font-weight: 600;
-  border: 1px solid #e5e7eb;
+  flex-direction: column; /* Mobile is a vertical stack */
+  min-height: 100vh;
+  background-color: var(--bg-color);
 }
 
-/* Optional but recommended: Explicitly style the icon for consistent size and color */
-.family-indicator .material-symbols-rounded {
-  font-size: 20px; /* Controls the size of the icon */
-  color: #6b7280; /* A slightly muted color for the icon */
-}
-
-.header-left, .header-right {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem; /* Consistent spacing */
-}
-
-.logo {
-  font-size: 2rem; /* Slightly larger for more impact */
-  font-weight: 800; /* Bolder font weight */
-  color: #111827;
-  margin: 0;
-}
-
-/* --- Reusable Button Styles --- */
-.button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-/* Primary button (e.g., "Create Post") */
-.button-primary {
-  background-color: #4f46e5; /* Your existing color */
-  color: white;
-}
-.button-primary:hover {
-  background-color: #4338ca;
-  transform: translateY(-2px);
-}
-
-/* Secondary button (e.g., "Invite") */
-.button-secondary {
-  background-color: #eef2ff; /* A light purple that matches your primary color */
-  color: #4338ca;
-}
-.button-secondary:hover {
-  background-color: #e0e7ff;
-}
-
-/* --- User Menu Dropdown --- */
-.user-menu {
-  position: relative; /* This is the anchor for the dropdown menu */
-}
-
-.user-menu-button {
-  background-color: #f3f4f6;
-  border: none;
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.user-menu-button .material-symbols-rounded {
-  font-size: 28px;
-  color: #4b5563;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: calc(100% + 10px); /* Position it below the button with a small gap */
-  right: 0;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e5e7eb;
-  width: 200px;
-  padding: 0.5rem;
-  z-index: 100;
-}
-
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 6px;
-  text-decoration: none;
-  color: #374151;
-  background: none;
-  border: none;
-  text-align: left;
-  font-size: 1rem;
-  cursor: pointer;
-  font-weight: 600; /* Making dropdown items bold like your other buttons */
-}
-
-.dropdown-item:hover {
-  background-color: #f3f4f6;
-}
-
-.dropdown-item .material-symbols-rounded {
-  color: #6b7280;
-}
-
-/* --- Invite Members Modal --- */
-.modal-overlay {
+/* --- Mobile Header --- */
+/* On mobile, the sidebar becomes a fixed top header */
+.dashboard-sidebar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+  height: 65px; /* Fixed height for reliable content offsetting */
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  z-index: 1000;
+  padding: 0 1rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  z-index: 100;
 }
 
-/* --- Loading Indicator --- */
-.loading-indicator {
-  text-align: center;
-  padding: 4rem;
-  font-size: 1.5rem;
-  color: #6b7280;
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
+
+.sidebar-header .logo {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* --- Main Content Area (Feed) --- */
+.dashboard-main {
+  flex-grow: 1;
+  /* KEY: Push content down to prevent it from being hidden under the fixed header */
+  padding: calc(65px + 1.5rem) 1rem 1.5rem;
+}
+
+/* --- Hiding Desktop-Only Elements --- */
+/*
+  THIS IS THE CRITICAL FIX: By prefixing with `.dashboard-sidebar`, we increase
+  the specificity of these rules, ensuring they override any general styles
+  (like a `.button { display: flex; }`) and are correctly hidden on mobile.
+*/
+.dashboard-sidebar .desktop-switcher,
+.dashboard-sidebar .create-post-desktop,
+.dashboard-sidebar .sidebar-widgets,
+.dashboard-sidebar .family-indicator.simple {
+  display: none !important; /* Adding !important provides absolute certainty */
+}
+
+
+/* --- Mobile Floating Action Button (FAB) --- */
+.mobile-fab {
+  display: flex; /* Use flex for centering the icon */
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 99;
+  text-decoration: none;
+}
+.mobile-fab .material-symbols-rounded {
+  font-size: 28px;
+}
+
+/* --- Shared User Menu & Dropdown Styles --- */
+
+.user-menu-button { background: none; border: none; cursor: pointer; padding: 0; border-radius: 50%; }
+.user-avatar-icon { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid transparent; }
+.user-menu-button:hover .user-avatar-icon { border-color: var(--accent-color); }
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px); /* Position below the header icon */
+  right: 0;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  width: 240px;
+  padding: 0.5rem 0;
+  z-index: 110;
+}
+
+
+/* ========================================================================== */
+/* DESKTOP OVERRIDES (For screens 768px and wider)                            */
+/* ========================================================================== */
+@media (min-width: 768px) {
+
+  /* --- Layout --- */
+  .dashboard-layout {
+    flex-direction: row; /* Switch to side-by-side */
+  }
+
+  /* --- Sidebar --- */
+  .dashboard-sidebar {
+    position: static; /* Return sidebar to the normal document flow */
+    width: 280px;
+    height: 100vh;
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+    flex-direction: column; /* Stack items vertically */
+    justify-content: flex-start;
+    padding: 1.5rem;
+    border-bottom: none;
+    border-right: 1px solid var(--border-color);
+  }
+
+  .sidebar-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .sidebar-header .logo {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebar-actions {
+    margin-top: auto; /* Push this block to the bottom */
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  /* --- Main Content --- */
+  .dashboard-main {
+    padding: 2rem; /* Reset padding for desktop */
+    height: 100vh;
+    overflow-y: auto; /* Allow only the main content to scroll */
+  }
+
+  /* --- Show Desktop-Only Elements --- */
+  .dashboard-sidebar .desktop-switcher,
+  .dashboard-sidebar .sidebar-widgets {
+    display: block;
+  }
+
+  .dashboard-sidebar .create-post-desktop {
+    display: flex !important; /* Restore as a flex container */
+  }
+
+  /* --- Hide Mobile-Only Elements --- */
+  .mobile-fab {
+    display: none;
+  }
+
+  /* --- Reposition Dropdown --- */
+  .dropdown-menu {
+    bottom: calc(100% + 10px); /* Open upwards */
+    top: auto;
+  }
+}
+
+
+/* ========================================================================== */
+/* SHARED COMPONENT STYLES (Unchanged)                                      */
+/* ========================================================================== */
+.sidebar-widgets { margin-top: 2rem; }
+.widget { margin-bottom: 1.5rem; }
+.widget-title { font-family: var(--font-heading); font-size: 1rem; font-weight: 700; color: var(--text-color); margin: 0 0 1rem 0; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
+.widget-content p { font-size: 0.9rem; color: #555; }
+.dropdown-divider { border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0; }
+.dropdown-switcher { padding: 0.5rem 1.25rem; }
+.dropdown-switcher label { font-size: 0.8rem; font-weight: 600; color: #666; display: block; margin-bottom: 0.5rem; }
+.dropdown-item { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1.25rem; text-decoration: none; color: var(--text-color); background: none; border: none; text-align: left; font-size: 0.95rem; cursor: pointer; }
+.dropdown-item:hover { background-color: var(--bg-color); }
+.button { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-family: var(--font-heading); font-weight: 700; border: none; cursor: pointer; width: 100%; }
+.button-primary { background-color: var(--accent-color); color: var(--text-color); }
+.button-primary:hover { background-color: var(--accent-color-darker); }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }

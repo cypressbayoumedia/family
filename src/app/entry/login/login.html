@@ -2,7 +2,9 @@
     <div class="auth-card">
       <h2>Welcome Back!</h2>
       <p class="subtitle">Log in to continue to your account.</p>
-  
+      @if (inviteId()) {
+        <p class="invite-message">You've been invited to join a family! Log in or sign up to accept the invitation.</p>
+      }
       <!-- Login Form -->
       <form (ngSubmit)="onLogin()">
         <div class="input-group">
@@ -32,7 +34,7 @@
       </button>
       
       <p class="footer-text">
-        Don't have an account? <a routerLink="/signup">Sign Up</a>
+        Don't have an account? <a [routerLink]="['/signup']" [queryParams]="{ inviteId: inviteId() }">Sign up</a>
       </p>
     </div>
   </div>
