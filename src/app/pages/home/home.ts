@@ -6,9 +6,10 @@ import { AuthService } from '../../core/auth';
 import { InviteMembers } from '../../components/invite-members/invite-members';
 import { Families } from '../../core/families';
 import { FamilySwitcher } from '../../components/family-switcher/family-switcher';
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-home',
-  imports: [RouterModule,PostList, Landing, FamilySwitcher,InviteMembers],
+  imports: [RouterModule,PostList, Landing, FamilySwitcher,InviteMembers, CommonModule],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

@@ -1,28 +1,7 @@
-/*
-  WIZ's NOTES:
-  This CSS brings the "vintage paper and ink" theme to life.
-  - :root variables define the brand palette for easy management.
-  - A mobile-first approach ensures a great experience on any device.
-  - Ample whitespace and clean typography reflect the minimalist aesthetic.
-  - The terracotta accent color is used sparingly but effectively for calls to action.
-*/
-
-/* 1. ROOT VARIABLES & GLOBAL STYLES */
-
-
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: var(--font-body);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .landing-page-wrapper {
@@ -70,6 +49,14 @@ section {
 }
 
 /* 3. BUTTON STYLES */
+/*
+  WIZ'S NOTES:
+  This is the corrected CSS for your landing page buttons. The addition of
+  `display: inline-block;` is the key fix that ensures <a> tags render
+  like solid buttons with a uniform background.
+*/
+
+/* 3. BUTTON STYLES */
 .cta-buttons {
   display: flex;
   justify-content: center;
@@ -78,7 +65,42 @@ section {
   flex-wrap: wrap; /* Allows buttons to stack on small screens */
 }
 
+.button-primary, .button-secondary {
+  /* --- THIS IS THE FIX --- */
+  display: inline-block; 
+  /* ---------------------- */
+  
+  padding: 0.85rem 1.75rem;
+  border-radius: 8px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 2px solid transparent;
+}
 
+.button-primary {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  box-shadow: 0 4px 14px 0 rgba(0,0,0,0.1);
+}
+
+.button-primary:hover {
+  background-color: var(--accent-color-darker);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(0,0,0,0.12);
+}
+
+.button-secondary {
+  background-color: transparent;
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.button-secondary:hover {
+  background-color: var(--bg-color);
+  border-color: var(--text-color);
+}
 
 .trust-signal {
   margin-top: 1rem;

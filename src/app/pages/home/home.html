@@ -1,12 +1,10 @@
 <!-- 
   WIZ'S NOTES:
-  This is the complete, final HTML for your main dashboard. It is designed to be
-  fully responsive and provides the best user experience on both desktop and mobile.
-  Key features include:
-  - A two-column desktop layout with a persistent sidebar.
-  - A clean, fixed mobile header with a Floating Action Button for the primary action.
-  - The Family Switcher is intelligently moved into the user menu on mobile to save space.
-  - A welcoming "empty state" for new families to guide their first actions.
+  THIS IS THE DEFINITIVE AND COMPLETE HTML. The key change is that the .dropdown-menu's @if block
+  for mobile has been MOVED out of the mobile header. It is now at the bottom of the layout,
+  making it a top-level element that is no longer "trapped" inside the fixed
+  header's rendering layer. This guarantees it can be displayed on top of all
+  other content.
 -->
 @if (authService.loading()) {
   <p class="loading-indicator">Loading your Family Hub...</p>
@@ -15,105 +13,107 @@
     <div class="dashboard-layout">
       
       <!-- =============================================================== -->
-      <!-- THE DASHBOARD SIDEBAR (DESKTOP) / HEADER (MOBILE)               -->
+      <!-- LEFT SIDEBAR (Desktop Only)                                     -->
       <!-- =============================================================== -->
       <aside class="dashboard-sidebar">
-        <div class="sidebar-header">
-          <h1 class="logo">The Familee.</h1>
-          
-          <!-- Desktop Switcher: Wrapped for easy hiding on mobile -->
-          @if (familiesService.allUserFamilies().length > 1) {
-            <div class="desktop-switcher">
-              <app-family-switcher></app-family-switcher>
-            </div>
-          } @else if (familiesService.activeFamily(); as family) {
-            <div class="family-indicator simple">
-              <span class="material-symbols-rounded">house</span>
-              <span>{{ family.name }}</span>
-            </div>
-          }
-        </div>
-
-        <div class="sidebar-actions">
-          <!-- Desktop "Create Post" button -->
+        <div class="sidebar-top">
+          <div class="sidebar-header">
+            <h1 class="logo">The Familee.</h1>
+          </div>
           <a routerLink="/create-post" class="button button-primary create-post-desktop">
             <span class="material-symbols-rounded">add</span>
             Create Post
-    {{this.authService.currentUser()?.displayName}} 
           </a>
-          
-          <!-- User Menu: Contains all actions including the mobile switcher -->
-<!-- This is the industry-standard and best-practice structure -->
-<menu class="user-menu">
-  <button class="user-menu-button" (click)="toggleUserMenu()">
-    <img [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed={{this.authService.currentUser()?.displayName}}'" class="user-avatar-icon" alt="User menu">
-  </button>
-  
-  @if (isUserMenuOpen()) {
-    <div class="dropdown-menu">
-      
-      <!-- Mobile Switcher -->
-      @if (familiesService.allUserFamilies().length > 1) {
-        <div class="dropdown-switcher">
-          <label>Switch Family</label>
-          <app-family-switcher></app-family-switcher>
         </div>
-        <hr class="dropdown-divider">
-      }
-
-      <a class="dropdown-item" (click)="openInviteModal()">
-        <span class="material-symbols-rounded">group_add</span>
-        Invite Members
-      </a>
-      <a routerLink="/manage-hubs" class="dropdown-item">
-        <span class="material-symbols-rounded">settings</span>
-        Manage Hubs
-      </a>
-      <button (click)="authService.signOut()" class="dropdown-item">
-        <span class="material-symbols-rounded">logout</span>
-        Sign Out
-      </button>
-    </div>
-  }
-</menu>
-        </div>
-
-        <!-- Sidebar Widgets for Desktop -->
-        <div class="sidebar-widgets">
-          <div class="widget">
-            <h3 class="widget-title">Calendar (Coming Soon)</h3>
-            <div class="widget-content">
-              <!-- Example: <app-upcoming-events-widget /> -->
-              <!-- <p>🎂 Alex's Birthday - Today!</p>
-              <p>🎉 Anniversary: Mom & Dad - Nov 10</p> -->
-            </div>
-          </div>
-          <div class="widget">
-            <h3 class="widget-title">Recent Activity (Coming Soon)</h3>
-            <div class="widget-content">
-              <!-- Example: <app-activity-widget /> -->
-              <!-- <p>📍 Sarah arrived at Home.</p>
-              <p>✅ Mark checked in at Soccer Practice.</p> -->
-            </div>
+        
+        <div class="sidebar-actions">
+          <!-- Desktop User Menu -->
+          <div class="user-menu">
+            <button class="user-menu-button" (click)="toggleUserMenu()">
+              <img [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName" class="user-avatar-icon" alt="User menu">
+              <div class="user-info-desktop">
+                <span class="user-name">{{ authService.currentUser()?.displayName }}</span>
+                <span class="user-handle">@{{ authService.currentUser()?.displayName | lowercase }}</span>
+              </div>
+              <span class="material-symbols-rounded more-icon-desktop">more_horiz</span>
+            </button>
+            <!-- This dropdown only appears on DESKTOP -->
+            @if (isUserMenuOpen()) {
+              <div class="dropdown-menu desktop-menu">
+                @if (familiesService.allUserFamilies().length > 1) {
+                  <div class="dropdown-switcher">
+                    <label>Switch Family</label>
+                    <app-family-switcher></app-family-switcher>
+                  </div>
+                  <hr class="dropdown-divider">
+                }
+                <a class="dropdown-item" (click)="openInviteModal()">Invite Members</a>
+                <a routerLink="/manage-hubs" class="dropdown-item">Manage Hubs</a>
+                <button (click)="authService.signOut()" class="dropdown-item">Sign Out</button>
+              </div>
+            }
           </div>
         </div>
       </aside>
 
       <!-- =============================================================== -->
-      <!-- THE MAIN CONTENT AREA (FEED)                                    -->
+      <!-- CENTER COLUMN (Main Feed)                                       -->
       <!-- =============================================================== -->
       <main class="dashboard-main">
-       
-          <app-post-list />
-        
-      
-        
+        <header class="feed-header">
+          <h3>{{familiesService.activeFamily()?.name}}</h3>
+          <!-- Mobile user menu button (the dropdown itself is rendered outside) -->
+           <div class="mobile-user-menu">
+             <button class="user-menu-button" (click)="toggleUserMenu()">
+                <img [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName" class="user-avatar-icon" alt="User menu">
+             </button>
+           </div>
+        </header>
+        <app-post-list />
       </main>
+
+      <!-- =============================================================== -->
+      <!-- RIGHT COLUMN (Desktop Widgets)                                  -->
+      <!-- =============================================================== -->
+      <aside class="dashboard-right-column">
+        @if (familiesService.allUserFamilies().length > 1) {
+          <div class="widget">
+             <h3 class="widget-title">Active Family</h3>
+             <app-family-switcher></app-family-switcher>
+          </div>
+        }
+        <div class="widget">
+          <h3 class="widget-title">Calendar (Coming Soon)</h3>
+          <div class="widget-content"></div>
+        </div>
+        <div class="widget">
+          <h3 class="widget-title">Recent Activity (Coming Soon)</h3>
+          <div class="widget-content"></div>
+        </div>
+      </aside>
       
-      <!-- Mobile-Only Floating Action Button (FAB) -->
+      <!-- =============================================================== -->
+      <!-- MOBILE-ONLY ELEMENTS (Positioned relative to viewport)          -->
+      <!-- =============================================================== -->
       <a routerLink="/create-post" class="mobile-fab">
         <span class="material-symbols-rounded">add</span>
       </a>
+
+      <!-- This dropdown is ONLY visible on MOBILE and is now a top-level element -->
+      @if (isUserMenuOpen()) {
+        <div class="dropdown-menu mobile-menu">
+          @if (familiesService.allUserFamilies().length > 1) {
+            <div class="dropdown-switcher">
+              <label>Switch Family</label>
+              <app-family-switcher></app-family-switcher>
+            </div>
+            <hr class="dropdown-divider">
+          }
+          <a class="dropdown-item" (click)="openInviteModal()">Invite Members</a>
+          <a routerLink="/manage-hubs" class="dropdown-item">Manage Hubs</a>
+          <button (click)="authService.signOut()" class="dropdown-item">Sign Out</button>
+        </div>
+      }
     </div>
 
     <!-- The Invite Members Modal -->
@@ -126,7 +126,7 @@
     }
 
   } @else {
-    <!-- Unauthenticated View: Renders the landing page -->
+    <!-- Unauthenticated View -->
     <app-landing />
   }
 }
