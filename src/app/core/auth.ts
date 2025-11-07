@@ -51,13 +51,13 @@ export class AuthService implements OnDestroy {
   async signUpWithEmail(name: string, email: string, password: string, inviteId?: string) {
     try {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-      if(inviteId){
+     
+      await this.createUserProfile(userCredential.user, { name });
+       if(inviteId){
         
         await this.switchActiveFamily(inviteId)
         await this.joinFamily(inviteId)
       }
-      await this.createUserProfile(userCredential.user, { name });
-      
       // ADDED: Navigate new users to the welcome page to create/join a family.
       await this.updateUserDisplayName(name);
 
@@ -137,19 +137,23 @@ export class AuthService implements OnDestroy {
       const userCredential = await signInWithPopup(this.auth, provider);
 
       const additionalInfo = getAdditionalUserInfo(userCredential);
-      if(inviteId){
-        await this.joinFamily(inviteId)
-        await this.switchActiveFamily(inviteId)
-      }
+     
       if (additionalInfo?.isNewUser) {
         // This is a new user signing up with Google
         await this.createUserProfile(userCredential.user);
         // ADDED: Navigate the new user to the welcome page.
-    
+        if(inviteId){
+          await this.joinFamily(inviteId)
+          await this.switchActiveFamily(inviteId)
+        }
         this.router.navigate(['/welcome']);
       } else {
         // This is an existing user logging in with Google
         // ADDED: Navigate the existing user to the dashboard.
+        if(inviteId){
+          await this.joinFamily(inviteId)
+          await this.switchActiveFamily(inviteId)
+        }
         this.router.navigate(['']);
       }
       
