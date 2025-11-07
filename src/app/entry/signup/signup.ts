@@ -45,7 +45,6 @@ export class Signup {
     } catch (error: any) {
       this.errorMessage.set(this.formatFirebaseError(error.code));
     } finally {
-      await this.familiesService.joinFamily(this.inviteId()?? '')
       this.isLoading.set(false);
     }
   }
@@ -63,7 +62,6 @@ export class Signup {
     } catch (error: any) {
       this.errorMessage.set(this.formatFirebaseError(error.code));
     } finally {
-      await this.familiesService.joinFamily(this.inviteId()?? '')
       this.isLoading.set(false);
     }
   }

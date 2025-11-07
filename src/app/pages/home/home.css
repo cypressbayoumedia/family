@@ -8,127 +8,127 @@
 /* ==========================================================================
    1. ROOT VARIABLES & GLOBAL STYLES
    ========================================================================== */
-   :root {
-    --bg-color: #FDFBF7;
-    --text-color: #333333;
-    --accent-color: #F6C0B5;
-    --accent-color-darker: #E5A89B;
-    --border-color: #e0e0e0;
-    --font-heading: 'Roboto Mono', monospace;
-    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background-color: var(--bg-color); color: var(--text-color); font-family: var(--font-body); }
-  
-  /* ==========================================================================
-     2. MAIN DASHBOARD LAYOUT (CSS GRID)
-     ========================================================================== */
-  .dashboard-layout {
-    display: grid;
-    grid-template-columns: 280px 1fr 320px;
-    max-width: 1400px;
-    margin: 0 auto;
-    height: 100vh;
-  }
-  
-  /* ==========================================================================
-     3. LEFT SIDEBAR & DESKTOP USER MENU
-     ========================================================================== */
-  .dashboard-sidebar {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100vh;
-    position: sticky;
-    top: 0;
-    padding: 1.5rem 1rem;
-    border-right: 1px solid var(--border-color);
-  }
-  .sidebar-header .logo { font-family: var(--font-heading); font-size: 1.75rem; font-weight: 700; margin-bottom: 2rem; }
-  .create-post-desktop { width: 100%; margin-top: 1rem; padding: 1rem 1.5rem; }
-  .user-menu { position: relative; }
-  .user-menu-button { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem; border-radius: 99px; background: none; border: none; cursor: pointer; transition: background-color 0.2s ease; }
-  .user-menu-button:hover { background-color: var(--bg-color); }
-  .user-avatar-icon { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-  .user-info-desktop { text-align: left; line-height: 1.3; }
-  .user-name { font-weight: 700; font-size: 1rem; color: var(--text-color); }
-  .user-handle { color: #555; font-size: 0.9rem; }
-  .more-icon-desktop { margin-left: auto; color: var(--text-color); }
-  
-  /* ==========================================================================
-     4. DROPDOWN MENU (BASE & SPECIFIC STYLES)
-     ========================================================================== */
-  .dropdown-menu {
-    width: 250px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--border-color);
-    padding: 0.5rem 0;
-    z-index: 1000; /* High z-index */
-    animation: fadeIn 0.15s ease-out;
-  }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .dropdown-divider { border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0; }
-  .dropdown-switcher { padding: 0.5rem 1.25rem; }
-  .dropdown-switcher label { font-size: 0.8rem; font-weight: 600; color: #666; margin-bottom: 0.5rem; }
-  .dropdown-switcher .family-select { width: 100%; border-radius: 8px; }
-  .dropdown-item { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1.25rem; font-size: 0.95rem; font-weight: 500; text-decoration: none; color: var(--text-color); background: none; border: none; text-align: left; cursor: pointer; }
-  .dropdown-item:hover { background-color: var(--bg-color); }
-  
-  /* Desktop-specific positioning */
-  .dropdown-menu.desktop-menu {
-    position: absolute;
-    bottom: calc(100% + 8px);
-    right: 0;
-  }
-  
-  /* Mobile-specific positioning (hidden by default) */
-  .dropdown-menu.mobile-menu {
-    display: none;
-    position: fixed;
-    top: 60px;
-    right: 1rem;
-  }
-  
-  /* ==========================================================================
-     5. CENTER & RIGHT COLUMNS
-     ========================================================================== */
-  .dashboard-main { border-right: 1px solid var(--border-color); overflow-y: auto; }
-  .feed-header { display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background-color: rgba(253, 251, 247, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); z-index: 10; }
-  .feed-header h3 { font-family: var(--font-heading); font-size: 1.25rem; margin: 0; }
-  .mobile-user-menu { display: none; }
-  .dashboard-right-column { padding: 2rem; overflow-y: auto; height: 100vh; position: sticky; top: 0; }
-  .widget { background-color: #f7f7f7; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
-  .widget-title { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
-  
-  /* ==========================================================================
-     6. SHARED & MOBILE-ONLY ELEMENTS
-     ========================================================================== */
-  .button { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 99px; text-decoration: none; font-family: var(--font-heading); font-weight: 700; border: none; cursor: pointer; }
-  .button-primary { background-color: var(--accent-color); color: var(--text-color); transition: background-color 0.2s; }
-  .button-primary:hover { background-color: var(--accent-color-darker); }
-  .mobile-fab { display: none; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background-color: var(--accent-color); color: var(--text-color); border-radius: 50%; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 99; text-decoration: none; }
-  .mobile-fab .material-symbols-rounded { font-size: 28px; }
-  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-  .modal-content { background-color: #fff; border-radius: 12px; padding: 2rem; }
-  
-  /* ==========================================================================
-     7. RESPONSIVE DESIGN
-     ========================================================================== */
-  @media (max-width: 1200px) {
-    .dashboard-layout { grid-template-columns: 280px 1fr; }
-    .dashboard-right-column { display: none; }
-  }
-  @media (max-width: 768px) {
-    .dashboard-layout { grid-template-columns: 1fr; }
-    .dashboard-sidebar, .dashboard-right-column { display: none; }
-    .dashboard-main { border: none; padding-top: 60px; }
-    .feed-header { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 100; }
-    .mobile-user-menu { display: block; }
-    .mobile-fab { display: flex; }
-  
-    /* --- THE LOGIC THAT MAKES THE FIX WORK --- */
-    .dropdown-menu.desktop-menu { display: none; } /* Hide the desktop version */
-    .dropdown-menu.mobile-menu { display: block; } /* Show the mobile version */
-  }
+:root {
+  --bg-color: #FDFBF7;
+  --text-color: #333333;
+  --accent-color: #F6C0B5;
+  --accent-color-darker: #E5A89B;
+  --border-color: #e0e0e0;
+  --font-heading: 'Roboto Mono', monospace;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background-color: var(--bg-color); color: var(--text-color); font-family: var(--font-body); }
+
+/* ==========================================================================
+   2. MAIN DASHBOARD LAYOUT (CSS GRID)
+   ========================================================================== */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 100vh;
+}
+
+/* ==========================================================================
+   3. LEFT SIDEBAR & DESKTOP USER MENU
+   ========================================================================== */
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  padding: 1.5rem 1rem;
+  border-right: 1px solid var(--border-color);
+}
+.sidebar-header .logo { font-family: var(--font-heading); font-size: 1.75rem; font-weight: 700; margin-bottom: 2rem; }
+.create-post-desktop { width: 100%; margin-top: 1rem; padding: 1rem 1.5rem; }
+.user-menu { position: relative; }
+.user-menu-button { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem; border-radius: 99px; background: none; border: none; cursor: pointer; transition: background-color 0.2s ease; }
+.user-menu-button:hover { background-color: var(--bg-color); }
+.user-avatar-icon { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.user-info-desktop { text-align: left; line-height: 1.3; }
+.user-name { font-weight: 700; font-size: 1rem; color: var(--text-color); }
+.user-handle { color: #555; font-size: 0.9rem; }
+.more-icon-desktop { margin-left: auto; color: var(--text-color); }
+
+/* ==========================================================================
+   4. DROPDOWN MENU (BASE & SPECIFIC STYLES)
+   ========================================================================== */
+.dropdown-menu {
+  width: 250px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0;
+  z-index: 1000; /* High z-index */
+  animation: fadeIn 0.15s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.dropdown-divider { border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0; }
+.dropdown-switcher { padding: 0.5rem 1.25rem; }
+.dropdown-switcher label { font-size: 0.8rem; font-weight: 600; color: #666; margin-bottom: 0.5rem; }
+.dropdown-switcher .family-select { width: 100%; border-radius: 8px; }
+.dropdown-item { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1.25rem; font-size: 0.95rem; font-weight: 500; text-decoration: none; color: var(--text-color); background: none; border: none; text-align: left; cursor: pointer; }
+.dropdown-item:hover { background-color: var(--bg-color); }
+
+/* Desktop-specific positioning */
+.dropdown-menu.desktop-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+}
+
+/* Mobile-specific positioning (hidden by default) */
+.dropdown-menu.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 60px;
+  right: 1rem;
+}
+
+/* ==========================================================================
+   5. CENTER & RIGHT COLUMNS
+   ========================================================================== */
+.dashboard-main { border-right: 1px solid var(--border-color); overflow-y: auto; }
+.feed-header { display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background-color: rgba(253, 251, 247, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); z-index: 10; }
+.feed-header h3 { font-family: var(--font-heading); font-size: 1.25rem; margin: 0; }
+.mobile-user-menu { display: none; }
+.dashboard-right-column { padding: 2rem; overflow-y: auto; height: 100vh; position: sticky; top: 0; }
+.widget { background-color: #f7f7f7; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
+.widget-title { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
+
+/* ==========================================================================
+   6. SHARED & MOBILE-ONLY ELEMENTS
+   ========================================================================== */
+.button { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 99px; text-decoration: none; font-family: var(--font-heading); font-weight: 700; border: none; cursor: pointer; }
+.button-primary { background-color: var(--accent-color); color: var(--text-color); transition: background-color 0.2s; }
+.button-primary:hover { background-color: var(--accent-color-darker); }
+.mobile-fab { display: none; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background-color: var(--accent-color); color: var(--text-color); border-radius: 50%; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 99; text-decoration: none; }
+.mobile-fab .material-symbols-rounded { font-size: 28px; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background-color: #fff; border-radius: 12px; padding: 2rem; }
+
+/* ==========================================================================
+   7. RESPONSIVE DESIGN
+   ========================================================================== */
+@media (max-width: 1200px) {
+  .dashboard-layout { grid-template-columns: 280px 1fr; }
+  .dashboard-right-column { display: none; }
+}
+@media (max-width: 768px) {
+  .dashboard-layout { grid-template-columns: 1fr; }
+  .dashboard-sidebar, .dashboard-right-column { display: none; }
+  .dashboard-main { border: none; padding-top: 60px; }
+  .feed-header { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 100; }
+  .mobile-user-menu { display: block; }
+  .mobile-fab { display: flex; }
+
+  /* --- THE LOGIC THAT MAKES THE FIX WORK --- */
+  .dropdown-menu.desktop-menu { display: none; } /* Hide the desktop version */
+  .dropdown-menu.mobile-menu { display: block; } /* Show the mobile version */
+}

@@ -13,10 +13,13 @@ import {
   User
 } from '@angular/fire/auth';
 import {
+  arrayUnion,
   doc,
   Firestore,
+  getDoc,
   setDoc,
-  updateDoc
+  updateDoc,
+  writeBatch
 } from '@angular/fire/firestore';
 import { Observable, Subscription } from 'rxjs';
 import { Families } from './families';
@@ -48,14 +51,16 @@ export class AuthService implements OnDestroy {
   async signUpWithEmail(name: string, email: string, password: string, inviteId?: string) {
     try {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+      if(inviteId){
+        
+        await this.switchActiveFamily(inviteId)
+        await this.joinFamily(inviteId)
+      }
       await this.createUserProfile(userCredential.user, { name });
       
       // ADDED: Navigate new users to the welcome page to create/join a family.
       await this.updateUserDisplayName(name);
-     if(inviteId){
-        // await this.familiesService.joinFamily(inviteId)
-        await this.switchActiveFamily(inviteId)
-      }
+
       
       this.router.navigate(['/welcome']); 
       
@@ -75,6 +80,33 @@ export class AuthService implements OnDestroy {
     await updateDoc(userDocRef, { activeFamilyId: familyId });
   }
 
+  async joinFamily(familyId: string, userName?: string): Promise<void> {
+    const user = this.currentUser();
+    if (!user) throw new Error("User must be logged in.");
+    if (userName) await this.updateUserDisplayName(userName);
+
+    const familyRef = doc(this.firestore, `families/${familyId}`);
+    const familySnap = await getDoc(familyRef);
+    if (!familySnap.exists()) throw new Error("No family found with that ID.");
+
+    const batch = writeBatch(this.firestore);
+
+    // 1. Add user to the family's member list
+    batch.update(familyRef, {
+      members: arrayUnion({ uid: user.uid, role: 'member' })
+    });
+    
+    // 2. Add membership to user's profile and set it as active
+    const userRef = doc(this.firestore, `users/${user.uid}`);
+    batch.update(userRef, {
+      activeFamilyId: familyId,
+      familyMemberships: arrayUnion({ familyId: familyId, role: 'member' })
+    });
+
+    await batch.commit();
+    this.router.navigate(['']);
+  }
+
   /**
    * Signs in an existing user and navigates them to the main dashboard.
    */
@@ -83,7 +115,7 @@ export class AuthService implements OnDestroy {
       const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
       
       if(inviteId){
-        // await this.familiesService.joinFamily(inviteId)
+        await this.joinFamily(inviteId)
         await this.switchActiveFamily(inviteId)
       }
       this.router.navigate(['']);
@@ -105,14 +137,15 @@ export class AuthService implements OnDestroy {
       const userCredential = await signInWithPopup(this.auth, provider);
 
       const additionalInfo = getAdditionalUserInfo(userCredential);
+      if(inviteId){
+        await this.joinFamily(inviteId)
+        await this.switchActiveFamily(inviteId)
+      }
       if (additionalInfo?.isNewUser) {
         // This is a new user signing up with Google
         await this.createUserProfile(userCredential.user);
         // ADDED: Navigate the new user to the welcome page.
-        if(inviteId){
-          // await this.familiesService.joinFamily(inviteId)
-          await this.switchActiveFamily(inviteId)
-        }
+    
         this.router.navigate(['/welcome']);
       } else {
         // This is an existing user logging in with Google
