@@ -6,7 +6,7 @@
     --accent-color-darker: #E5A89B; /* For hover states */
     --border-color: #e0e0e0;
     --font-heading: 'Roboto Mono', monospace;
-    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto Mono, Helvetica, Arial, sans-serif;
     background-color: #FDFBF7;
   }
 body { margin: 0;

@@ -99,7 +99,7 @@
           </button>
           <hr class="dropdown-divider">
         }
-        <button mat-menu-item (click)="openInviteModal()">
+        <button mat-menu-item routerLink="/invite-members">
           <mat-icon class="material-symbols-rounded">group_add</mat-icon>
          <span>Invite Members</span> 
         </button>
@@ -129,14 +129,6 @@
       </mat-menu>
     </div>
 
-    <!-- The Invite Members Modal -->
-    @if (isInviteModalOpen()) {
-      <div class="modal-overlay" (click)="closeInviteModal()">
-        <div class="modal-content" (click)="$event.stopPropagation()">
-          <app-invite-members (close)="closeInviteModal()"></app-invite-members>
-        </div>
-      </div>
-    }
 
   } @else {
     <!-- Unauthenticated View -->

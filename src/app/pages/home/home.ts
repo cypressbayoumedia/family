@@ -21,21 +21,7 @@ export class Home {
   public authService = inject(AuthService);
   public familiesService = inject(Families);
   
-  // --- SIGNALS to control the UI ---
-  
-  isInviteModalOpen = signal(false);
 
- 
-  
-  openInviteModal(): void {
-    // We'll close the user menu if it's open when we open the invite modal
-   
-    this.isInviteModalOpen.set(true);
-  }
-  
-  closeInviteModal(): void {
-    this.isInviteModalOpen.set(false);
-  }
   switchFamily(familyId:string){
     this.authService.switchActiveFamily(familyId);
 

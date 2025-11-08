@@ -1,33 +1,44 @@
 /*
-  CSS for the improved Invite Modal Component
+  WIZ'S NOTES:
+  This CSS styles the new full-page invite experience. It centers the
+  content, styles the two distinct invitation methods, and ensures
+  everything is responsive and on-brand.
 */
 
-.invite-modal-content {
-  position: relative;
-  background-color: #fff;
-  border-radius: 16px;
-  padding: 2.5rem 2rem;
-  width: 100%;
-  max-width: 420px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+/* --- Main Page Layout --- */
+.invite-page-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem 1.5rem; /* Extra bottom padding */
 }
 
-.modal-close-button {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #999;
+.page-header {
+  margin-bottom: 2rem;
 }
-.modal-close-button:hover {
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
   color: var(--text-color);
+  font-weight: 600;
+}
+
+/* --- The Main Invite Card --- */
+.invite-card {
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
 
 .invite-header {
-  margin-bottom: 2rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 2.5rem;
 }
 
 .invite-icon {
@@ -38,13 +49,31 @@
 
 .invite-header h3 {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   margin: 0 0 0.5rem 0;
 }
 
 .invite-header p {
   color: #666;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+/* --- Individual Invite Method Sections --- */
+.invite-method {
+  margin-bottom: 1.5rem;
+}
+
+.method-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.method-description {
+  color: #666;
+  margin-bottom: 1.5rem;
 }
 
 .invite-link-wrapper {
@@ -52,20 +81,19 @@
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.75rem 1rem;
-  margin-bottom: 2rem;
-  overflow-x: auto; /* Handles long links on small screens */
+  margin-bottom: 1rem;
+  overflow-x: auto;
 }
 
 .invite-link {
-  font-family: var(--font-heading); /* Monospaced font for the link */
+  font-family: var(--font-heading);
   font-size: 0.95rem;
   color: #555;
-  word-break: break-all; /* Ensures long text doesn't overflow */
+  word-break: break-all;
 }
 
 .invite-actions .button-primary,
 .invite-actions .copy-button {
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -74,24 +102,59 @@
   font-size: 1rem;
   font-weight: 700;
   border-radius: 8px;
+  width: 100%; /* Make button full width */
 }
 
-.copy-button {
-  /* Inherits from .button-secondary but with specific styles */
-  background-color: var(--bg-color);
-  color: var(--text-color);
+/* --- Separator --- */
+.separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #999;
+  margin: 2.5rem 0;
+  font-family: var(--font-heading);
+}
+.separator::before, .separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+.separator:not(:empty)::before { margin-right: 1em; }
+.separator:not(:empty)::after { margin-left: 1em; }
+
+
+/* --- Email Form Styling --- */
+.email-form {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.email-form .input-group {
+  flex-grow: 1;
+}
+
+.email-form input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  font-size: 1rem;
 }
 
-.copy-button:hover {
-  border-color: var(--text-color);
+.email-form .button-secondary {
+  /* Re-uses button styles, but ensures it doesn't stretch */
+  flex-shrink: 0;
 }
 
-/* The state when the button has been clicked */
-.copy-button.copied {
-  background-color: #DFF2BF; /* A nice success green */
-  color: #270;
-  border-color: #DFF2BF;
+/* --- Responsive Adjustments --- */
+@media (max-width: 500px) {
+  .invite-card {
+    padding: 1.5rem;
+  }
+  .invite-header h3 {
+    font-size: 1.5rem;
+  }
+  .email-form {
+    flex-direction: column;
+  }
 }

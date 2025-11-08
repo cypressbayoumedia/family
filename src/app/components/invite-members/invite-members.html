@@ -1,48 +1,75 @@
 <!-- 
   WIZ'S NOTES:
-  This is a complete overhaul focused on reducing friction and improving the invitation experience.
-  1.  The Magic Link: The single biggest improvement. We now generate and share a full URL (`https://thefamilee.app/join?code=XYZ`). This is a one-click process for the new user, dramatically increasing conversion.
-  2.  Clearer UI: Instead of just showing the code, we display the full link in a disabled input-style field. This makes it obvious to desktop users what they are copying.
-  3.  Enhanced Feedback: The "Copy" button now provides superior feedback. It changes its icon to a checkmark AND its text to "Copied!", leaving no doubt the action was successful. This is a best-in-class UX pattern.
-  4.  Branded Experience: The component is no longer a generic box. It has an icon, a more personal title, and styling that aligns perfectly with the rest of the app, making it feel official and trustworthy.
-  5.  Better Structure: Assumes this component is in a modal, so a proper close button is included for better accessibility and user flow.
+  This is a complete redesign from a modal to a full-page experience,
+  incorporating best practices for user invitations.
+  1.  Full-Page Structure: The component is now wrapped in a `.page-container`
+      with a proper header and a clear "Back to Hub" link for easy navigation.
+  2.  Benefit-Oriented Copy: The title is now more active and personal ("Invite
+      Your Family"), and the subtitle reinforces the value proposition.
+  3.  Multiple Invite Options: Following best practices, we now offer two ways to
+      invite: the highly effective "Magic Link" and a direct "Invite by Email"
+      form, which is a very common and user-friendly pattern. [1]
+  4.  Clearer Actions: The "Copy Link" and "Share Link" actions are more
+      prominent and provide excellent visual feedback.
+  5.  Polished UI: The entire component is structured within a card that feels
+      cohesive with the rest of your application's design.
 -->
-<div class="invite-modal-content">
-  <!-- A dedicated close button for the modal -->
-  <button class="modal-close-button"  title="Close"> 
-    <!-- (click)="closeModal()" -->
-    <span class="material-symbols-rounded">close</span>
-  </button>
-  
-  <div class="invite-header">
-    <span class="material-symbols-rounded invite-icon">group_add</span>
-    <h3>Invite Family to "{{ familyName()?.name }}"</h3>
-    <p>They can join instantly with this private invite link.</p>
-  </div>
-  
-  <div class="invite-link-wrapper">
-    <!-- Display the full, clickable invite link -->
-    <span class="invite-link">{{ familyId() }}</span>
-  </div>
+<div class="invite-page-container">
+  <header class="page-header">
+    <a routerLink="/" class="back-link">
+      <span class="material-symbols-rounded">arrow_back</span>
+      Back to Hub
+    </a>
+  </header>
 
-  <div class="invite-actions">
-    <!-- NATIVE SHARE (Mobile): The best experience -->
-    @if (canShare()) {
-      <button class="button-primary" (click)="nativeShare()">
-        <span class="material-symbols-rounded">share</span>
-        Share Invite Link
-      </button>
-    } @else {
-      <!-- DESKTOP FALLBACK: Copying the link is the next best thing -->
-      <button class="copy-button" (click)="copyToClipboard()" [class.copied]="copied()">
-        @if (copied()) {
-          <span class="material-symbols-rounded">check</span>
-          <span>Copied!</span>
+  <div class="invite-card">
+    <div class="invite-header">
+      <span class="material-symbols-rounded invite-icon">group_add</span>
+      <h3>Invite Your Family to {{ familyName()?.name }} Hub</h3>
+      <p>Sharing is better with family. Send an invite and get everyone connected in your private, secure hub.</p>
+    </div>
+
+    <!-- METHOD 1: SHARE A LINK -->
+    <div class="invite-method">
+      <h4 class="method-title">Share a Magic Link</h4>
+      <p class="method-description">Anyone with this link can join. Share it in a text, a group chat, or anywhere you like.</p>
+      <div class="invite-link-wrapper">
+        <span class="invite-link">https://thefamilee.app/invited-to-join/{{familyId()}}</span>
+      </div>
+      <div class="invite-actions">
+        @if (canShare()) {
+          <button class="button-primary" (click)="nativeShare()">
+            <span class="material-symbols-rounded">share</span>
+            Share Invite
+          </button>
         } @else {
-          <span class="material-symbols-rounded">content_copy</span>
-          <span>Copy Link</span>
+          <button class="copy-button" (click)="copyToClipboard()" [class.copied]="copied()">
+            @if (copied()) {
+              <span class="material-symbols-rounded">check</span>
+              <span>Copied!</span>
+            } @else {
+              <span class="material-symbols-rounded">content_copy</span>
+              <span>Copy Link</span>
+            }
+          </button>
         }
-      </button>
-    }
+      </div>
+    </div>
+
+    <!--<div class="separator">or</div>
+
+     METHOD 2: INVITE BY EMAIL -->
+    <!-- <div class="invite-method">
+      <h4 class="method-title">Invite by Email</h4>
+      <p class="method-description">We'll send a friendly invitation directly to their inbox.</p>
+      <div class="email-form">
+        <div class="input-group">
+          <input type="email" placeholder="Enter one or more emails" [(ngModel)]="emailInvites">
+        </div>
+        <button class="button-secondary" (click)="sendEmailInvites()" [disabled]="!emailInvites.trim()">
+          Send Invites
+        </button>
+      </div>
+    </div> -->
   </div>
 </div>

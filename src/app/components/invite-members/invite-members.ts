@@ -20,6 +20,7 @@ export class InviteMembers {
   // Signal to check if the Web Share API is available on this device
   canShare = signal<boolean>(!!navigator.share);
 
+
   // Signal to provide feedback when the user copies the code
   copied = signal<boolean>(false);
 
