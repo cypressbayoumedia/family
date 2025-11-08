@@ -33,7 +33,6 @@
               <img [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName" class="user-avatar-icon" alt="User menu">
               <div class="user-info-desktop">
                 <span class="user-name">{{ authService.currentUser()?.displayName }}</span>
-                <span class="user-handle">@{{ authService.currentUser()?.displayName | lowercase }}</span>
               </div>
               <span class="material-symbols-rounded more-icon-desktop">more_horiz</span>
             </button>
