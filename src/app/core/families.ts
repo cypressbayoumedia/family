@@ -5,6 +5,7 @@ import { AuthService } from './auth';
 import { Subscription, combineLatest, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { User } from '@angular/fire/auth';
+import { getFunctions, httpsCallable } from '@angular/fire/functions';
 
 // Define an interface for a family member for type safety
 export interface FamilyMember {
@@ -18,6 +19,7 @@ export interface Family {
   id: string;
   name: string;
   members: { uid: string; role: string; }[];
+  subscription: { type: string }
 }
 
 @Injectable({
@@ -74,7 +76,8 @@ export class Families implements OnDestroy {
     batch.set(familyRef, {
       name: familyName,
       createdAt: new Date(),
-      members: [{ uid: user.uid, role: 'admin' }]
+      members: [{ uid: user.uid, role: 'admin' }],
+      subscription: { type: 'free' }
     });
 
     // 2. Update the user's profile with the new membership and set it as active
@@ -85,39 +88,35 @@ export class Families implements OnDestroy {
     });
 
     await batch.commit();
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['']);
   }
 
   /**
    * UPDATED: Now accepts an optional user name.
    * If the name is provided, it updates the user's profile before joining the family.
    */
-  async joinFamily(familyId: string, userName?: string): Promise<void> {
-    const user = this.authService.currentUser();
-    if (!user) throw new Error("User must be logged in.");
-    if (userName) await this.authService.updateUserDisplayName(userName);
+async joinFamily(familyId: string, userName?: string): Promise<void> {
+  const user = this.authService.currentUser();
+  if (!user) throw new Error("User must be logged in.");
+  if (userName) await this.authService.updateUserDisplayName(userName);
 
-    const familyRef = doc(this.firestore, `families/${familyId}`);
-    const familySnap = await getDoc(familyRef);
-    if (!familySnap.exists()) throw new Error("No family found with that ID.");
+  const functions = getFunctions();
+  const joinFamilyCallable = httpsCallable(functions, 'joinFamily');
 
-    const batch = writeBatch(this.firestore);
-
-    // 1. Add user to the family's member list
-    batch.update(familyRef, {
-      members: arrayUnion({ uid: user.uid, role: 'member' })
-    });
-    
-    // 2. Add membership to user's profile and set it as active
-    const userRef = doc(this.firestore, `users/${user.uid}`);
-    batch.update(userRef, {
-      activeFamilyId: familyId,
-      familyMemberships: arrayUnion({ familyId: familyId, role: 'member' })
-    });
-
-    await batch.commit();
+  try {
+    const result = await joinFamilyCallable({ familyId });
+    console.log('Successfully joined family:', result.data);
     this.router.navigate(['']);
+  } catch (error: any) {
+    // The error object from a callable function has a 'message' property
+    // that contains the string you passed in the HttpsError on the backend.
+    console.error('Error joining family:', error.message);
+    alert('Error joining family')
+    // Here you can show a notification to the user, for example:
+    // this.uiService.showError(error.message);
+    throw new Error(error.message);
   }
+}
 
 
   /*

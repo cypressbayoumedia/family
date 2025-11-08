@@ -23,6 +23,7 @@ import {
 } from '@angular/fire/firestore';
 import { Observable, Subscription } from 'rxjs';
 import { Families } from './families';
+import { getFunctions, httpsCallable } from '@angular/fire/functions';
 @Injectable({
   providedIn: 'root',
 })
@@ -84,30 +85,26 @@ export class AuthService implements OnDestroy {
     const user = this.currentUser();
     if (!user) throw new Error("User must be logged in.");
     if (userName) await this.updateUserDisplayName(userName);
-
-    const familyRef = doc(this.firestore, `families/${familyId}`);
-    const familySnap = await getDoc(familyRef);
-    if (!familySnap.exists()) throw new Error("No family found with that ID.");
-
-    const batch = writeBatch(this.firestore);
-
-    // 1. Add user to the family's member list
-    batch.update(familyRef, {
-      members: arrayUnion({ uid: user.uid, role: 'member' })
-    });
-    
-    // 2. Add membership to user's profile and set it as active
-    const userRef = doc(this.firestore, `users/${user.uid}`);
-    batch.update(userRef, {
-      activeFamilyId: familyId,
-      familyMemberships: arrayUnion({ familyId: familyId, role: 'member' })
-    });
-
-    await batch.commit();
-    this.router.navigate(['']);
+  
+    const functions = getFunctions();
+    const joinFamilyCallable = httpsCallable(functions, 'joinFamily');
+  
+    try {
+      const result = await joinFamilyCallable({ familyId });
+      console.log('Successfully joined family:', result.data);
+      this.router.navigate(['']);
+    } catch (error: any) {
+      // The error object from a callable function has a 'message' property
+      // that contains the string you passed in the HttpsError on the backend.
+      console.error('Error joining family:', error.message);
+      alert('Error joining family')
+      // Here you can show a notification to the user, for example:
+      // this.uiService.showError(error.message);
+      throw new Error(error.message);
+    }
   }
 
-  /**
+  /** this.router.navigate(['']);
    * Signs in an existing user and navigates them to the main dashboard.
    */
   async signInWithEmail(email: string, password: string, inviteId?: string) {

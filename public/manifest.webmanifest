@@ -1,6 +1,6 @@
 {
-  "name": "myapp",
-  "short_name": "myapp",
+  "name": "The Familee.",
+  "short_name": "The Familee",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
