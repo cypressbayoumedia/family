@@ -1,10 +1,9 @@
 <!-- 
   WIZ'S NOTES:
-  THIS IS THE DEFINITIVE AND COMPLETE HTML. The key change is that the .dropdown-menu's @if block
-  for mobile has been MOVED out of the mobile header. It is now at the bottom of the layout,
-  making it a top-level element that is no longer "trapped" inside the fixed
-  header's rendering layer. This guarantees it can be displayed on top of all
-  other content.
+  This is the complete, cleaned-up HTML. The redundant menu definitions have been
+  removed. We now define the user menu and the switcher submenu only ONCE at the
+  bottom of the file. Both the desktop and mobile trigger buttons point to this
+  single menu definition, which is the correct and efficient Angular Material pattern.
 -->
 @if (authService.loading()) {
   <p class="loading-indicator">Loading your Family Hub...</p>
@@ -27,30 +26,16 @@
         </div>
         
         <div class="sidebar-actions">
-          <!-- Desktop User Menu -->
+          <!-- Desktop User Menu Trigger -->
           <div class="user-menu">
-            <button class="user-menu-button" (click)="toggleUserMenu()">
+            <button class="user-menu-button" [matMenuTriggerFor]="userMenu" aria-label="Open user menu" [matMenuTriggerData]="{name: familiesService.activeFamily()?.name}">
               <img [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName" class="user-avatar-icon" alt="User menu">
               <div class="user-info-desktop">
                 <span class="user-name">{{ authService.currentUser()?.displayName }}</span>
               </div>
               <span class="material-symbols-rounded more-icon-desktop">more_horiz</span>
             </button>
-            <!-- This dropdown only appears on DESKTOP -->
-            @if (isUserMenuOpen()) {
-              <div class="dropdown-menu desktop-menu">
-                @if (familiesService.allUserFamilies().length > 1) {
-                  <div class="dropdown-switcher">
-                    <label>Switch Family</label>
-                    <app-family-switcher></app-family-switcher>
-                  </div>
-                  <hr class="dropdown-divider">
-                }
-                <a class="dropdown-item" (click)="openInviteModal()">Invite Members</a>
-                <a routerLink="/manage-hubs" class="dropdown-item">Manage Hubs</a>
-                <button (click)="authService.signOut()" class="dropdown-item">Sign Out</button>
-              </div>
-            }
+            <!-- The menu panel itself is defined once at the bottom -->
           </div>
         </div>
       </aside>
@@ -60,10 +45,10 @@
       <!-- =============================================================== -->
       <main class="dashboard-main">
         <header class="feed-header">
-          <h3>{{familiesService.activeFamily()?.name}}</h3>
-          <!-- Mobile user menu button (the dropdown itself is rendered outside) -->
+          <h3>{{ familiesService.activeFamily()?.name }}</h3>
+          <!-- Mobile User Menu Trigger -->
            <div class="mobile-user-menu">
-             <button class="user-menu-button" (click)="toggleUserMenu()">
+             <button class="user-menu-button" [matMenuTriggerFor]="userMenu" aria-label="Open user menu" [matMenuTriggerData]="{name:  familiesService.activeFamily()?.name }">
                 <img [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName" class="user-avatar-icon" alt="User menu">
              </button>
            </div>
@@ -92,27 +77,56 @@
       </aside>
       
       <!-- =============================================================== -->
-      <!-- MOBILE-ONLY ELEMENTS (Positioned relative to viewport)          -->
+      <!-- GLOBAL & MOBILE-ONLY ELEMENTS                                   -->
       <!-- =============================================================== -->
       <a routerLink="/create-post" class="mobile-fab">
         <span class="material-symbols-rounded">add</span>
       </a>
 
-      <!-- This dropdown is ONLY visible on MOBILE and is now a top-level element -->
-      @if (isUserMenuOpen()) {
-        <div class="dropdown-menu mobile-menu">
-          @if (familiesService.allUserFamilies().length > 1) {
-            <div class="dropdown-switcher">
-              <label>Switch Family</label>
-              <app-family-switcher></app-family-switcher>
-            </div>
-            <hr class="dropdown-divider">
-          }
-          <a class="dropdown-item" (click)="openInviteModal()">Invite Members</a>
-          <a routerLink="/manage-hubs" class="dropdown-item">Manage Hubs</a>
-          <button (click)="authService.signOut()" class="dropdown-item">Sign Out</button>
-        </div>
-      }
+      <!-- 
+        SINGLE MENU DEFINITION FOR MULTIPLE TRIGGERS 
+        Both the desktop and mobile buttons link to this one menu.
+      -->
+      <mat-menu #userMenu="matMenu" xPosition="before">
+        <ng-template matMenuContent let-name="name">
+        @if (familiesService.allUserFamilies().length > 1) {
+          <button mat-menu-item [matMenuTriggerFor]="familySwitcherMenu">
+            <mat-icon class="material-symbols-rounded">swap_horiz</mat-icon>
+            <span>Switch Family</span>
+            <br>
+            <span class="small-text">{{name}}</span>
+            
+          </button>
+          <hr class="dropdown-divider">
+        }
+        <button mat-menu-item (click)="openInviteModal()">
+          <mat-icon class="material-symbols-rounded">group_add</mat-icon>
+         <span>Invite Members</span> 
+        </button>
+        <a mat-menu-item routerLink="/manage-hubs">
+          <mat-icon class="material-symbols-rounded">settings</mat-icon>
+          <span>Manage Hubs</span>
+        </a>
+        <button mat-menu-item (click)="authService.signOut()">
+          <mat-icon class="material-symbols-rounded">logout</mat-icon>
+          <span>Sign Out</span>
+        </button>
+        </ng-template> 
+      </mat-menu>
+      
+      <!-- Single Submenu Definition for Switching Families -->
+      <mat-menu #familySwitcherMenu="matMenu">
+        @for (family of familiesService.allUserFamilies(); track family.id) {
+          <button mat-menu-item (click)="switchFamily(family.id)">
+            @if (family.id === familiesService.activeFamily()?.id) {
+              <mat-icon class="material-symbols-rounded">check</mat-icon>
+            } @else {
+              <span class="mat-icon-spacer"></span>
+            }
+            <span>{{ family.name }}</span>
+          </button>
+        }
+      </mat-menu>
     </div>
 
     <!-- The Invite Members Modal -->
