@@ -6,9 +6,10 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { Post, Posts } from '../../core/posts'; // Adjust path
 import { Families } from '../../core/families'; // Adjust path
 import { CommentList } from '../comment-list/comment-list';
+import { AudioWaveform } from '../../components/audio-waveform/audio-waveform';
 @Component({
   selector: 'app-post-details',
-  imports: [CommonModule, RouterLink, CommentList],  
+  imports: [CommonModule, RouterLink, CommentList, AudioWaveform],  
   templateUrl: './post-details.html',
   styleUrl: './post-details.css',
 })

@@ -1,0 +1,16 @@
+<div class="waveform-player">
+    <button (click)="togglePlayPause()" class="play-button" [disabled]="isLoading()">
+      <!-- Show a loading spinner or a disabled state -->
+      @if(isLoading()) {
+        <span class="material-symbols-rounded loading">hourglass_empty</span>
+      } @else {
+        <!-- Toggle between play and pause icons -->
+        <span class="material-symbols-rounded">
+          {{ isPlaying() ? 'pause' : 'play_arrow' }}
+        </span>
+      }
+    </button>
+    
+    <!-- This is the container where WaveSurfer will draw the waveform -->
+    <div #waveform class="waveform-container"></div>
+  </div>

@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core
 import { CommonModule, DatePipe } from '@angular/common';
 import { Post } from '../../core/posts';
 import { RouterModule, Router } from '@angular/router';
-
+import { AudioWaveform } from '../../components/audio-waveform/audio-waveform';
 @Component({
   selector: 'app-post-item',
-  imports: [CommonModule, DatePipe, RouterModule],
+  imports: [CommonModule, DatePipe, RouterModule, AudioWaveform],
   templateUrl: './post-item.html',
   styleUrl: './post-item.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

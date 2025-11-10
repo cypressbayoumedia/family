@@ -15,5 +15,9 @@
         "npm --prefix \"$RESOURCE_DIR\" run build"
       ]
     }
+  ],
+  "header":[
+    "Content-Type",
+    "Access-Control-Allow-Origin"
   ]
 }

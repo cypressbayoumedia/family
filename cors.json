@@ -1,0 +1,22 @@
+[
+  {
+    "origin": [
+      "https://9000-firebase-family-1762273868130.cluster-hlmk2l2htragyudeyf6f3tzsi6.cloudworkstations.dev",
+      "http://localhost:4200",
+      "https://thefamilee.app",
+      "https://*.cloudworkstations.dev"
+    ],
+    "method": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "OPTIONS"
+    ],
+    "responseHeader": [
+      "Content-Type",
+      "Access-Control-Allow-Origin"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]

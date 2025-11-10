@@ -1,0 +1,42 @@
+.waveform-player {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: var(--bg-color); /* Dark background from your image */
+    padding: 0.5rem 1rem;
+    border-radius: 30px; /* Pill shape */
+  }
+  
+  .play-button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .play-button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+  }
+  
+  .waveform-container {
+    flex-grow: 1; /* Allows the waveform to fill the remaining space */
+    min-width: 0; /* Important for flexbox to allow shrinking */
+  }
+  
+  /* Optional: Add a spinning animation for the loading icon */
+  .loading {
+    animation: spin 1.5s linear infinite;
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }

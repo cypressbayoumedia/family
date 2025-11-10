@@ -48,7 +48,7 @@
             </div>
           }
           @if (post.audioUrl) {
-            <audio controls [src]="post.audioUrl" class="post-audio"></audio>
+            <app-audio-waveform [audioUrl]="post.audioUrl!"/>
           }
         </div>
       </div>
