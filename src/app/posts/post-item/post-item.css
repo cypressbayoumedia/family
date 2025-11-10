@@ -10,8 +10,8 @@
   margin-top: 1.5rem;
   overflow: hidden; /* Ensures child elements respect the border radius */
   transition: box-shadow 0.2s ease-in-out;
-  margin-left: 1.5rem;
-  margin-right: 1.5rem;
+  margin-left: .5rem;
+  margin-right: .5rem;
 }
 
 

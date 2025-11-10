@@ -62,15 +62,15 @@
   <div class="post-footer">
     <!-- Stop propagation on all footer actions -->
     <div class="footer-actions" (click)="$event.stopPropagation()">
-      <button class="action-button" >
+      <button (click)="navigateToPost(post().id)" class="action-button" >
         <!-- (click)="navigateToPost()" -->
         <span class="material-symbols-rounded">chat_bubble_outline</span>
         <!-- Show real data, even if it's zero -->
-        <span (click)="navigateToPost(post().id)">{{ post().commentCount || 0 }} Comments</span>
+        <span>{{ post().commentCount || 0 }}</span>
       </button>
       <!-- Example of a future "Like" button -->
       <button class="action-button">
-        <span class="material-symbols-rounded">favorite_border</span>
+        <!-- <span class="material-symbols-rounded">favorite_border</span> -->
         <!-- <span>{{ post().likeCount || 0 }}</span> -->
       </button>
     </div>
