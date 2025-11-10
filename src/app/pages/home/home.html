@@ -59,7 +59,7 @@
       <!-- =============================================================== -->
       <!-- RIGHT COLUMN (Desktop Widgets)                                  -->
       <!-- =============================================================== -->
-      <aside class="dashboard-right-column">
+      <!-- <aside class="dashboard-right-column">
         @if (familiesService.allUserFamilies().length > 1) {
           <div class="widget">
              <h3 class="widget-title">Active Family</h3>
@@ -74,7 +74,7 @@
           <h3 class="widget-title">Recent Activity (Coming Soon)</h3>
           <div class="widget-content"></div>
         </div>
-      </aside>
+      </aside> -->
       
       <!-- =============================================================== -->
       <!-- GLOBAL & MOBILE-ONLY ELEMENTS                                   -->
@@ -107,6 +107,10 @@
           <mat-icon class="material-symbols-rounded">settings</mat-icon>
           <span>Manage Hubs</span>
         </a>
+        <a mat-menu-item routerLink="/calendar">
+          <mat-icon class="material-symbols-rounded">calendar_month</mat-icon>
+          <span>Family Calendar</span>
+          </a> 
         <button mat-menu-item (click)="authService.signOut()">
           <mat-icon class="material-symbols-rounded">logout</mat-icon>
           <span>Sign Out</span>

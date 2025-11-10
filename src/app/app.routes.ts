@@ -62,4 +62,9 @@ export const routes: Routes = [
     path: 'invited-to-join/:inviteId', 
     component: JoinHub,
   },
+  {
+    path: 'calendar',
+    loadComponent: () => import('./pages/calendar-page/calendar-page').then(m => m.CalendarPage),
+    canActivate: [AuthGuard],
+  },
 ];

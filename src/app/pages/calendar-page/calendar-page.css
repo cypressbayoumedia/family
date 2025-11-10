@@ -1,0 +1,135 @@
+/*
+  WIZ'S NOTES:
+  This CSS styles the new, visually-driven calendar layout. It styles the
+  monthly grouping, the redesigned event items with date blocks, and the
+  new stateful RSVP buttons for a clean and modern user experience.
+*/
+
+/* --- Main Page Layout --- */
+.calendar-page-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+  
+  .page-header {
+    margin-bottom: 2rem;
+  }
+  .page-header h3 {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+  }
+  
+  /* --- Monthly Grouping --- */
+  .month-group {
+    margin-bottom: 2rem;
+  }
+  
+  .month-header {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+    /* Sticky header for better context while scrolling */
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-color);
+    z-index: 5;
+  }
+  
+  /* --- Event Item Redesign --- */
+  .event-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    transition: box-shadow 0.2s;
+  }
+  .event-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  
+  .event-date-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-color);
+    padding-right: 1rem;
+  }
+  .event-day {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+  .event-month {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #666;
+  }
+  
+  .event-details {
+    flex-grow: 1;
+  }
+  .event-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: block;
+  }
+  .event-subtitle {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  /* Special styling for birthdays/anniversaries */
+  .event-item.birthday {
+    border-left: 4px solid var(--accent-color);
+  }
+  .event-item.birthday .event-title::before {
+    content: '🎂 ';
+  }
+  
+  /* --- New RSVP Button --- */
+  .event-actions {
+    margin-left: auto;
+  }
+  .rsvp-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .rsvp-button.going { background-color: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+  /* .rsvp-button.maybe { ... other styles ... } */
+  /* .rsvp-button.not-going { ... other styles ... } */
+  
+  /* --- Create Event Modal --- */
+  .create-event-form {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 450px;
+  }
+  .create-event-form h4 { font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 1.5rem; }
+  .input-group { margin-bottom: 1rem; }
+  .input-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+  .input-group input { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); }
+  .form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; }
+  
+  /* --- Empty State --- */
+  .empty-state { text-align: center; padding: 3rem 0; }
+  .empty-icon { font-size: 48px; color: #ccc; }
