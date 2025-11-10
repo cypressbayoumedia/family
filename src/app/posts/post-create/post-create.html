@@ -48,7 +48,7 @@
         }
         @if (audioPreviewUrl(); as audioUrl) {
           <div class="preview-item audio-preview">
-            <audio [src]="audioUrl" controls></audio>
+            <<app-audio-waveform [audioUrl]="audioUrl!"/> 
             <button class="remove-media-button" (click)="removeAudio()" title="Remove audio">
               <span class="material-symbols-rounded">close</span>
             </button>

@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
-
+import { AudioWaveform } from '../audio-waveform/audio-waveform';
 @Component({
   selector: 'app-record-audio',
+  imports:[AudioWaveform],
   templateUrl: './record-audio.html',
   styleUrls: ['./record-audio.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

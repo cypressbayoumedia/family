@@ -1,5 +1,5 @@
 <div class="record-audio-container">
-  <button class="close-button" (click)="close()">×</button>
+  <button class="close-button" (click)="close()"><span class="material-symbols-rounded">close</span></button>
   <h2>Record Audio</h2>
 
   <!-- Display error message if microphone access fails -->
@@ -9,7 +9,7 @@
 
   <!-- Initial state: Ready to record -->
   @if (!isRecording() && !audioUrl()) {
-    <button (click)="startRecording()" class="record-button">Start Recording</button>
+    <button (click)="startRecording()" class="record-button button-primary">Start Recording</button>
   }
 
   <!-- Recording state -->
@@ -22,11 +22,11 @@
   <!-- Playback/Save state -->
   @if (audioUrl()) {
     <div class="playback-container">
-      <audio [src]="audioUrl()" controls></audio>
+      <app-audio-waveform [audioUrl]="audioUrl()!"/>
       <div class="button-group">
         <!-- The startRecording function also handles re-recording -->
-        <button (click)="startRecording()" class="rerecord-button">Re-record</button>
-        <button (click)="saveAudio()" class="save-button">Save & Close</button>
+        <button (click)="startRecording()" class="rerecord-button button-secondary">Re-record</button>
+        <button (click)="saveAudio()" class="save-button button-primary">Save & Close</button>
       </div>
     </div>
   }

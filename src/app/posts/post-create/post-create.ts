@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, OnDestroy, signal } from '@
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
+import { AudioWaveform } from '../../components/audio-waveform/audio-waveform';
 // Import the NEW, family-aware PostsService
 import { Posts } from '../../core/posts'; // Adjust path if needed
 import { RecordAudio } from '../../components/record-audio/record-audio';
@@ -10,7 +10,7 @@ import { AuthService } from '../../core/auth';
 
 @Component({
   selector: 'app-post-create',
-  imports: [FormsModule, CommonModule, RecordAudio, RouterModule],
+  imports: [FormsModule, CommonModule, RecordAudio, RouterModule, AudioWaveform],
   templateUrl: './post-create.html',
   styleUrl: './post-create.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

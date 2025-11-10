@@ -2,7 +2,7 @@
     <button (click)="togglePlayPause()" class="play-button" [disabled]="isLoading()">
       <!-- Show a loading spinner or a disabled state -->
       @if(isLoading()) {
-        <span class="material-symbols-rounded loading">hourglass_empty</span>
+        <span class="material-symbols-rounded loading">cycle</span> 
       } @else {
         <!-- Toggle between play and pause icons -->
         <span class="material-symbols-rounded">
