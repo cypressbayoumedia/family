@@ -151,3 +151,11 @@
   font-size: 36px;
   cursor: pointer;
 }
+
+/* Add this to your existing post-details.css file */
+
+.details-comments {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb; /* A nice separator line */
+}

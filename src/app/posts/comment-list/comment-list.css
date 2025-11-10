@@ -1,0 +1,103 @@
+/*
+  WIZ'S NOTES:
+  This CSS styles the entire comment section, providing a clean, modern,
+  and on-brand experience that encourages user interaction.
+*/
+
+/* --- Main Container --- */
+.comments-section {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-top: 2rem;
+    padding: 1.5rem;
+  }
+  
+  /* --- Header ("Comments (3)") --- */
+  .comments-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .comments-header h3 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    margin: 0;
+  }
+  
+  /* --- Empty State ("Be the first to comment") --- */
+  .empty-comments {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #666;
+  }
+  
+  .empty-comments .material-symbols-rounded {
+    font-size: 40px;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+  }
+  
+  /* --- Comment Form Area --- */
+  .comment-form-area {
+    display: flex;
+    align-items: flex-start; /* Aligns avatar with the top of the textarea */
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  
+  .user-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .form-controls {
+    flex-grow: 1; /* Allows the form to take up the remaining space */
+  }
+  
+  .comment-textarea {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.5rem 0.25rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    background-color: transparent;
+    resize: none; /* Crucial for auto-resizing behavior */
+    overflow: hidden; /* Also needed for auto-resizing */
+    transition: border-color 0.2s ease;
+  }
+  
+  .comment-textarea:focus {
+    outline: none;
+    border-bottom-color: var(--accent-color);
+  }
+  
+  /* --- Form Actions (the "Post" button) --- */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.75rem;
+  }
+  
+  .submit-comment-button {
+    /* Reusing brand button styles for consistency */
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+  
+  .submit-comment-button:disabled {
+    background-color: #ccc;
+    opacity: 0.7;
+    cursor: not-allowed;
+  }

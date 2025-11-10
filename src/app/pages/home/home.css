@@ -44,7 +44,18 @@
     padding: 1.5rem 1rem;
     border-right: 1px solid var(--border-color);
   }
-  .sidebar-header .logo { font-family: var(--font-heading); font-size: 1.75rem; font-weight: 700; margin-bottom: 2rem; }
+   .sidebar-header .logo {
+    display: flex;
+    align-items: center;
+    font-family: var(--font-heading); 
+    font-size: 1.75rem; 
+    font-weight: 700; 
+    margin-bottom: 2rem; 
+   }
+   .sidebar-header .logo img {
+    height: 1em;
+    margin-right: 0.25em;
+   }
   .create-post-desktop { width: 100%; margin-top: 1rem; padding: 1rem 1.5rem; }
   .user-menu { position: relative; } /* Still needed as a container */
   .user-menu-button { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem; border-radius: 99px; background: none; border: none; cursor: pointer; transition: background-color 0.2s ease; }
@@ -73,7 +84,7 @@
      ========================================================================== */
   .button { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 99px; text-decoration: none; font-family: var(--font-heading); font-weight: 700; border: none; cursor: pointer; }
   .button-primary { background-color: var(--accent-color); color: var(--text-color); transition: background-color 0.2s; }
-  .button-primary:hover { background-color: var(--accent-color-darker); }
+  .button-primary:hover { color: var(--bg-color); background-color: var(--accent-color-darker); }
   .mobile-fab { display: none; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background-color: var(--accent-color); color: var(--text-color); border-radius: 50%; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 99; text-decoration: none; }
   .mobile-fab .material-symbols-rounded { font-size: 28px; }
   .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }

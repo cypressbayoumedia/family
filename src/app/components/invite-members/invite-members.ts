@@ -33,8 +33,8 @@ export class InviteMembers {
 
     const shareData = {
       title: 'Join our Familee!',
-      text: `You've been invited to join our family hub. Use this invite link to sign up`,
-       url: `https://thefamilee.app/invited-to-join/${inviteCode}` 
+      text: `I'm setting up our private family space on The Familee! Let's have one central place for family stuff, away from public social media. Here’s our private link to join it's super quick!`,
+      url: `https://thefamilee.app/invited-to-join/${inviteCode}` 
     };
 
     try {

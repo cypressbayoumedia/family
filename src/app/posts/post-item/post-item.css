@@ -3,13 +3,18 @@
 */
 
 .post-card {
-  background-color: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+  background-color: #fffdf6;
+  border: .5px solid var(--border-color);
+  border-radius: 24px;
   margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
   overflow: hidden; /* Ensures child elements respect the border radius */
   transition: box-shadow 0.2s ease-in-out;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
 }
+
+
 
 .post-card:hover {
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
@@ -90,7 +95,7 @@
 /* === Footer === */
 .post-footer {
   padding: 0.5rem 1.25rem;
-  border-top: 1px solid var(--border-color);
+ 
   margin-top: 1rem;
 }
 

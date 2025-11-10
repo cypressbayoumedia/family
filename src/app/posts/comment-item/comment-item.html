@@ -1,0 +1,44 @@
+<!-- 
+  WIZ'S NOTES:
+  This is a more robust and complete structure for a single comment.
+  1.  Semantic Container: The component is now wrapped in an `<article>` tag, which
+      is the semantically correct choice for a piece of self-contained,
+      user-generated content.
+  2.  Timestamp Added: A timestamp is a critical piece of context for any
+      conversation. It's now included and designed to be formatted with a
+      `timeAgo` pipe for the best user experience (e.g., "5m ago").
+  3.  Options Menu: A "more" button has been added. This is a crucial UI element
+      for future features like allowing a user to delete or edit their own
+      comment, or for an admin to moderate.
+  4.  Improved Structure: The author name and timestamp are now grouped in a
+      header, which allows for better layout control with CSS.
+-->
+<article class="comment-item">
+    <!-- The user's avatar -->
+    <div class="comment-avatar">
+      @if (comment.authorPhotoURL) {
+        <img [src]="comment.authorPhotoURL" [alt]="comment.authorName + ' avatar'">
+      } @else {
+        <div class="avatar-fallback">
+          <span>{{ comment.authorName.charAt(0) }}</span>
+        </div>
+      }
+    </div>
+  
+    <!-- The main content of the comment -->
+    <div class="comment-content">
+      <div class="comment-header">
+        <div class="author-info">
+          <span class="comment-author">{{ comment.authorName }}</span>
+          <span class="comment-timestamp">· {{ comment.createdAt?.toDate()|date}}</span>
+        </div>
+        <button class="options-button" title="Comment options">
+          <span class="material-symbols-rounded">more_horiz</span>
+        </button>
+      </div>
+      
+      <div class="comment-body">
+        <p class="comment-text">{{ comment.text }}</p>
+      </div>
+    </div>
+  </article>

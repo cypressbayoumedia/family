@@ -2,6 +2,7 @@
   <!-- Just change 'posts' to 'posts$' to match the component property -->
   @for (post of (posts$ | async); track post.id) {
     <app-post-item [post]="post"></app-post-item>
+    <span class="post-separator"></span>
   } @empty {
     <!-- It's good practice to add an @empty block for when there are no posts -->
     <div class="empty-feed-message">

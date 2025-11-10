@@ -53,6 +53,7 @@
         <div (click)="$event.stopPropagation()">
           <audio controls [src]="post().audioUrl" class="post-audio"></audio>
         </div>
+        
       }
     </div>
   </div>
@@ -65,7 +66,7 @@
         <!-- (click)="navigateToPost()" -->
         <span class="material-symbols-rounded">chat_bubble_outline</span>
         <!-- Show real data, even if it's zero -->
-        <!-- <span>{{ post().commentCount || 0 }}</span> -->
+        <span (click)="navigateToPost(post().id)">{{ post().commentCount || 0 }} Comments</span>
       </button>
       <!-- Example of a future "Like" button -->
       <button class="action-button">

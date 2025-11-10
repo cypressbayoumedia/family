@@ -5,10 +5,10 @@ import { Observable, of, switchMap } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Post, Posts } from '../../core/posts'; // Adjust path
 import { Families } from '../../core/families'; // Adjust path
-
+import { CommentList } from '../comment-list/comment-list';
 @Component({
   selector: 'app-post-details',
-  imports: [CommonModule, RouterLink],  
+  imports: [CommonModule, RouterLink, CommentList],  
   templateUrl: './post-details.html',
   styleUrl: './post-details.css',
 })

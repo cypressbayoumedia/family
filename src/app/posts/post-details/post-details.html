@@ -52,27 +52,13 @@
           }
         </div>
       </div>
+      <div class="details-comments">
+        @if (post.id) {
+          <app-comment-list [familyId]="post.familyId" [postId]="post.id"></app-comment-list>
+        }
+      </div>
     </div>
 
-    
-   <!-- <section class="comments-section">
-      <div class="comments-header">
-         <h3>Comments ({{ post.commentCount || 0 }})</h3>
-      </div>
-       -->
-      <!-- This is where you would render the list of comments -->
-      <!-- <div class="comments-list"> -->
-        <!-- Example: <app-comment-item *ngFor="let comment of comments"></app-comment-item> -->
-        <!-- <p class="placeholder-text">Be the first to leave a comment!</p>
-      </div> -->
-
-      <!-- This is where you would place the form for adding a new comment -->
-      <!-- <div class="comment-form-area"> -->
-        <!-- Example: <app-comment-form [postId]="post.id"></app-comment-form> -->
-         <!-- <textarea placeholder="Write a comment..."></textarea>
-         <button class="button-primary">Submit</button>
-      </div> 
-    </section>-->
 
   } @else {
     <p class="loading-indicator">Loading post...</p>

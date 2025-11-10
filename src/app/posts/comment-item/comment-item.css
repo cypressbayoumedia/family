@@ -1,0 +1,96 @@
+/*
+  WIZ'S NOTES:
+  This CSS styles a single comment item. It uses Flexbox for a robust
+  layout and is styled to be clean, scannable, and on-brand.
+*/
+
+/* --- Main Article Container --- */
+.comment-item {
+    display: flex;
+    align-items: flex-start; /* Aligns avatar with the top of the comment */
+    gap: 0.75rem;
+    padding: 1rem 0; /* Vertical padding to separate comments */
+  }
+  
+  /* Add a border between comments, but not on the last one */
+  .comment-item:not(:last-child) {
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  /* --- Avatar Styling --- */
+  .comment-avatar img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .avatar-fallback {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--text-color);
+  }
+  
+  /* --- Comment Content Container --- */
+  .comment-content {
+    flex-grow: 1; /* Takes up the remaining space */
+  }
+  
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+  }
+  
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap; /* Allows timestamp to wrap on tiny screens */
+  }
+  
+  .comment-author {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  
+  .comment-timestamp {
+    font-size: 0.85rem;
+    color: #666;
+  }
+  
+  /* --- Options Button (the "...") --- */
+  .options-button {
+    background: none;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .options-button:hover {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+  
+  /* --- Comment Text Body --- */
+  .comment-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-color);
+    white-space: pre-wrap; /* Respects line breaks and spacing */
+    word-break: break-word; /* Prevents long words from overflowing */
+  }

@@ -22,6 +22,7 @@ export interface Post {
   imageUrl?: string;
   audioUrl?: string;
   createdAt: any; // Stays as `any` for serverTimestamp compatibility
+  commentCount?: number;
 }
 
 @Injectable({
