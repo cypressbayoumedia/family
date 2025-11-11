@@ -3,7 +3,7 @@
   This is a complete redesign from a modal to a full-page experience,
   incorporating best practices for user invitations.
   1.  Full-Page Structure: The component is now wrapped in a `.page-container`
-      with a proper header and a clear "Back to Hub" link for easy navigation.
+      with a proper header and a clear "Back to Circle" link for easy navigation.
   2.  Benefit-Oriented Copy: The title is now more active and personal ("Invite
       Your Family"), and the subtitle reinforces the value proposition.
   3.  Multiple Invite Options: Following best practices, we now offer two ways to
@@ -18,15 +18,15 @@
   <header class="page-header">
     <a routerLink="/" class="back-link">
       <span class="material-symbols-rounded">arrow_back</span>
-      Back to Hub
+      Back to Circle
     </a>
   </header>
 
   <div class="invite-card">
     <div class="invite-header">
       <span class="material-symbols-rounded invite-icon">group_add</span>
-      <h3>Invite Your Family to {{ familyName()?.name }} Hub</h3>
-      <p>Sharing is better with family. Send an invite and get everyone connected in your private, secure hub.</p>
+      <h3>Invite Your Family to {{ familyName()?.name }} Circle</h3>
+      <p>Sharing is better with family. Send an invite and get everyone connected in your private, secure circle.</p>
     </div>
 
     <!-- METHOD 1: SHARE A LINK -->

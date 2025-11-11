@@ -24,7 +24,7 @@ export class ManageFamilies {
   successMessage = signal<string | null>(null);
 
   /**
-   * Creates a new family hub. The service will automatically make it the active hub.
+   * Creates a new family circle. The service will automatically make it the active circle.
    */
   async createHub(): Promise<void> {
     if (!this.newFamilyName().trim()) return;
@@ -37,14 +37,14 @@ export class ManageFamilies {
       await this.familiesService.createFamily(this.newFamilyName().trim());
       // The service automatically navigates back to the dashboard on success.
     } catch (error: any) {
-      this.errorMessage.set(error.message || 'Failed to create hub.');
+      this.errorMessage.set(error.message || 'Failed to create circle.');
     } finally {
       this.isLoading.set(false);
     }
   }
 
   /**
-   * Joins an existing family hub. The service will automatically make it the active hub.
+   * Joins an existing family circle. The service will automatically make it the active circle.
    */
   async joinHub(): Promise<void> {
     if (!this.inviteCode().trim()) return;
@@ -61,7 +61,7 @@ export class ManageFamilies {
       if (error.message.includes("No family found")) {
         this.errorMessage.set("Invalid invite code. Please check and try again.");
       } else {
-        this.errorMessage.set(error.message || 'Failed to join hub.');
+        this.errorMessage.set(error.message || 'Failed to join circle.');
       }
     } finally {
       this.isLoading.set(false);

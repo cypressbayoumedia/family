@@ -53,7 +53,7 @@ export const routes: Routes = [
     data: { authGuardPipe: redirectUnauthorizedToLogin }
   },
   {
-    path: 'manage-hubs',
+    path: 'manage-circles',
     loadComponent: () => import('./pages/manage-families/manage-families').then(m => m.ManageFamilies),
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }

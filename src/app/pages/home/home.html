@@ -6,7 +6,7 @@
   single menu definition, which is the correct and efficient Angular Material pattern.
 -->
 @if (authService.loading()) {
-  <p class="loading-indicator">Loading your Family Hub...</p>
+  <p class="loading-indicator">Loading your Family Circle...</p>
 } @else {
   @if (authService.currentUser()) {
     <div class="dashboard-layout">
@@ -103,7 +103,7 @@
           <mat-icon class="material-symbols-rounded">group_add</mat-icon>
          <span>Invite Members</span> 
         </button>
-        <a mat-menu-item routerLink="/manage-hubs">
+        <a mat-menu-item routerLink="/manage-circles">
           <mat-icon class="material-symbols-rounded">settings</mat-icon>
           <span>Manage Hubs</span>
         </a>

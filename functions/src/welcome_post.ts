@@ -34,7 +34,7 @@ export const createWelcomePost = onDocumentCreated("families/{familyId}", async 
     const creatorPhotoURL = authUserRecord.photoURL || null; 
 
     const familyName = familyData.name;
-    const welcomeMessage = `Welcome to the ${familyName} Hub! This is our new private space to share updates, stay connected, and celebrate together. I'll be inviting everyone to join us here shortly!`;
+    const welcomeMessage = `Welcome to the ${familyName} Circle! This is our new private space to share updates, stay connected, and celebrate together. I'll be inviting everyone to join us here shortly!`;
     
     const welcomePost = {
       authorId: creatorUid,

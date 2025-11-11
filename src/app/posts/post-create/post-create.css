@@ -12,7 +12,7 @@
   margin-bottom: 1rem;
 }
 
-/* Reuses .back-link from the manage-hubs page for consistency */
+/* Reuses .back-link from the manage-circles page for consistency */
 .back-link {
   display: inline-flex;
   align-items: center;

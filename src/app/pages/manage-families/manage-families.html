@@ -4,7 +4,7 @@
   1.  Clear Hierarchy: A proper header with a prominent back link, title, and subtitle sets the context clearly.
   2.  Parallel Choices: By placing the "Create" and "Join" actions in a side-by-side grid (on desktop), we present them as equal choices, making the page easier to scan and understand.
   3.  Contextual Feedback: Error and success messages are now placed *inside* the respective action cards. This is much better UX, as the feedback appears directly next to the action the user just took. (This may require a small logic change to have separate error/success variables for each action, e.g., `createErrorMessage` and `joinErrorMessage`).
-  4.  Descriptive Copy: The titles and descriptions are more engaging and provide examples of *why* a user might create another hub ("Perfect for cousins, vacation planning...").
+  4.  Descriptive Copy: The titles and descriptions are more engaging and provide examples of *why* a user might create another circle ("Perfect for cousins, vacation planning...").
   5.  Brand Reinforcement: Icons and consistent styling reinforce the app's visual identity.
 -->
 
@@ -15,18 +15,18 @@
       Back to My Family
     </a>
     <h1 class="manage-title">Expand Your Family Circles</h1>
-    <p class="manage-subtitle">Create a new, separate hub for a different group, or join another family's circle with their invite code.</p>
+    <p class="manage-subtitle">Create a new, separate circle for a different group, or join another family's circle with their invite code.</p>
   </div>
 
   <div class="manage-choices-grid">
-    <!-- ACTION CARD 1: CREATE A HUB -->
+    <!-- ACTION CARD 1: CREATE A CIRCLE -->
     <div class="action-card">
       <span class="material-symbols-rounded icon-medium">add_circle</span>
-      <h3>Create a New Hub</h3>
+      <h3>Create a New Circle</h3>
       <p class="card-description">Perfect for the cousins' crew, a vacation planning group, or a different branch of the family.</p>
 
       <div class="form-group">
-        <label for="newFamilyName">New Hub Name</label>
+        <label for="newFamilyName">New Circle Name</label>
         <input 
           id="newFamilyName"
           class="form-input"
@@ -49,15 +49,15 @@
         class="button-primary"
         (click)="createHub()" 
         [disabled]="isLoading() || !newFamilyName().trim()">
-        {{ isLoading() ? 'Creating...' : 'Create Hub' }}
+        {{ isLoading() ? 'Creating...' : 'Create Circle' }}
       </button>
     </div>
 
-    <!-- ACTION CARD 2: JOIN A HUB -->
+    <!-- ACTION CARD 2: JOIN A CIRCLE -->
     <div class="action-card">
       <span class="material-symbols-rounded icon-medium">key</span>
-      <h3>Join an Existing Hub</h3>
-      <p class="card-description">Someone from another family hub must share their unique invite code with you.</p>
+      <h3>Join an Existing Circle</h3>
+      <p class="card-description">Someone from another family circle must share their unique invite code with you.</p>
 
       <div class="form-group">
         <label for="inviteCode">Invite Code</label>
@@ -83,7 +83,7 @@
         class="button-secondary"
         (click)="joinHub()" 
         [disabled]="isLoading() || !inviteCode().trim()">
-        {{ isLoading() ? 'Joining...' : 'Join Hub' }}
+        {{ isLoading() ? 'Joining...' : 'Join Circle' }}
       </button>
     </div>
   </div>
