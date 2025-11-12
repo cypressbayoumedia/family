@@ -66,5 +66,6 @@ export const routes: Routes = [
     path: 'calendar',
     loadComponent: () => import('./pages/calendar-page/calendar-page').then(m => m.CalendarPage),
     canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin }
   },
 ];

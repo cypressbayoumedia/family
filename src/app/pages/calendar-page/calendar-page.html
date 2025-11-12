@@ -1,71 +1,60 @@
-<div class="calendar-page-container">
-  
-    <!-- Page Header with Title and "New Event" Button -->
-    <header class="page-header">
-      <h3>Family Calendar</h3>
-      <button class="button-primary button" (click)="showCreateForm.set(true)">
-        <span class="material-symbols-rounded">add</span>
-        New Event
-      </button>
-    </header>
-  
-    <!-- Create Event Form (Modal Overlay) -->
-    @if(showCreateForm()) {
-      <div class="modal-overlay" (click)="showCreateForm.set(false)">
-        <div class="create-event-form" (click)="$event.stopPropagation()">
-          <h4>Create a New Event</h4>
-          <div class="input-group">
-            <label for="eventTitle">Event Name</label>
-            <input id="eventTitle" type="text" [(ngModel)]="newEventTitle" placeholder="e.g., Family Reunion Potluck">
-          </div>
-          <div class="input-group">
-            <label for="eventDate">Date</label>
-            <input id="eventDate" type="date" [(ngModel)]="newEventDate">
-          </div>
-          <div class="form-actions">
-            <button class="button-secondary" (click)="showCreateForm.set(false)">Cancel</button>
-            <button class="button-primary" (click)="createEvent()">Create Event</button>
-          </div>
+<div class="calendar-page">
+  <header class="calendar-header">
+    <h2>Family Calendar</h2>
+    <button class="button-primary" (click)="showCreateForm.set(true)">+ New Event</button>
+  </header>
+
+  <!-- Create Event Form (Modal) -->
+  @if(showCreateForm()) {
+    <div class="modal-overlay" (click)="showCreateForm.set(false)">
+      <div class="create-event-form" (click)="$event.stopPropagation()">
+        <h3>Create a New Event</h3>
+        <input type="text" [(ngModel)]="newEventTitle" placeholder="Event Name (e.g., Family BBQ)">
+        <input type="date" [(ngModel)]="newEventDate">
+        <div class="form-actions">
+          <button class="button-secondary" (click)="showCreateForm.set(false)">Cancel</button>
+          <button class="button-primary" (click)="createEvent()">Create</button>
         </div>
       </div>
-    }
-  
-    <!-- The Main Calendar Content Area -->
-    <div class="calendar-content">
-      
-      <!-- Outer Loop: Iterates over each month group (e.g., "November 2025") -->
-      @for(month of eventsByMonth$ | async; track month.name) {
-        <div class="month-group">
-          <h4 class="month-header">{{ month.name }}</h4>
-          <div class="event-list">
-  
-            <!-- Inner Loop: Iterates over each event within that month -->
-            @for(event of month.events; track event.id || event.title) {
-              <div class="event-item" [class.birthday]="event.type === 'birthday'">
-                
-                <!-- Left Side: The scannable date block -->
-                <div class="event-date-block">
-                  <span class="event-day">{{ event.start | date:'d' }}</span>
-                  <span class="event-month">{{ event.start | date:'MMM' }}</span>
-                </div>
-                
-                <!-- Middle: The event title and details -->
-                <div class="event-details">
-                  <span class="event-title">{{ event.title }}</span>
-                  <span class="event-subtitle">{{ event.start | date:'EEEE' }}</span>
-                </div>
-          
-              </div>
-            }
-          </div>
-        </div>
-      } @empty {
-        <!-- This block is shown only if there are no events at all -->
-        <div class="empty-state">
-          <span class="material-symbols-rounded empty-icon">calendar_month</span>
-          <h4>No upcoming events</h4>
-          <p>Create a new event to get your family organized.</p>
-        </div>
-      }
     </div>
+  }
+
+  <!-- List of Upcoming Events -->
+  <div class="event-list">
+    @for(event of events$ | async; track event.id || event.title) {
+      <div class="event-item" [ngClass]="event.type">
+        @if (isEventOwner(event)) {
+          <button class="delete-event-button" (click)="deleteEvent(event)" title="Delete event">
+            <span class="material-symbols-rounded">delete</span>
+          </button>
+        }
+        <div class="event-icon">
+
+          <span class="material-symbols-rounded">{{ event.type === 'birthday' ? '🎂' : 'calendar_month' }}</span>
+        </div>
+        <div class="event-details">
+          <span class="event-date">{{ event.start | date:'fullDate' }}</span>
+          <span class="event-title">{{ event.title }}</span>
+        </div>
+        
+        @if(event.type === 'custom') {
+          <div class="event-rsvp">
+            <button 
+              [class.active]="getUserRsvpStatus(event) === 'attending'"
+              (click)="updateRsvp(event.id, 'attending')">Attending</button>
+            <button 
+              [class.active]="getUserRsvpStatus(event) === 'maybe'"
+              (click)="updateRsvp(event.id, 'maybe')">Maybe</button>
+            <button 
+              [class.active]="getUserRsvpStatus(event) === 'not_attending'"
+              (click)="updateRsvp(event.id, 'not_attending')">Not Attending</button>
+          </div>
+        }
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <p>No upcoming events. Create one to get started!</p>
+      </div>
+    }
   </div>
+</div>

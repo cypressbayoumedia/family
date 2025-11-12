@@ -25,7 +25,7 @@ export interface Message {
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService {
+export class Chat {
   private afs = inject(Firestore);
   private authService = inject(AuthService);
 
