@@ -1,0 +1,215 @@
+/*
+  WIZ'S NOTES:
+  This CSS fixes the "bleeding" issue with the inputs and buttons.
+  The key fix is adding `box-sizing: border-box;` explicitly to the
+  input and base button styles to ensure their padding is calculated
+  as part of their total width, not added on top of it.
+*/
+
+/* --- 1. Main Page Layout --- */
+.profile-page-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem 1.5rem;
+  }
+  
+  .profile-card {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+  
+  .profile-card h2 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    text-align: center;
+    margin: 0 0 2rem 0;
+  }
+  
+  /* --- 2. Profile Picture Section --- */
+  .profile-picture-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  
+  .profile-picture-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  
+  .profile-picture-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .edit-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .profile-picture-wrapper:hover .edit-overlay {
+    opacity: 1;
+  }
+  
+  .edit-overlay .material-symbols-rounded {
+    font-size: 36px;
+  }
+  
+  /* --- 3. User Details Form --- */
+  .details-section {
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    background-color: var(--bg-color);
+    /* --- THE FIX for INPUTS --- */
+    box-sizing: border-box; 
+  }
+  
+  .form-group input:disabled {
+    background-color: #f0f0f0;
+    color: #888;
+    cursor: not-allowed;
+  }
+  
+  /* --- 4. Shared Button Styles --- */
+  /* Base button styles applied to all buttons in this component */
+  .button-primary, .button-secondary, .button-danger {
+    width: 100%;
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    /* --- THE FIX for ALL BUTTONS --- */
+    box-sizing: border-box;
+  }
+  
+  .button-primary {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+  }
+  .button-primary:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .button-secondary {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+  
+  .button-danger {
+    background-color: #e53e3e;
+    color: #fff;
+    border: none;
+  }
+  .button-danger:hover {
+    background-color: #c53030;
+  }
+  
+  
+  /* --- 5. Feedback Messages --- */
+  .feedback {
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    text-align: center;
+  }
+  .feedback.success { color: #270; background-color: #DFF2BF; }
+  .feedback.error { color: #D8000C; background-color: #FFD2D2; }
+  
+  
+  /* --- 6. My Families Section --- */
+  .families-section {
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .families-section h3 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  
+  .families-section ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1.5rem;
+  }
+  
+  .families-section li {
+    background-color: var(--bg-color);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  
+  /* --- 7. Danger Zone --- */
+  .danger-zone {
+    background-color: #fff5f5;
+    border: 1px solid #e53e3e;
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+  
+  .danger-zone h3 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    color: #c53030;
+    margin-bottom: 0.5rem;
+  }
+  
+  .danger-zone p {
+    color: #e53e3e;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }

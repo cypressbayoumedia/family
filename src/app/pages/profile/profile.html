@@ -1,0 +1,65 @@
+<div class="profile-page-container">
+    <a routerLink="/" class="back-link">
+        <span class="material-symbols-rounded">arrow_back</span>
+        Back to My Family
+      </a>
+    @if(currentUser()){
+      <div class="profile-card">
+        <h2>My Profile</h2>
+        
+        <!-- Profile Picture Section -->
+        <div class="profile-picture-section">
+          <label for="profile-picture-upload" class="profile-picture-wrapper" title="Change profile picture">
+            <img [src]="imagePreviewUrl() || currentUser()?.photoURL || 'assets/default-avatar.png'" alt="Profile picture">
+            <span class="edit-overlay">
+              <span class="material-symbols-rounded">edit</span>
+            </span>
+          </label>
+          <input id="profile-picture-upload" type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+        </div>
+  
+        <!-- User Details Section -->
+        <div class="details-section">
+          <div class="form-group">
+            <label for="name">Display Name</label>
+            <input id="name" type="text" [(ngModel)]="editableName">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" [value]="currentUser()?.email || ''" disabled>
+          </div>
+          <button class="button-primary" (click)="saveProfile()" [disabled]="isLoading()">
+            {{ isLoading() ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+  
+        <!-- Feedback Messages -->
+        @if(successMessage()){ <p class="feedback success">{{ successMessage() }}</p> }
+        @if(errorMessage()){ <p class="feedback error">{{ errorMessage() }}</p> }
+  
+        <!-- My Families Section -->
+        <div class="families-section">
+          <h3>My Family Circles</h3>
+          <ul>
+            @for(family of allUserFamilies(); track family.id) {
+              <li>{{ family.name }}</li>
+            } @empty {
+              <li>You are not a member of any family circles yet.</li>
+            }
+          </ul>
+          <a routerLink="/manage-circles" class="button-secondary">Manage Circles</a>
+        </div>
+  
+        <!-- Danger Zone Section -->
+        <div class="danger-zone">
+          <h3>Danger Zone</h3>
+          <p>Deleting your account is permanent and cannot be undone.</p>
+          <button class="button-danger" (click)="deleteAccount()" [disabled]="isLoading()">
+            Delete My Account
+          </button>
+        </div>
+      </div>
+    } @else {
+      <p>Loading profile...</p>
+    }
+  </div>

@@ -24,6 +24,9 @@ import {
 import { Observable, Subscription } from 'rxjs';
 import { Families } from './families';
 import { getFunctions, httpsCallable } from '@angular/fire/functions';
+import { getStorage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage'; // <-- Import Storage functions
+import { deleteUser } from '@angular/fire/auth';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -31,7 +34,7 @@ export class AuthService implements OnDestroy {
   private readonly auth: Auth = inject(Auth);
   private readonly firestore: Firestore = inject(Firestore);
   private readonly router: Router = inject(Router);
-
+  private readonly storage = getStorage();
   public readonly currentUser = signal<User | null>(null);
   public readonly loading = signal<boolean>(true);
 
@@ -192,16 +195,58 @@ export class AuthService implements OnDestroy {
     const user = this.currentUser();
     if (!user) throw new Error("User must be logged in to update their name.");
 
-    // 1. Update the Firebase Authentication user profile
+    // 1. Update the Firebase Auth user profile
     await updateProfile(user, { displayName: name });
 
-    // 2. Update the user's document in the 'users' collection in Firestore
+    // 2. Update the user's document in Firestore
     const userDocRef = doc(this.firestore, `users/${user.uid}`);
     await updateDoc(userDocRef, { name: name });
 
-    // 3. Manually refresh the currentUser signal to reflect the change immediately
-    this.currentUser.set({ ...user, displayName: name });
+    // 3. THE FIX: Set the signal to the LIVE currentUser from the Auth SDK,
+    // which is now updated. Do NOT create a copy.
+    this.currentUser.set(this.auth.currentUser);
   }
+
+  /**
+   * Uploads a new profile picture and correctly updates the local state.
+   */
+  async updateProfilePicture(file: File): Promise<void> {
+    const user = this.currentUser();
+    if (!user) throw new Error("User must be logged in to update their picture.");
+
+    const filePath = `users/${user.uid}/profile.${file.name.split('.').pop()}`;
+    const storageRef = ref(this.storage, filePath);
+    const snapshot = await uploadBytes(storageRef, file);
+    const photoURL = await getDownloadURL(snapshot.ref);
+
+    // Update the Auth profile
+    await updateProfile(user, { photoURL });
+
+    // Update the Firestore document
+    const userDocRef = doc(this.firestore, `users/${user.uid}`);
+    await updateDoc(userDocRef, { photoURL });
+
+    // THE FIX: Again, set the signal to the now-updated LIVE currentUser.
+    this.currentUser.set(this.auth.currentUser);
+  }
+
+  /**
+   * Deletes the user's account. This will now work correctly.
+   */
+  async deleteAccount(): Promise<void> {
+    const user = this.currentUser();
+    if (!user) throw new Error("No user is currently logged in to delete.");
+
+    try {
+      // Now, 'user' is the live User instance, so this call will succeed.
+      await deleteUser(user);
+      this.router.navigate(['/login']);
+    } catch (error: any) {
+      console.error("Error deleting account:", error);
+      throw new Error("Account deletion failed. Please sign out and sign in again before retrying.");
+    }
+  }
+
 
   ngOnDestroy() {
     this.authStateSubscription.unsubscribe();

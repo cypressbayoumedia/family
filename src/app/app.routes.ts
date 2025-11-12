@@ -68,4 +68,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }
   },
+
+  {
+    path: 'profile',
+    loadComponent: () => import('./pages/profile/profile').then(m => m.Profile),
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },
 ];
