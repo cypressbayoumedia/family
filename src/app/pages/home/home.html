@@ -48,6 +48,9 @@
           <h3>{{ familiesService.activeFamily()?.name }}</h3>
           <!-- Mobile User Menu Trigger -->
            <div class="mobile-user-menu">
+            <button  class="user-menu-button" routerLink="/calendar">
+              <span class="material-symbols-rounded">calendar_month</span>
+            </button>
              <button class="user-menu-button" [matMenuTriggerFor]="userMenu" aria-label="Open user menu" [matMenuTriggerData]="{name:  familiesService.activeFamily()?.name }">
                 <img [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName" class="user-avatar-icon" alt="User menu">
              </button>

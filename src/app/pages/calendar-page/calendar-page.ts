@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { Calendar, CalendarEvent } from '../../core/calendar';
 import { AuthService } from '../../core/auth';
-
+import { RouterLink } from '@angular/router'
 @Component({
   selector: 'app-calendar-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule, DatePipe, RouterLink],
   templateUrl: './calendar-page.html',
   styleUrls: ['./calendar-page.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

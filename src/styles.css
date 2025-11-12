@@ -30,6 +30,20 @@ body, html {
     'GRAD' 0,
     'opsz' 24
   }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+  
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
 
   .form-input {
     

@@ -102,6 +102,6 @@
     .dashboard-sidebar, .dashboard-right-column { display: none; }
     .dashboard-main { border: none; padding-top: 60px; }
     .feed-header { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 100; }
-    .mobile-user-menu { display: block; }
+    .mobile-user-menu { display: flex; }
     .mobile-fab { display: flex; }
   }

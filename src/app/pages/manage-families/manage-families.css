@@ -9,19 +9,7 @@
   margin-bottom: 3rem;
 }
 
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  color: var(--text-color);
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-}
 
-.back-link:hover {
-  text-decoration: underline;
-}
 
 .manage-title {
   font-family: var(--font-heading);
