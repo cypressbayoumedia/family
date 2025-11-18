@@ -1,10 +1,10 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-
+import { StripeService } from '../../core/stripe';
 import { AuthService } from '../../core/auth';
 import { Families } from '../../core/families';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-profile-page',
@@ -16,7 +16,7 @@ import { Families } from '../../core/families';
 export class Profile implements OnInit {
   authService = inject(AuthService);
   familiesService = inject(Families);
-  private router = inject(Router);
+  stripeService = inject(StripeService)
 
   // --- Signals for Form State ---
   editableName = signal('');
@@ -32,8 +32,10 @@ export class Profile implements OnInit {
   currentUser = this.authService.currentUser;
   allUserFamilies = this.familiesService.allUserFamilies;
 
+  private priceId = 'price_1STlkCJblgCw5364qsohDh7t';
+
+
   ngOnInit(): void {
-    // Initialize the editable name with the user's current name
     this.editableName.set(this.currentUser()?.displayName || '');
   }
 
@@ -42,7 +44,6 @@ export class Profile implements OnInit {
     if (input.files?.length) {
       const file = input.files[0];
       this.newProfilePicFile.set(file);
-      // Create a temporary URL for the preview
       this.imagePreviewUrl.set(URL.createObjectURL(file));
     }
   }
@@ -53,13 +54,11 @@ export class Profile implements OnInit {
 
     try {
       let changesMade = false;
-      // 1. Check if the name was changed
       if (this.editableName() !== this.currentUser()?.displayName) {
         await this.authService.updateUserDisplayName(this.editableName());
         changesMade = true;
       }
 
-      // 2. Check if a new profile picture was selected
       if (this.newProfilePicFile()) {
         await this.authService.updateProfilePicture(this.newProfilePicFile()!);
         changesMade = true;
@@ -68,7 +67,6 @@ export class Profile implements OnInit {
       if (changesMade) {
         this.successMessage.set("Profile updated successfully!");
       }
-      // Reset file input after successful upload
       this.newProfilePicFile.set(null);
       this.imagePreviewUrl.set(null);
 
@@ -90,12 +88,53 @@ export class Profile implements OnInit {
     this.resetMessages();
     try {
       await this.authService.deleteAccount();
-      // The service handles navigation on success
     } catch (error: any) {
       this.errorMessage.set(error.message);
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  goToCheckout(): void {
+    const currentUser = this.authService.currentUser();
+    const email = currentUser?.email;
+    if (!email) {
+      this.errorMessage.set('You must be logged in to subscribe.');
+      return;
+    }
+    const familyId = this.familiesService.activeFamilyId();
+    if (!familyId) {
+        this.errorMessage.set('You must have an active family to subscribe.');
+        return;
+    }
+
+    this.isLoading.set(true);
+    this.stripeService.createCheckoutSession(this.priceId, email, familyId).subscribe(session => {
+      if (session && session.data.url) {
+        window.location.href = session.data.url;
+      } else {
+        this.errorMessage.set('Could not create checkout session.');
+      }
+      this.isLoading.set(false);
+    });
+  }
+
+  goToBillingPortal(): void {
+    const customerId = this.familiesService.activeFamily()?.subscription?.stripeCustomerId;
+    if (!customerId) {
+      this.errorMessage.set('Could not find a subscription to manage.');
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.stripeService.createBillingPortal(customerId).subscribe(result => {
+      if (result && result.data.url) {
+        window.location.href = result.data.url;
+      } else {
+        this.errorMessage.set('Could not open billing portal.');
+      }
+      this.isLoading.set(false);
+    });
   }
 
   private resetMessages(): void {

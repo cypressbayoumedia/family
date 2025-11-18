@@ -65,6 +65,15 @@
           </app-record-audio>
         </div>
       }
+
+      @if (showDoodleCanvas()) {
+        <div class="doodle-creator-inline">
+          <app-doodle-create
+            (doodleSaved)="onDoodleSaved($event)"
+            (closed)="onDoodleClosed()">
+          </app-doodle-create>
+        </div>
+      }
     </div>
 
     <!-- The new, improved actions footer -->
@@ -85,6 +94,11 @@
         <button (click)="toggleRecordAudio()" class="action-button" [class.active]="showRecordAudio()">
           <span class="material-symbols-rounded">mic</span>
           <!-- Record Audio -->
+        </button>
+
+        <!--Doodles-->
+        <button (click)="toggleDoodleCanvas()" class="action-button" [class.active]="showDoodleCanvas()">
+          <span class="material-symbols-rounded">draw</span>
         </button>
       </div>
       

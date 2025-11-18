@@ -1,0 +1,171 @@
+/*
+  WIZ'S NOTES:
+  This is a complete redesign into a "super mobile-friendly" full-page
+  Doodle Pad experience. It uses a flexbox layout to fix the toolbar to the
+  bottom for easy thumb access and custom-styles all inputs for a
+  polished, on-brand, and intuitive user interface.
+*/
+
+  
+  /* --- 1. Main Full-Screen Container --- */
+  .doodle-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 50dvh; /* Dynamic Viewport Height: Fills the screen on mobile, accounting for browser bars */
+    background-color: var(--bg-color);
+    overflow: hidden; /* Prevents any accidental overflow */
+  }
+  
+  /* --- 2. The Canvas Drawing Area --- */
+  .doodle-canvas-area {
+    flex-grow: 1; /* Takes up all available vertical space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto; /* Allows panning if canvas is larger than area */
+  }
+  
+  canvas {
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    cursor: crosshair;
+    touch-action: none; /* CRITICAL: Prevents scrolling while drawing on touch devices */
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+  /* --- 3. The Ergonomic Toolbar --- */
+  .doodle-toolbar {
+    flex-shrink: 0; /* Prevents the toolbar from shrinking */
+    background-color: #ffffff;
+    padding: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap; /* Allows groups to stack on narrow screens */
+    gap: 1rem;
+  }
+  
+  .toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  /* --- 4. Styling Individual Tools --- */
+  
+  /* Tool & Action Buttons (Brush, Eraser, Clear, Close) */
+  .toolbar-group button {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    transition: background-color 0.2s;
+  }
+  .toolbar-group button:hover {
+    background-color: var(--bg-color);
+  }
+  .toolbar-group button.active {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color-darker);
+  }
+  
+  /* Color Picker & Presets */
+  .color-picker-wrapper {
+    position: relative;
+    width: 32px;
+    height: 32px;
+  }
+  .color-display {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+  }
+  .color-picker-wrapper input[type="color"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0; /* Hide the ugly input, but keep it clickable */
+    cursor: pointer;
+  }
+  .color-preset {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+  }
+  .color-preset:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Brush Size Slider */
+  .slider-group {
+    flex-grow: 1; /* Allows slider to take up space */
+    min-width: 150px;
+  }
+  .slider-group .material-symbols-rounded {
+    color: #555;
+  }
+  .slider-group span:last-of-type {
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    min-width: 40px; /* Prevents layout shift */
+    text-align: right;
+  }
+  
+  /* Custom Slider Styles */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex-grow: 1;
+    height: 8px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--text-color);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--text-color);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  /* --- 5. Main Action Buttons --- */
+  .toolbar-group.actions {
+    gap: 0.75rem;
+  }
+  /* Re-use global button styles */
+  .actions .button-primary,
+  .actions .button-secondary {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+  }
+  .actions .button-primary {
+    display: flex; /* Ensure icon and text are aligned */
+    gap: 0.5rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }

@@ -1,0 +1,62 @@
+<div class="doodle-container">
+  
+    <!-- The main canvas area where the user draws -->
+    <div #canvasContainer class="doodle-canvas-area">
+       <canvas 
+         #drawingCanvas
+         (mousedown)="startDrawing($event)"
+         (mousemove)="draw($event)"
+         (mouseup)="stopDrawing()"
+         (mouseleave)="stopDrawing()"
+         (touchstart)="startDrawing($event)"
+         (touchmove)="draw($event)"
+         (touchend)="stopDrawing()"
+       ></canvas>
+    </div>
+  
+    <!-- The toolbar for drawing tools and actions -->
+    <div class="doodle-toolbar">
+      
+      <!-- Tool Selection: Brush & Eraser -->
+      <div class="toolbar-group">
+        <button (click)="setTool('brush')" [class.active]="activeTool() === 'brush'" title="Brush">
+          <span class="material-symbols-rounded">brush</span>
+        </button>
+        <button (click)="setTool('eraser')" [class.active]="activeTool() === 'eraser'" title="Eraser">
+          <span class="material-symbols-rounded">ink_eraser</span>
+        </button>
+      </div>
+  
+      <!-- Color Selection -->
+      <div class="toolbar-group">
+        <div class="color-picker-wrapper">
+          <input type="color" [value]="brushColor()" (input)="updateColor($event)"/>
+          <div class="color-display" [style.backgroundColor]="brushColor()"></div>
+        </div>
+        @for(color of presets; track color) {
+          <button (click)="setPresetColor(color)" class="color-preset" [style.backgroundColor]="color"></button>
+        }
+      </div>
+  
+      <!-- Brush Size Slider -->
+      <div class="toolbar-group slider-group">
+        <span class="material-symbols-rounded">line_weight</span>
+        <input type="range" min="1" max="50" [value]="brushSize()" (input)="updateSize($event)"/>
+        <span>{{ brushSize() }}px</span>
+      </div>
+      
+      <!-- Main Actions: Clear, Save, Close -->
+      <div class="toolbar-group actions">
+        <button (click)="clearCanvas()" class="button-secondary" title="Clear Canvas">
+          <span class="material-symbols-rounded">delete</span>
+        </button>
+        <button (click)="saveDoodle()" class="button-primary" title="Save Doodle">
+          <span class="material-symbols-rounded">check</span>
+          Save
+        </button>
+        <button (click)="close()" class="button-secondary" title="Close Doodle Pad">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+    </div>
+  </div>

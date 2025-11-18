@@ -19,7 +19,7 @@ export interface Family {
   id: string;
   name: string;
   members: { uid: string; role: string; }[];
-  subscription: { type: string }
+  subscription: { type: string, payingUser?: string, stripeSubscriptionId?: string, stripeCustomerId?: string };
 }
 
 @Injectable({
