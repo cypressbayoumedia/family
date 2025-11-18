@@ -11,18 +11,9 @@ setGlobalOptions({ region: 'us-central1' });
 const stripeSecretKey = defineSecret('STRIPE_SECRET_KEY');
 const webhookSecret = defineSecret('STRIPE_WEBHOOK_SECRET');
 
-const corsOrigins = [
-  "https://9000-firebase-family-1762273868130.cluster-hlmk2l2htragyudeyf6f3tzsi6.cloudworkstations.dev",
-  "http://localhost:4200",
-  "https://thefamilee.app",
-  new RegExp("https://.*\\.cloudworkstations\\.dev")
-];
-
 export const stripeWebhook = onRequest(
   { 
-    secrets: [stripeSecretKey, webhookSecret], 
-    cors: corsOrigins, 
-    invoker: 'public' 
+    secrets: [stripeSecretKey, webhookSecret],  
   }, 
   async (request, response) => {
     const stripe = new Stripe(stripeSecretKey.value(), {

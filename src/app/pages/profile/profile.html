@@ -32,25 +32,6 @@
             {{ isLoading() ? 'Saving...' : 'Save Changes' }}
           </button>
         </div>
-
-        <!-- Subscription Section -->
-        <div class="subscription-section">
-            <h3>Subscription</h3>
-            @if (familiesService.activeFamily()?.subscription?.type === 'paid') {
-                <p>This family has a Premium subscription.</p>
-                <p>Paid by: {{ familiesService.activeFamily()?.subscription?.payingUser }}</p>
-                @if (currentUser()?.email === familiesService.activeFamily()?.subscription?.payingUser) {
-                  <button class="button-secondary" (click)="goToBillingPortal()">
-                    Manage Subscription
-                  </button>
-                }
-            } @else {
-                <p>Unlock exclusive features with The Familee Premium.</p>
-                <button class="button-premium" (click)="goToCheckout()">
-                    Go Premium
-                </button>
-            }
-        </div>
   
         <!-- Feedback Messages -->
         @if(successMessage()){ <p class="feedback success">{{ successMessage() }}</p> }

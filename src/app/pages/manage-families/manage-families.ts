@@ -1,10 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 
-// We only need the FamiliesService for this component's logic
-import { Families } from '../../core/families'; // Adjust path
+// Import necessary services
+import { Families } from '../../core/families';
+import { AuthService } from '../../core/auth';
+
 @Component({
   selector: 'app-manage-families',
   imports: [CommonModule, FormsModule, RouterLink],
@@ -13,57 +16,127 @@ import { Families } from '../../core/families'; // Adjust path
 })
 export class ManageFamilies {
   private familiesService = inject(Families);
+  private authService = inject(AuthService);
+  private functions = inject(Functions);
 
-  // Signals for the form inputs
+  // --- Signals for Form Inputs ---
   newFamilyName = signal('');
   inviteCode = signal('');
 
-  // Signals for robust UI feedback
+  // --- Signals for UI Feedback ---
   isLoading = signal(false);
-  errorMessage = signal<string | null>(null);
+  // Separate error signals for better contextual feedback
+  createJoinError = signal<string | null>(null);
+  subError = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
+  // --- Signals from Services ---
+  currentUser = this.authService.currentUser;
+  activeFamily = this.familiesService.activeFamily;
+
+  // --- Computed Signals ---
+  isSubscriptionOwner = computed(() => {
+    const family = this.activeFamily();
+    const user = this.currentUser();
+    if (!family?.subscription || !user) return false;
+    return family.subscription.payingUser === user.email;
+  });
+
+  // Hardcoded Stripe Price ID for the premium plan
+  private priceId = 'price_1SSLJvJblgCw5364OjCpp2Ok';
+
   /**
-   * Creates a new family circle. The service will automatically make it the active circle.
+   * Creates a new family circle.
    */
   async createHub(): Promise<void> {
     if (!this.newFamilyName().trim()) return;
 
     this.isLoading.set(true);
-    this.errorMessage.set(null);
+    this.createJoinError.set(null);
     this.successMessage.set(null);
 
     try {
       await this.familiesService.createFamily(this.newFamilyName().trim());
-      // The service automatically navigates back to the dashboard on success.
+      // The service automatically navigates on success.
     } catch (error: any) {
-      this.errorMessage.set(error.message || 'Failed to create circle.');
+      this.createJoinError.set(error.message || 'Failed to create circle.');
     } finally {
       this.isLoading.set(false);
     }
   }
 
   /**
-   * Joins an existing family circle. The service will automatically make it the active circle.
+   * Joins an existing family circle.
    */
   async joinHub(): Promise<void> {
     if (!this.inviteCode().trim()) return;
 
     this.isLoading.set(true);
-    this.errorMessage.set(null);
+    this.createJoinError.set(null);
     this.successMessage.set(null);
 
     try {
       await this.familiesService.joinFamily(this.inviteCode().trim());
-      // The service automatically navigates back to the dashboard on success.
+      // The service automatically navigates on success.
     } catch (error: any) {
-      // Provide a user-friendly error for a common issue
       if (error.message.includes("No family found")) {
-        this.errorMessage.set("Invalid invite code. Please check and try again.");
+        this.createJoinError.set("Invalid invite code. Please check and try again.");
       } else {
-        this.errorMessage.set(error.message || 'Failed to join circle.');
+        this.createJoinError.set(error.message || 'Failed to join circle.');
       }
     } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  /**
+   * Redirects the user to the Stripe checkout page.
+   */
+  async goToCheckout(): Promise<void> {
+    this.isLoading.set(true);
+    this.subError.set(null);
+    try {
+      const checkoutData = {
+        priceId: this.priceId,
+        email: this.currentUser()?.email,
+        familyId: this.activeFamily()?.id
+      };
+      
+      const createCheckout = httpsCallable(this.functions, 'createStripeCheckout');
+      const result = await createCheckout(checkoutData) as any;
+
+      if (result.data.url) {
+        window.location.href = result.data.url;
+      } else {
+        throw new Error('Could not create checkout session.');
+      }
+    } catch (error: any) {
+      this.subError.set(error.message || 'An unexpected error occurred.');
+      this.isLoading.set(false);
+    }
+  }
+
+  /**
+   * Redirects the user to the Stripe billing portal.
+   */
+  async goToBillingPortal(): Promise<void> {
+    this.isLoading.set(true);
+    this.subError.set(null);
+    try {
+      const portalData = {
+        customerId: this.activeFamily()?.subscription?.stripeCustomerId
+      };
+
+      const createPortal = httpsCallable(this.functions, 'createBillingPortal');
+      const result = await createPortal(portalData) as any;
+
+      if (result.data.url) {
+        window.location.href = result.data.url;
+      } else {
+        throw new Error('Could not open billing portal.');
+      }
+    } catch (error: any) {
+      this.subError.set(error.message || 'An unexpected error occurred.');
       this.isLoading.set(false);
     }
   }

@@ -1,11 +1,18 @@
 <!-- 
   WIZ'S NOTES:
-  This page is for an existing user, so we can be more direct. The goal is clarity and efficiency.
-  1.  Clear Hierarchy: A proper header with a prominent back link, title, and subtitle sets the context clearly.
-  2.  Parallel Choices: By placing the "Create" and "Join" actions in a side-by-side grid (on desktop), we present them as equal choices, making the page easier to scan and understand.
-  3.  Contextual Feedback: Error and success messages are now placed *inside* the respective action cards. This is much better UX, as the feedback appears directly next to the action the user just took. (This may require a small logic change to have separate error/success variables for each action, e.g., `createErrorMessage` and `joinErrorMessage`).
-  4.  Descriptive Copy: The titles and descriptions are more engaging and provide examples of *why* a user might create another circle ("Perfect for cousins, vacation planning...").
-  5.  Brand Reinforcement: Icons and consistent styling reinforce the app's visual identity.
+  This page now handles three distinct user actions:
+  1. Creating a new family circle.
+  2. Joining an existing circle.
+  3. Managing the subscription for the *active* circle.
+
+  The layout is structured with a clear grid. The subscription card is given more prominence as a full-width banner because it's a different type of action related to the current family, not creating/joining a new one.
+
+  Key Changes:
+  - Added a new `sub-management-card` for all subscription-related UI.
+  - Used `@if` and `@else` to conditionally show the "Upgrade" view vs. the "Manage" view.
+  - Added specific feedback containers (`createJoinError` and `subError`) to show errors in the correct card.
+  - Included a feature list in the premium card to better sell the value proposition.
+  - Added a `disabled` state for the subscription buttons tied to `isLoading()`.
 -->
 
 <div class="manage-page-container">
@@ -14,41 +21,86 @@
       <span class="material-symbols-rounded">arrow_back</span>
       Back to My Family
     </a>
-    <h1 class="manage-title">Expand Your Family Circles</h1>
-    <p class="manage-subtitle">Create a new, separate circle for a different group, or join another family's circle with their invite code.</p>
+    <h1 class="manage-title">Manage Your Circles</h1>
+    <p class="manage-subtitle">Create or join new circles, or manage the subscription for your currently selected family circle.</p>
   </div>
 
+  <!-- === SUBSCRIPTION MANAGEMENT CARD === -->
+  <div class="sub-management-card">
+    @if (activeFamily()?.subscription?.type === 'free') {
+      <!-- --- UPGRADE TO PREMIUM VIEW --- -->
+      <div class="sub-content">
+        <div class="sub-icon-header">
+          <span class="material-symbols-rounded icon-large">workspace_premium</span>
+          <h3>Upgrade to a Premium Family Circle</h3>
+        </div>
+        <p class="sub-description">Unlock premium features for everyone in your <strong>{{ activeFamily()?.name }}</strong> circle:</p>
+        <ul class="feature-list">
+          <li><span class="material-symbols-rounded">check_circle</span> Unlimited family members</li>
+          <li><span class="material-symbols-rounded">check_circle</span> Unlimited events in the calendar</li>
+          <!-- <li><span class="material-symbols-rounded">check_circle</span> 30-Day Location History</li> -->
+          <li><span class="material-symbols-rounded">check_circle</span> The Family Vault & Gifting (Coming Soon)</li>
+          <li><span class="material-symbols-rounded">check_circle</span> Add Members on their behalf (Coming Soon)</li>
+          <li><span class="material-symbols-rounded">check_circle</span> Audio & Video Chat (Coming Soon)</li>
+        </ul>
+        <div class="feedback-container">
+          @if (subError()) {
+            <p class="feedback-message error">{{ subError() }}</p>
+          }
+        </div>
+        <button class="button-primary glow-effect" (click)="goToCheckout()" [disabled]="isLoading()">
+          {{ isLoading() ? 'Redirecting...' : 'Go Premium - $9.99/month' }}
+        </button>
+      </div>
+    } @else {
+      <!-- --- MANAGE EXISTING SUBSCRIPTION VIEW --- -->
+      <div class="sub-content">
+        <div class="sub-icon-header">
+          <span class="material-symbols-rounded icon-large">verified</span>
+          <h3>Premium Circle Activated!</h3>
+        </div>
+        <p class="sub-description">Your <strong>{{ activeFamily()?.name }}</strong> circle is on the premium plan. Thank you for your support!</p>
+        @if (isSubscriptionOwner()) {
+          <p class="sub-description-small">You are the paying user for this subscription. You can manage your billing details, view invoices, or cancel at any time.</p>
+        } @else {
+          <p class="sub-description-small">{{ activeFamily()?.subscription?.payingUser }} is the paying user for this subscription.</p>
+        }
+
+        <div class="feedback-container">
+          @if (subError()) {
+            <p class="feedback-message error">{{ subError() }}</p>
+          }
+        </div>
+
+        @if (isSubscriptionOwner()) {
+          <button class="button-secondary" (click)="goToBillingPortal()" [disabled]="isLoading()">
+            {{ isLoading() ? 'Redirecting...' : 'Manage Billing' }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- === CREATE AND JOIN GRID === -->
   <div class="manage-choices-grid">
     <!-- ACTION CARD 1: CREATE A CIRCLE -->
     <div class="action-card">
       <span class="material-symbols-rounded icon-medium">add_circle</span>
       <h3>Create a New Circle</h3>
-      <p class="card-description">Perfect for the cousins' crew, a vacation planning group, or a different branch of the family.</p>
+      <p class="card-description">Perfect for a vacation planning group or a different branch of the family.</p>
 
       <div class="form-group">
         <label for="newFamilyName">New Circle Name</label>
-        <input 
-          id="newFamilyName"
-          class="form-input"
-          [(ngModel)]="newFamilyName" 
-          placeholder="e.g., The Ski Trip Crew"
-          (keyup.enter)="createHub()">
+        <input id="newFamilyName" class="form-input" [(ngModel)]="newFamilyName" placeholder="e.g., The Ski Trip Crew" (keyup.enter)="createHub()">
       </div>
 
-      <!-- Contextual feedback for the Create action -->
       <div class="feedback-container">
-        @if (errorMessage()) {
-          <p class="feedback-message error">{{ errorMessage() }}</p>
-        }
-        @if (successMessage()) {
-          <p class="feedback-message success">{{ successMessage() }}</p>
+        @if (createJoinError()) {
+          <p class="feedback-message error">{{ createJoinError() }}</p>
         }
       </div>
 
-      <button 
-        class="button-primary"
-        (click)="createHub()" 
-        [disabled]="isLoading() || !newFamilyName().trim()">
+      <button class="button-primary" (click)="createHub()" [disabled]="isLoading() || !newFamilyName().trim()">
         {{ isLoading() ? 'Creating...' : 'Create Circle' }}
       </button>
     </div>
@@ -57,32 +109,20 @@
     <div class="action-card">
       <span class="material-symbols-rounded icon-medium">key</span>
       <h3>Join an Existing Circle</h3>
-      <p class="card-description">Someone from another family circle must share their unique invite code with you.</p>
+      <p class="card-description">Someone from another circle must share their unique invite code with you.</p>
 
       <div class="form-group">
         <label for="inviteCode">Invite Code</label>
-        <input 
-          id="inviteCode"
-          class="form-input"
-          [(ngModel)]="inviteCode" 
-          placeholder="Enter the code"
-          (keyup.enter)="joinHub()">
+        <input id="inviteCode" class="form-input" [(ngModel)]="inviteCode" placeholder="Enter the code" (keyup.enter)="joinHub()">
       </div>
 
-      <!-- Contextual feedback for the Join action -->
       <div class="feedback-container">
-        @if (errorMessage()) {
-          <p class="feedback-message error">{{ errorMessage() }}</p>
-        }
-        @if (successMessage()) {
-          <p class="feedback-message success">{{ successMessage() }}</p>
+        @if (createJoinError()) {
+          <p class="feedback-message error">{{ createJoinError() }}</p>
         }
       </div>
 
-      <button 
-        class="button-secondary"
-        (click)="joinHub()" 
-        [disabled]="isLoading() || !inviteCode().trim()">
+      <button class="button-secondary" (click)="joinHub()" [disabled]="isLoading() || !inviteCode().trim()">
         {{ isLoading() ? 'Joining...' : 'Join Circle' }}
       </button>
     </div>
