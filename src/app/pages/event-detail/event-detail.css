@@ -82,9 +82,7 @@
   overflow-y: auto; /* The magic: only this part scrolls */
   padding: 1.5rem;
 }
-.tab-content {
-  /* No specific styles needed, but selector is here */
-}
+
 .desc { font-size: 1.05rem; line-height: 1.6; margin-bottom: 1.5rem; }
 .location { font-weight: 500; color: #555; margin-bottom: 2rem; }
 .detail-rsvp { justify-content: center; }

@@ -3,13 +3,12 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Calendar, CalendarEvent } from '../../core/calendar';
 import { AuthService } from '../../core/auth';
-import { RouterLink } from '@angular/router';
 import { EventDetail } from '../event-detail/event-detail';
 
 @Component({
   selector: 'app-calendar-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe, RouterLink, EventDetail],
+  imports: [CommonModule, FormsModule, DatePipe, EventDetail],
   templateUrl: './calendar-page.html',
   styleUrls: ['./calendar-page.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
