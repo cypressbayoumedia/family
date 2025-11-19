@@ -63,7 +63,10 @@
               <div class="day-events">
                 @for (event of getEventsForDay(day.date, events); track event.id) {
                   <div class="event-pill" [class.birthday]="event.type === 'birthday'" [style.backgroundColor]="event.type === 'custom' ? event.ownerColor : ''" (click)="$event.stopPropagation(); openEvent(event)">
-                    <span class="dot" *ngIf="event.type === 'custom'"></span>
+                    @if(event.type === 'custom'){
+                        <span class="dot"></span>
+                    }
+                    
                     {{ event.title }}
                   </div>
                 }
