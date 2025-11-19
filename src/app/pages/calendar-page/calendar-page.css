@@ -1,202 +1,281 @@
-/*
-  WIZ'S NOTES:
-  This CSS styles the full-page Family Calendar. It creates a clean,
-  scannable list of events, provides distinct styling for event types,
-  and includes a responsive, on-brand modal for creating new events.
-*/
-
-/* --- 1. Main Page Layout --- */
-.calendar-page {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem 4rem 1.5rem;
+.calendar-container, 
+.calendar-container * {
+  box-sizing: border-box;
 }
 
-.calendar-header {
+/* --- 1. Main Container & Header --- */
+.calendar-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background-color: #fff;
+  /* Soft, modern shadow instead of a hard border */
+  box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.08); 
+  border: 1px solid rgba(0,0,0,0.04); /* Extremely subtle border */
+  border-radius: 24px; /* More organic curvature */
+  font-family: var(--font-body, sans-serif); /* Fallback if var missing */
+}
+
+.cal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-.calendar-header h2 {
-  font-family: var(--font-heading);
-  font-size: 2rem;
-  margin: 0;
-}
-
-/* --- 2. Create Event Form (Modal) --- */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+.month-nav {
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
-  padding: 1rem;
-}
-
-.create-event-form {
-  background-color: #fff;
-  border-radius: 16px;
-  padding: 2rem;
-  max-width: 450px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.create-event-form h3 {
-  font-family: var(--font-heading);
-  font-size: 1.5rem;
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.create-event-form input {
-  padding: 0.8rem 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  font-size: 1rem;
-  background-color: var(--bg-color);
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-}
-
-/* --- 3. Event List & Items --- */
-.event-list {
-  display: flex;
-  flex-direction: column;
   gap: 1.5rem;
 }
 
-.event-item {
-  background-color: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  padding: 1.25rem;
+.month-nav h2 {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  min-width: 220px;
+  text-align: center;
+  color: var(--text-color, #333);
+  letter-spacing: -0.5px; /* Tight tracking for modern feel */
+}
+
+.icon-btn {
+  background: transparent;
+  border: 1px solid transparent; /* Invisible border to prevent layout shift */
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  position: relative;
-  overflow: hidden; /* For the colored border effect */
+  justify-content: center;
+  font-size: 1.25rem;
+  color: #777;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* Special styling for birthdays */
-.event-item.birthday {
-  border-left: 5px solid var(--accent-color);
+.icon-btn:hover {
+  background-color: var(--bg-color, #f4f4f4);
+  color: var(--accent-color, #000);
+  transform: scale(1.05);
 }
 
-.delete-event-button {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: none;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
+/* --- 2. Weekday Row --- */
+.weekday-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.weekday-row span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
   color: #999;
-  font-size: 1.5rem;
-  line-height: 1;
-}
-.delete-event-button:hover {
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  padding-bottom: 1rem;
 }
 
-.event-icon {
-  font-size: 2rem;
+/* --- 3. Main Calendar Grid --- */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  /* Using gap + background color to create the grid lines is cleaner than borders */
+  gap: 1px;
+  background-color: rgba(0,0,0,0.05); /* Color of the grid lines */
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.event-details {
+.cal-day {
+  background-color: #fff; /* White cells sit on top of grid background */
+  min-height: 140px; /* Slightly taller for elegance */
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
-  flex-grow: 1; /* Takes up available space */
+  position: relative;
+  transition: background-color 0.2s ease;
+  
 }
 
-.event-date {
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.event-title {
-  color: #555;
-  font-size: 0.95rem;
-}
-
-/* --- 4. RSVP Section --- */
-.event-rsvp {
-  display: flex;
-  background-color: var(--bg-color);
-  border-radius: 8px;
-  padding: 4px;
-  border: 1px solid var(--border-color);
-}
-
-.event-rsvp button {
-  background-color: transparent;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+.cal-day:not(.empty):hover {
+  background-color: #f7f9fc; /* Light brand color tint */
   cursor: pointer;
+}
+
+.cal-day.empty {
+  background-color: #fcfcfc;
+}
+
+/* Date Number Styling */
+.day-number {
+  font-family: var(--font-heading, sans-serif);
   font-weight: 600;
+  font-size: 0.9rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-bottom: 0.5rem;
   color: #555;
+  /* Aligned top-left for better scanning */
+  align-self: flex-start; 
+}
+
+/* Current Day Highlight */
+.cal-day.today .day-number {
+  background-color: var(--accent-color, #000);
+  color: #fff; /* Force white for contrast against accent */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1; /* Fills remaining space */
+}
+
+/* --- 4. Event Pills --- */
+.event-pill {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
   transition: all 0.2s ease;
+  border-left: 3px solid rgba(255,255,255,0.3); /* Glassy aesthetic touch */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.event-rsvp button.active {
-  background-color: var(--accent-color);
-  color: var(--text-color);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.event-pill:hover {
+  transform: translateY(-1px);
+  filter: brightness(95%);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* --- 5. Empty State --- */
-.empty-state {
-  text-align: center;
-  padding: 3rem 1.5rem;
+.event-pill.birthday {
+  background-color: var(--accent-color, #000);
+  color: #fff;
+}
+
+.event-pill[style] {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* --- 5. Modals (Clean & Airy) --- */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.4); /* Lighter, blurrier backdrop */
+  backdrop-filter: blur(5px); /* Modern frosted glass effect */
+  z-index: 1000;
+  /* ...keep positioning from original... */
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  display: flex; justify-content: center; align-items: center;
+}
+
+.create-event-form{
   background-color: #fff;
-  border: 1px dashed var(--border-color);
-  border-radius: 12px;
-}
-.empty-state p {
-  color: #666;
-  font-size: 1.1rem;
+  border-radius: 20px;
+  padding: 1rem;
 }
 
-/* --- 6. Responsive Adjustments --- */
-@media (max-width: 600px) {
-  .calendar-header {
+textarea {
+  width:100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 1em;
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: #fafafa;
+resize: none; 
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: modalUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- 6. Responsive Design --- */
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 1rem;
+    margin: 0.5rem;
+    border-radius: 12px;
+  }
+  
+  .cal-header {
     flex-direction: column;
     gap: 1rem;
-    align-items: flex-start;
+    margin-bottom: 1rem;
+    border-bottom: none;
   }
 
-  .event-item {
-    flex-direction: column;
-    align-items: flex-start;
+  .month-nav h2 {
+    font-size: 1.5rem;
   }
 
-  .event-rsvp {
+  .weekday-row span {
+    font-size: 0.7rem;
+    letter-spacing: 0;
+  }
+
+  .cal-day {
+    min-height: 70px;
+    padding: 4px;
+    align-items: center; /* Center dots on mobile */
+  }
+  
+  .day-number {
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+    align-self: center; /* Center numbers on mobile */
+  }
+
+  .day-events {
+    flex-direction: row; /* Horizontal dots */
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
     width: 100%;
-    margin-top: 1rem;
-    justify-content: space-between;
   }
 
-  .event-rsvp button {
-    flex-grow: 1; /* Make buttons fill the space */
+  /* MOBILE UI: Simple Dots */
+  .event-pill {
+    padding: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%; /* Perfect circle */
+    text-indent: -9999px;
+    border: none;
+    box-shadow: none;
+    position: relative; 
+    z-index: 2; 
   }
 }

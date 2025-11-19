@@ -1,176 +1,283 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, doc, updateDoc, where, Timestamp,deleteDoc } from '@angular/fire/firestore';
-import { Observable, combineLatest, of } from 'rxjs';
+import { Firestore, collection, addDoc, query, where, orderBy, collectionData, doc, updateDoc, deleteDoc, Timestamp, getDocs } from '@angular/fire/firestore';
+import { Observable, combineLatest, of, BehaviorSubject } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
-
 import { Families, FamilyMember } from './families';
 import { AuthService } from './auth';
 
-// Interface for a Firestore event document
-export interface EventDocument {
+// --- Interfaces ---
+export interface EventItem {
   id?: string;
-  title: string;
-  startAt: Timestamp; // Use Firestore Timestamp for queries
-  endAt: Timestamp;
-  isAllDay: boolean;
-  createdBy: string;
-  invitedUserIds: string[];
-  rsvps: { [key: string]: 'attending' | 'maybe' | 'not_attending' | 'pending' };
+  name: string;
+  claimedByUserId: string | null;
+  claimedByName: string | null;
+}
+export interface ChatMessage {
+  id?: string;
+  text: string;
+  senderId: string;
+  senderName: string;
+  createdAt: Timestamp;
 }
 
-// Interface for the rich event object our app will use
 export interface CalendarEvent {
   id: string;
   title: string;
   start: Date;
   end: Date;
   isAllDay: boolean;
+  location?: string;
+  description?: string;
   type: 'custom' | 'birthday';
-  rsvps: { [key: string]: 'attending' | 'maybe' | 'not_attending' | 'pending' };
-  relatedUserId?: string;
+  createdBy?: string;
+  invitedUserIds: string[];
+  rsvps: { [userId: string]: 'attending' | 'maybe' | 'not_attending' | 'pending' };
+  ownerColor?: string; // UI helper
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class Calendar {
   private afs = inject(Firestore);
   private familiesService = inject(Families);
   private authService = inject(AuthService);
 
-  /**
-   * Gets a merged and sorted list of all upcoming family events (custom + birthdays).
-   */
-  getUpcomingEvents(): Observable<CalendarEvent[]> {
-    const familyId$ = toObservable(this.familiesService.activeFamilyId);
-    const familyMembers$ = toObservable(this.familiesService.activeFamilyMembers);
+  // Tracks the currently viewed month (defaults to today)
+  currentViewDate$ = new BehaviorSubject<Date>(new Date());
 
-    return familyId$.pipe(
-      switchMap(familyId => {
+  /**
+   * Gets events for the specific month currently being viewed.
+   */
+  getEventsForCurrentMonth(): Observable<CalendarEvent[]> {
+    const familyId$ = toObservable(this.familiesService.activeFamilyId);
+    const members$ = toObservable(this.familiesService.activeFamilyMembers);
+
+    return combineLatest([familyId$, this.currentViewDate$, members$]).pipe(
+      switchMap(([familyId, viewDate, members]) => {
         if (!familyId) return of([]);
 
-        const customEvents$ = this.getCustomEvents(familyId);
+        // Calculate start/end of the month for Firestore query
+        const startOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
+        const endOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0, 23, 59, 59);
+
+        const eventsRef = collection(this.afs, `families/${familyId}/events`);
         
-        return combineLatest([customEvents$, familyMembers$]).pipe(
-          map(([customEvents, members]) => {
-            const birthdayEvents = this.generateBirthdayEvents(members);
-            const allEvents = [...customEvents, ...birthdayEvents];
-            return allEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
+        // Query: Get events that start within this month range
+        // Note: This is a basic range query. 
+        const q = query(
+          eventsRef, 
+          where('startAt', '>=', startOfMonth),
+          where('startAt', '<=', endOfMonth)
+        );
+
+        return collectionData(q, { idField: 'id' }).pipe(
+          map(events => {
+            const customEvents = events.map(e => this.docToEvent(e, members));
+            const birthdayEvents = this.generateBirthdaysForMonth(members, viewDate);
+            return [...customEvents, ...birthdayEvents].sort((a, b) => a.start.getTime() - b.start.getTime());
           })
         );
       })
     );
   }
 
-  /**
-   * Adds a new custom event to the family's calendar.
-   */
-  async createEvent(eventData: { title: string; start: Date; }): Promise<void> {
-    const familyId = this.familiesService.activeFamilyId();
-    const user = this.authService.currentUser();
-    const members = this.familiesService.activeFamilyMembers();
-    if (!familyId || !user) throw new Error("Not authorized.");
+  getUpcomingEvents(): Observable<CalendarEvent[]> {
+    const familyId$ = toObservable(this.familiesService.activeFamilyId);
+    const members$ = toObservable(this.familiesService.activeFamilyMembers);
 
-    const invitedUserIds = members.map(m => m.uid);
-    // Initialize RSVPs with all invited members as 'pending'
-    const rsvps = invitedUserIds.reduce((acc, uid) => ({ ...acc, [uid]: 'pending' }), {});
+    return combineLatest([familyId$, members$]).pipe(
+      switchMap(([familyId, members]) => {
+        if (!familyId) return of([]);
 
-    const eventsCollection = collection(this.afs, `families/${familyId}/events`);
-    await addDoc(eventsCollection, {
-      title: eventData.title,
-      startAt: Timestamp.fromDate(eventData.start),
-      endAt: Timestamp.fromDate(eventData.start), // MVP: end is same as start
-      isAllDay: true, // MVP: all events are all-day
-      createdBy: user.uid,
-      invitedUserIds,
-      rsvps,
-    });
-  }
+        const eventsRef = collection(this.afs, `families/${familyId}/events`);
+        
+        // Query: All events starting from Right Now
+        const q = query(
+          eventsRef, 
+          where('startAt', '>=', new Date()),
+          orderBy('startAt', 'asc')
+        );
 
-  /**
-   * Updates the current user's RSVP status for a given event using dot notation.
-   */
-  async updateRsvp(eventId: string, status: 'attending' | 'maybe' | 'not_attending'): Promise<void> {
-    const familyId = this.familiesService.activeFamilyId();
-    const user = this.authService.currentUser();
-    if (!familyId || !user || !eventId) return;
-
-    const eventDocRef = doc(this.afs, `families/${familyId}/events/${eventId}`);
-    
-    // Use dot notation to update a specific field within the 'rsvps' map.
-    // This is highly efficient and avoids race conditions.
-    const rsvpField = `rsvps.${user.uid}`;
-    await updateDoc(eventDocRef, {
-      [rsvpField]: status
-    });
-  }
-
-  /**
-   * Fetches upcoming custom events from Firestore.
-   */
-  private getCustomEvents(familyId: string): Observable<CalendarEvent[]> {
-    const eventsCollection = collection(this.afs, `families/${familyId}/events`);
-    // Query for events that start today or in the future
-    const q = query(eventsCollection, where('startAt', '>=', new Date()), orderBy('startAt', 'asc'));
-    
-    return collectionData(q, { idField: 'id' }).pipe(
-      map(events => events.map(event => this.docToEvent(event as EventDocument)))
+        return collectionData(q, { idField: 'id' }).pipe(
+          map(events => {
+            // 1. Convert Firestore docs to Event objects
+            const customEvents = events.map(e => this.docToEvent(e, members));
+            
+            // 2. Generate upcoming birthdays (next 12 months)
+            const birthdayEvents = this.generateUpcomingBirthdays(members);
+            
+            // 3. Merge and Sort
+            return [...customEvents, ...birthdayEvents].sort((a, b) => a.start.getTime() - b.start.getTime());
+          })
+        );
+      })
     );
   }
 
-  /**
-   * Dynamically generates birthday events from the member list for the upcoming year.
-   */
-  private generateBirthdayEvents(members: FamilyMember[]): CalendarEvent[] {
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const events: CalendarEvent[] = [];
-    
-    for (const member of members) {
-      if (member.birthday) { // Expects 'YYYY-MM-DD'
-        const birthDate = new Date(`${member.birthday}T00:00:00`);
-        let thisYearsBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
-
-        // If the birthday has already passed this year, show next year's birthday
-        if (thisYearsBirthday < today) {
-          thisYearsBirthday.setFullYear(currentYear + 1);
-        }
-
-        events.push({
-          id: `birthday_${member.uid}`, // Create a stable ID
-          title: `${member.name}'s Birthday`,
-          start: thisYearsBirthday,
-          end: thisYearsBirthday,
-          isAllDay: true,
-          type: 'birthday',
-          rsvps: {},
-          relatedUserId: member.uid
-        });
-      }
-    }
-    return events;
-  }
+  // --- Sub-Feature: Potluck ---
   
-  /**
-   * Converts a Firestore event document to a client-side CalendarEvent object.
-   */
-  private docToEvent(doc: EventDocument): CalendarEvent {
-    return {
-      ...doc,
-      id: doc.id!,
-      start: doc.startAt.toDate(),
-      end: doc.endAt.toDate(),
-      type: 'custom',
-    };
+  getEventItems(eventId: string): Observable<EventItem[]> {
+    const familyId = this.familiesService.activeFamilyId();
+    if (!familyId) return of([]);
+    // Path is now .../events/{id}/items
+    const col = collection(this.afs, `families/${familyId}/events/${eventId}/items`);
+    return collectionData(col, { idField: 'id' }) as Observable<EventItem[]>;
+  }
+
+  async addEventItem(eventId: string, itemName: string): Promise<void> {
+    const familyId = this.familiesService.activeFamilyId();
+    if (!familyId) return;
+    const col = collection(this.afs, `families/${familyId}/events/${eventId}/items`);
+    await addDoc(col, { name: itemName, claimedByUserId: null, claimedByName: null });
+  }
+
+  async claimEventItem(eventId: string, itemId: string, claim: boolean): Promise<void> {
+    const familyId = this.familiesService.activeFamilyId();
+    const user = this.authService.currentUser();
+    if (!familyId || !user) return;
+    
+    const docRef = doc(this.afs, `families/${familyId}/events/${eventId}/items/${itemId}`);
+    await updateDoc(docRef, {
+      claimedByUserId: claim ? user.uid : null,
+      claimedByName: claim ? user.displayName || 'Family Member' : null
+    });
+  }
+
+  // --- Sub-Feature: Discussion Board ---
+
+  getEventChat(eventId: string): Observable<ChatMessage[]> {
+    const familyId = this.familiesService.activeFamilyId();
+    if (!familyId) return of([]);
+    const col = collection(this.afs, `families/${familyId}/events/${eventId}/discussion`);
+    const q = query(col, orderBy('createdAt', 'asc'));
+    return collectionData(q, { idField: 'id' }) as Observable<ChatMessage[]>;
+  }
+
+  async postMessage(eventId: string, text: string): Promise<void> {
+    const familyId = this.familiesService.activeFamilyId();
+    const user = this.authService.currentUser();
+    if (!familyId || !user) return;
+
+    const col = collection(this.afs, `families/${familyId}/events/${eventId}/discussion`);
+    await addDoc(col, {
+      text,
+      senderId: user.uid,
+      senderName: user.displayName || 'Unknown',
+      createdAt: Timestamp.now()
+    });
+  }
+
+  // --- Core Operations ---
+
+  async createEvent(data: Partial<CalendarEvent>): Promise<void> {
+    const familyId = this.familiesService.activeFamilyId();
+    const user = this.authService.currentUser();
+    const members = this.familiesService.activeFamilyMembers();
+    if (!familyId || !user) return;
+
+    // Default: Invite everyone if specific IDs not provided
+    const invitedUserIds = data.invitedUserIds || members.map(m => m.uid);
+    const rsvps = invitedUserIds.reduce((acc, uid) => ({ ...acc, [uid]: 'pending' }), {} as Record<string, string>);
+    // Auto-set creator as attending
+    rsvps[user.uid] = 'attending';
+
+    const col = collection(this.afs, `families/${familyId}/events`);
+    await addDoc(col, {
+      title: data.title,
+      startAt: Timestamp.fromDate(data.start!),
+      endAt: Timestamp.fromDate(data.end || data.start!),
+      isAllDay: data.isAllDay ?? true,
+      location: data.location || '',
+      description: data.description || '',
+      createdBy: user.uid,
+      invitedUserIds,
+      rsvps
+    });
+  }
+
+  async updateRsvp(eventId: string, status: 'attending' | 'maybe' | 'not_attending'): Promise<void> {
+    const familyId = this.familiesService.activeFamilyId();
+    const user = this.authService.currentUser();
+    if (!familyId || !user) return;
+    const eventRef = doc(this.afs, `families/${familyId}/events/${eventId}`);
+    await updateDoc(eventRef, { [`rsvps.${user.uid}`]: status });
   }
 
   async deleteEvent(eventId: string): Promise<void> {
     const familyId = this.familiesService.activeFamilyId();
-    const user = this.authService.currentUser();
-    if (!familyId || !user || !eventId) return;
-    const eventDocRef = doc(this.afs, `families/${familyId}/events/${eventId}`);
+    if(!familyId) return;
+    // Note: In a real app, delete subcollections (chat/potluck) via Cloud Functions to avoid orphans.
+    await deleteDoc(doc(this.afs, `families/${familyId}/events/${eventId}`));
+  }
 
-    await deleteDoc(eventDocRef);
+  // --- Helpers ---
+
+  private docToEvent(doc: any, members: FamilyMember[]): CalendarEvent {
+    const creator = members.find(m => m.uid === doc.createdBy);
+    return {
+      ...doc,
+      id: doc.id,
+      start: doc.startAt.toDate(),
+      end: doc.endAt.toDate(),
+      type: 'custom',
+      ownerColor: creator?.color || 'gray' // Assumes FamilyMember has a 'color' property
+    };
+  }
+
+  private generateBirthdaysForMonth(members: FamilyMember[], viewDate: Date): CalendarEvent[] {
+    const month = viewDate.getMonth();
+    const year = viewDate.getFullYear();
+    
+    return members
+      .filter(m => {
+        if (!m.birthday) return false; // Format YYYY-MM-DD
+        const bMonth = new Date(m.birthday).getMonth(); // 0-11
+        // Note: This simple check ignores timezone edge cases for simplicity
+        return bMonth === month;
+      })
+      .map(m => {
+        const bDate = new Date(m.birthday!);
+        const thisYearBday = new Date(year, month, bDate.getDate() + 1); // +1 handles timezone drift in simple conversions
+        return {
+          id: `bday_${m.uid}_${year}`,
+          title: `${m.name}'s Birthday`,
+          start: thisYearBday,
+          end: thisYearBday,
+          isAllDay: true,
+          type: 'birthday',
+          rsvps: {},
+          invitedUserIds: [],
+          ownerColor: m.color || 'gold'
+        };
+      });
+  }
+
+  private generateUpcomingBirthdays(members: FamilyMember[]): CalendarEvent[] {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    
+    return members
+      .filter(m => m.birthday) // Only members with birthdays
+      .map(m => {
+        const birthDate = new Date(m.birthday! + 'T00:00:00'); // Ensure YYYY-MM-DD is parsed correctly
+        let targetDate = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+
+        // If birthday has passed this year, move to next year
+        if (targetDate < today) {
+          targetDate.setFullYear(currentYear + 1);
+        }
+
+        return {
+          id: `bday_up_${m.uid}`,
+          title: `${m.name}'s Birthday`,
+          start: targetDate,
+          end: targetDate,
+          isAllDay: true,
+          type: 'birthday',
+          rsvps: {},
+          invitedUserIds: [],
+          ownerColor: m.color || 'gold'
+        } as CalendarEvent;
+      });
   }
 }

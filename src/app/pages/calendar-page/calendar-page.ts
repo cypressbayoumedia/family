@@ -1,69 +1,134 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { CommonModule,DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Observable } from 'rxjs';
 import { Calendar, CalendarEvent } from '../../core/calendar';
 import { AuthService } from '../../core/auth';
-import { RouterLink } from '@angular/router'
+import { RouterLink } from '@angular/router';
+import { EventDetail } from '../event-detail/event-detail';
+
 @Component({
   selector: 'app-calendar-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe, RouterLink],
+  imports: [CommonModule, FormsModule, DatePipe, RouterLink, EventDetail],
   templateUrl: './calendar-page.html',
   styleUrls: ['./calendar-page.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarPage {
-  private calendarService = inject(Calendar);
+  calendarService = inject(Calendar);
   authService = inject(AuthService);
 
-  events$: Observable<CalendarEvent[]>;
-  currentUser = this.authService.currentUser;
+  // Current Month View State
+  viewDate = signal(new Date());
+  
+  // Events source
+  events$ = this.calendarService.getEventsForCurrentMonth();
 
-  showCreateForm = signal(false);
-  newEventTitle = signal('');
-  newEventDate = signal('');
-
-  constructor() {
-    this.events$ = this.calendarService.getUpcomingEvents();
-  }
-
-  async createEvent(): Promise<void> {
-    if (!this.newEventTitle() || !this.newEventDate()) return;
+  // Logic to build the calendar grid
+  calendarGrid = computed(() => {
+    const date = this.viewDate();
+    const year = date.getFullYear();
+    const month = date.getMonth();
     
-    await this.calendarService.createEvent({
-      title: this.newEventTitle(),
-      start: new Date(this.newEventDate() + "T00:00:00"), // Ensure it's a valid date
-    });
+    const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 (Sun) - 6 (Sat)
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const days = [];
     
-    this.showCreateForm.set(false);
-    this.newEventTitle.set('');
-    this.newEventDate.set('');
-  }
-
-  updateRsvp(eventId: string, status: 'attending' | 'maybe' | 'not_attending'): void {
-    this.calendarService.updateRsvp(eventId, status);
-  }
-
-  // Helper to get the user's RSVP status for a specific event
-  getUserRsvpStatus(event: CalendarEvent): string {
-    const uid = this.currentUser()?.uid;
-    return uid ? event.rsvps[uid] : 'pending';
-  }
-
-  deleteEvent(event: CalendarEvent): void {
-    if (!event.id || event.type === 'birthday') return;
-
-    // It's good practice to confirm a destructive action.
-    const confirmation = confirm(`Are you sure you want to delete the event "${event.title}"?`);
-    if (confirmation) {
-      this.calendarService.deleteEvent(event.id);
+    // Previous Month Padding
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      days.push({ day: null, date: null }); 
     }
+    
+    // Actual Days
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push({ 
+        day: i, 
+        date: new Date(year, month, i),
+        isToday: this.isSameDate(new Date(), new Date(year, month, i))
+      });
+    }
+
+    return days;
+  });
+
+  // Selected Event for Modal
+  selectedEvent = signal<CalendarEvent | null>(null);
+  showCreateModal = signal(false);
+
+  // Simple Create Form Data
+  newEventData = {   
+    title: '', 
+    date: '', 
+    time: '12:00', // Default Time
+    location: '', 
+    description: '',
+     type: 'custom' 
+    };
+
+  changeMonth(delta: number) {
+    const current = this.viewDate();
+    const newDate = new Date(current.getFullYear(), current.getMonth() + delta, 1);
+    this.viewDate.set(newDate);
+    this.calendarService.currentViewDate$.next(newDate);
   }
 
-
-  isEventOwner(event: CalendarEvent): boolean {
-    const uid = this.currentUser()?.uid;
-    return uid ? event.type === 'custom' && (event as any).createdBy === uid : false;
+  openEvent(event: CalendarEvent) {
+    this.selectedEvent.set(event);
   }
+
+  // Helper to filter events for a specific day in the grid
+  getEventsForDay(date: Date | null, allEvents: CalendarEvent[] | null): CalendarEvent[] {
+    if (!date || !allEvents) return [];
+    return allEvents.filter(e => this.isSameDate(e.start, date));
+  }
+
+  private isSameDate(d1: Date, d2: Date): boolean {
+    return d1.getDate() === d2.getDate() && 
+           d1.getMonth() === d2.getMonth() && 
+           d1.getFullYear() === d2.getFullYear();
+  }
+
+  async createFullEvent() {
+    if(!this.newEventData.title || !this.newEventData.date) return;
+
+    // Merge Date and Time strings into one Date object
+    const dateTimeString = `${this.newEventData.date}T${this.newEventData.time}:00`;
+    const startDate = new Date(dateTimeString);
+
+    await this.calendarService.createEvent({
+      title: this.newEventData.title,
+      start: startDate,
+      end: startDate, // MVP: 1 hour duration or same end time
+      isAllDay: false, // We now have time, so it's not always all-day
+      location: this.newEventData.location,
+      description: this.newEventData.description
+    });
+
+    // Reset and close
+    this.showCreateModal.set(false);
+    this.newEventData = { title: '', date: '', time: '12:00', location: '', description: '', type: 'custom' };
+  }
+
+  openCreateModal(date: Date | null) {
+    if (!date) return; // Ignore empty padding days
+
+    // Format Date to YYYY-MM-DD for the input field
+    // We use this trick to ensure we get the Local date, not UTC
+    const offset = date.getTimezoneOffset(); 
+    const localDate = new Date(date.getTime() - (offset * 60 * 1000)); 
+    const dateString = localDate.toISOString().split('T')[0];
+
+    this.newEventData = { 
+      title: '', 
+      date: dateString, // <--- Pre-fill the date
+      time: '12:00', 
+      location: '', 
+      description: '',
+      type: 'custom' 
+    };
+    
+    this.showCreateModal.set(true);
+  }
+
 }

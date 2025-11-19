@@ -14,6 +14,7 @@ export interface FamilyMember {
   email: string;
   birthday?: string; // Optional for now
   role?: 'admin' | 'member';
+  color?:string;
 }
 export interface Family {
   id: string;

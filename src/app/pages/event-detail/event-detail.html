@@ -1,0 +1,110 @@
+<div class="modal-overlay" (click)="close.emit()">
+  <!-- We use 'create-event-form' class here to inherit existing styles -->
+  <div class="create-event-form modal-panel" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <header class="modal-header">
+      <div class="header-content">
+        <span class="type-badge" [class.birthday-badge]="event.type === 'birthday'">
+          {{ event.type === 'birthday' ? '🎂 Birthday' : '📅 Event' }}
+        </span>
+        <h3>{{ event.title }}</h3>
+        <p class="sub-text">{{ event.start | date:'fullDate' }} • {{ event.start | date:'shortTime' }}</p>
+      </div>
+      <button class="close-btn" (click)="close.emit()">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </header>
+
+    <!-- Tabs (Only for Custom Events) -->
+    @if (event.type === 'custom') {
+      <div class="tabs">
+        <button [class.active]="activeTab() === 'details'" (click)="activeTab.set('details')">Details</button>
+        <button [class.active]="activeTab() === 'items'" (click)="activeTab.set('items')">To-Bring</button>
+        <button [class.active]="activeTab() === 'chat'" (click)="activeTab.set('chat')">Chat</button>
+      </div>
+    }
+
+    <div class="modal-body">
+      
+      @switch (activeTab()) {
+        
+        <!-- TAB: DETAILS -->
+        @case ('details') {
+          <div class="tab-content">
+            <p class="desc">{{ event.description || 'No description provided.' }}</p>
+            
+            @if (event.location) {
+              <p class="location">📍 {{ event.location }}</p>
+            }
+            
+            <!-- Reuse event-rsvp classes -->
+            @if (event.type === 'custom') {
+              <div class="event-rsvp detail-rsvp">
+                <button [class.active]="myRsvp === 'attending'" (click)="setRsvp('attending')">Going</button>
+                <button [class.active]="myRsvp === 'maybe'" (click)="setRsvp('maybe')">Maybe</button>
+                <button [class.active]="myRsvp === 'not_attending'" (click)="setRsvp('not_attending')">No</button>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- TAB: TO-BRING LIST -->
+        @case ('items') {
+          <div class="tab-content">
+            <div class="add-row">
+              <input type="text" [(ngModel)]="newItemName" placeholder="Add item (e.g. Chips, Tent)..." (keyup.enter)="addItem()">
+              <button class="btn-small" (click)="addItem()">Add</button>
+            </div>
+            
+            <ul class="item-list">
+              <!-- Note: 'track' is required in new syntax. Ideally track by item.id, falling back to item (identity) here -->
+              @for (item of items$ | async; track item) {
+                <li>
+                  <div class="item-info">
+                    <span class="item-name" [class.strike]="!!item.claimedByUserId">{{ item.name }}</span>
+                    @if (item.claimedByUserId) {
+                      <span class="claimed-by">
+                        {{ item.claimedByName }}
+                      </span>
+                    }
+                  </div>
+                  
+                  @if (!item.claimedByUserId) {
+                    <button class="claim-btn" (click)="toggleClaim(item, true)">Claim</button>
+                  }
+                  @if (item.claimedByUserId === currentUser?.uid) {
+                    <button class="undo-btn" (click)="toggleClaim(item, false)">x</button>
+                  }
+                </li>
+              }
+            </ul>
+          </div>
+        }
+
+        <!-- TAB: CHAT -->
+        @case ('chat') {
+          <div class="tab-content chat-layout">
+            <div class="chat-feed">
+              @for (msg of chatMessages$ | async; track msg) {
+                <div class="chat-msg" [class.mine]="msg.senderId === currentUser?.uid">
+                  <div class="bubble">
+                    @if (msg.senderId !== currentUser?.uid) {
+                      <span class="sender-name">{{ msg.senderName }}</span>
+                    }
+                    {{ msg.text }}
+                  </div>
+                </div>
+              }
+            </div>
+            <div class="chat-input-row">
+              <input [(ngModel)]="chatInput" placeholder="Message..." (keyup.enter)="sendMessage()">
+              <button class="btn-small" (click)="sendMessage()">Send</button>
+            </div>
+          </div>
+        }
+      }
+
+    </div>
+  </div>
+</div>
