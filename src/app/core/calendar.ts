@@ -220,7 +220,7 @@ export class Calendar {
       start: doc.startAt.toDate(),
       end: doc.endAt.toDate(),
       type: 'custom',
-      ownerColor: creator?.color || 'gray' // Assumes FamilyMember has a 'color' property
+      ownerColor: creator?.color || '#BB7F6A' // Assumes FamilyMember has a 'color' property
     };
   }
 

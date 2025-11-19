@@ -4,11 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { Calendar, CalendarEvent } from '../../core/calendar';
 import { AuthService } from '../../core/auth';
 import { EventDetail } from '../event-detail/event-detail';
-
+import { RouterLink } from '@angular/router'
 @Component({
   selector: 'app-calendar-page',
-  standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe, EventDetail],
+  imports: [CommonModule, FormsModule, DatePipe, EventDetail, RouterLink],
   templateUrl: './calendar-page.html',
   styleUrls: ['./calendar-page.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,10 +18,24 @@ export class CalendarPage {
 
   // Current Month View State
   viewDate = signal(new Date());
-  
+  monthEvents$ = this.calendarService.getEventsForCurrentMonth();
+
+  // SOURCE 2: For the List (Shows everything in the future)
+  listEvents$ = this.calendarService.getUpcomingEvents();
+  viewMode = signal<'calendar' | 'list'>(
+    (localStorage.getItem('calViewPref') as 'calendar' | 'list') || 'calendar'
+  );
   // Events source
   events$ = this.calendarService.getEventsForCurrentMonth();
-
+  setViewMode(mode: 'calendar' | 'list') {
+    this.viewMode.set(mode);
+    localStorage.setItem('calViewPref', mode);
+  }
+  getEventColor(event: CalendarEvent): string {
+    // If it's a custom event, use the owner's color. If birthday, use pink.
+    if (event.type === 'birthday') return '#e91e63'; // Pink
+    return event.ownerColor || '#bcaaa4'; // Default to the "Terracotta" color from your image
+  }
   // Logic to build the calendar grid
   calendarGrid = computed(() => {
     const date = this.viewDate();

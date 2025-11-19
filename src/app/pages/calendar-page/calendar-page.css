@@ -1,121 +1,137 @@
-.calendar-container, 
-.calendar-container * {
-  box-sizing: border-box;
-}
+/*
+  WIZ'S NOTES:
+  This is the complete and final CSS for your refactored calendar component.
+  All selectors have been updated to match your new, cohesive HTML structure.
+  New styles for the detailed "Create Event" form and other elements have been
+  added, ensuring every part of the component is fully styled and on-brand.
+*/
 
-/* --- 1. Main Container & Header --- */
-.calendar-container {
+/* --- 1. Main Page Layout --- */
+.page-container.calendar-page {
   max-width: 1200px;
-  margin: 2rem auto;
-  padding: 2.5rem;
-  background-color: #fff;
-  /* Soft, modern shadow instead of a hard border */
-  box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.08); 
-  border: 1px solid rgba(0,0,0,0.04); /* Extremely subtle border */
-  border-radius: 24px; /* More organic curvature */
-  font-family: var(--font-body, sans-serif); /* Fallback if var missing */
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem 1.5rem;
 }
 
-.cal-header {
+/* --- 2. Header & Navigation --- */
+.page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap; /* Allows wrapping on small screens */
+  gap: 1.5rem;
   margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .month-nav {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .month-nav h2 {
-  font-family: var(--font-heading, sans-serif);
-  font-size: 2rem;
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
   font-weight: 700;
   margin: 0;
   min-width: 220px;
   text-align: center;
-  color: var(--text-color, #333);
-  letter-spacing: -0.5px; /* Tight tracking for modern feel */
+  color: var(--text-color);
 }
 
-.icon-btn {
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Reusable icon button style */
+.icon-button {
   background: transparent;
-  border: 1px solid transparent; /* Invisible border to prevent layout shift */
+  border: 1px solid var(--border-color);
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
-  color: #777;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  color: #555;
+  transition: background-color 0.2s;
+}
+.icon-button:hover {
+  background-color: var(--bg-color);
 }
 
-.icon-btn:hover {
-  background-color: var(--bg-color, #f4f4f4);
-  color: var(--accent-color, #000);
-  transform: scale(1.05);
+/* View Toggle Buttons */
+.view-toggle {
+  display: flex;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 99px; /* Pill shape */
+  padding: 4px;
 }
 
-/* --- 2. Weekday Row --- */
+.view-toggle button {
+  border: none;
+  background: none;
+  border-radius: 99px;
+  padding: 6px;
+  color: #555;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-toggle button.active {
+  background: var(--accent-color);
+  color: var(--text-color);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+/* --- 3. Month View Grid --- */
 .weekday-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
   margin-bottom: 0.5rem;
-}
-
-.weekday-row span {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
   font-weight: 600;
-  color: #999;
+  color: #666;
   padding-bottom: 1rem;
 }
 
-/* --- 3. Main Calendar Grid --- */
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  /* Using gap + background color to create the grid lines is cleaner than borders */
-  gap: 1px;
-  background-color: rgba(0,0,0,0.05); /* Color of the grid lines */
-  border: 1px solid rgba(0,0,0,0.05);
   border-radius: 12px;
   overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 
 .cal-day {
-  background-color: #fff; /* White cells sit on top of grid background */
-  min-height: 140px; /* Slightly taller for elegance */
+  background-color: #fff;
+  min-height: 140px;
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
   position: relative;
   transition: background-color 0.2s ease;
-  
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
+.cal-day:nth-child(7n) { border-right: none; } /* Remove border on last column */
+.cal-day:not(.empty):hover { background-color: var(--bg-color); cursor: pointer; }
+.cal-day.empty { background-color: #fcfcfc; }
 
-.cal-day:not(.empty):hover {
-  background-color: #f7f9fc; /* Light brand color tint */
-  cursor: pointer;
-}
-
-.cal-day.empty {
-  background-color: #fcfcfc;
-}
-
-/* Date Number Styling */
 .day-number {
-  font-family: var(--font-heading, sans-serif);
-  font-weight: 600;
+  font-family: var(--font-heading);
+  font-weight: 700;
   font-size: 0.9rem;
   width: 28px;
   height: 28px;
@@ -125,157 +141,95 @@
   border-radius: 50%;
   margin-bottom: 0.5rem;
   color: #555;
-  /* Aligned top-left for better scanning */
-  align-self: flex-start; 
+  align-self: flex-end;
 }
-
-/* Current Day Highlight */
 .cal-day.today .day-number {
-  background-color: var(--accent-color, #000);
-  color: #fff; /* Force white for contrast against accent */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  background-color: var(--accent-color);
+  color: var(--text-color);
 }
 
-.day-events {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1; /* Fills remaining space */
-}
+.day-events { display: flex; flex-direction: column; gap: 6px; }
 
-/* --- 4. Event Pills --- */
 .event-pill {
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  position: relative;
-  transition: all 0.2s ease;
-  border-left: 3px solid rgba(255,255,255,0.3); /* Glassy aesthetic touch */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: filter 0.2s;
 }
+.event-pill:hover { filter: brightness(95%); }
+.event-pill.birthday { background-color: var(--accent-color); color: var(--text-color); }
+.event-pill[style] { color: #fff; }
 
-.event-pill:hover {
-  transform: translateY(-1px);
-  filter: brightness(95%);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+
+/* --- 4. List View --- */
+.list-view-container { display: flex; flex-direction: column; gap: 1rem; }
+.list-card {
+  display: flex;
+  background: #fff;
+  border-radius: 4rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  padding: 1.5rem;
 }
-
-.event-pill.birthday {
-  background-color: var(--accent-color, #000);
-  color: #fff;
-}
-
-.event-pill[style] {
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-/* --- 5. Modals (Clean & Airy) --- */
-.modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.4); /* Lighter, blurrier backdrop */
-  backdrop-filter: blur(5px); /* Modern frosted glass effect */
-  z-index: 1000;
-  /* ...keep positioning from original... */
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  display: flex; justify-content: center; align-items: center;
-}
-
-.create-event-form{
-  background-color: #fff;
-  border-radius: 20px;
-  padding: 1rem;
-}
-
-textarea {
-  width:100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 1em;
-  font-size: 1rem;
-  font-family: inherit;
-  background-color: #fafafa;
-resize: none; 
-}
-
-.modal-content {
-  background-color: #fff;
-  border-radius: 20px;
-  padding: 2.5rem;
-  width: 90%;
-  max-width: 480px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+.list-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08); }
+.date-badge {
+  width: 90px;
+  min-width: 90px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  animation: modalUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  justify-content: center;
+ 
+  color: #fff;
+  background-color: var(--accent-color);
+  padding: 1rem;
+  border-radius: 2rem;
 }
+.date-day { font-size: 2rem; font-family: var(--font-heading); font-weight: 700; line-height: 1; }
+.date-month { font-size: 2rem; font-weight: 400; }
+.card-content { padding: 1rem 1.25rem; display: flex; flex-direction: column; flex: 1; }
+.card-time { font-family: var(--font-heading); font-size: 0.9rem; color: #555; }
+.card-title { margin: 4px 0; font-size: 1.2rem; font-family: var(--font-heading); color: var(--text-color); font-weight: 700; }
+.card-loc { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; color: #555; }
+.icon-tiny { font-size: 16px; }
 
-@keyframes modalUp {
-  from { opacity: 0; transform: translateY(20px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+/* --- 5. Empty State & Modals --- */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background-color: transparent;
+  border: 1px dashed var(--border-color);
+  border-radius: 12px;
+}
+.empty-state p { color: #666; font-size: 1.1rem; margin-bottom: 1.5rem; }
+
+.modal-content h3 { font-family: var(--font-heading); font-size: 1.5rem; text-align: center; margin-bottom: 1.5rem; }
+.form-row { display: flex; gap: 1rem; }
+.form-row .form-group { flex: 1; }
+.form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; }
+/* Assuming global .form-group, .modal-overlay, .modal-content, .button-primary/secondary styles exist */
+
+textarea{
+  width: 100%;
 }
 
 /* --- 6. Responsive Design --- */
 @media (max-width: 768px) {
-  .calendar-container {
-    padding: 1rem;
-    margin: 0.5rem;
-    border-radius: 12px;
-  }
-  
-  .cal-header {
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    border-bottom: none;
-  }
+  .page-container.calendar-page { padding: 1rem; }
+  .page-header { justify-content: center; }
+  .month-nav h2 { font-size: 1.5rem; min-width: auto; }
+  .weekday-row { font-size: 0.7rem; }
+  .cal-day { min-height: 70px; padding: 4px; align-items: center; }
+  .day-number { width: 24px; height: 24px; font-size: 0.8rem; margin-bottom: 4px; align-self: center; }
+  .form-row { flex-direction: column; gap: 1.25rem; }
 
-  .month-nav h2 {
-    font-size: 1.5rem;
-  }
-
-  .weekday-row span {
-    font-size: 0.7rem;
-    letter-spacing: 0;
-  }
-
-  .cal-day {
-    min-height: 70px;
-    padding: 4px;
-    align-items: center; /* Center dots on mobile */
-  }
-  
-  .day-number {
-    width: 24px;
-    height: 24px;
-    font-size: 0.8rem;
-    margin-bottom: 4px;
-    align-self: center; /* Center numbers on mobile */
-  }
-
-  .day-events {
-    flex-direction: row; /* Horizontal dots */
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 4px;
-    width: 100%;
-  }
-
-  /* MOBILE UI: Simple Dots */
-  .event-pill {
-    padding: 0;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%; /* Perfect circle */
-    text-indent: -9999px;
-    border: none;
-    box-shadow: none;
-    position: relative; 
-    z-index: 2; 
-  }
+  /* Mobile Dots View */
+  .day-events { flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 4px; }
+  .event-pill { padding: 0; width: 8px; height: 8px; border-radius: 50%; text-indent: -9999px; border: none; box-shadow: none; }
 }
