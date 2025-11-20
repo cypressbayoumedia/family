@@ -1,0 +1,100 @@
+@if (capsule(); as caps) {
+  @if (content(); as items) {
+    
+    <!-- Layer 1: Background Blur (furthest back) -->
+    <div class="ambient-background">
+      @if (activeItem(); as item) {
+        <img [src]="item.type === 'photo' ? item.url : item.authorPhotoURL" alt="Ambient background">
+      }
+    </div>
+
+    <!-- Layer 2: Main Content (The waveform and images are here) -->
+    <div class="story-container">
+      <div class="media-wrapper">
+        @if (activeItem(); as item) {
+          @if (item.type === 'photo') {
+            <img [src]="item.url" class="main-image" alt="Memory">
+          } @else {
+            <div class="audio-visualizer">
+              <img [src]="item.authorPhotoURL" class="audio-avatar" alt="Author">
+              <!-- <app-audio-waveform [audioUrl]="item.url!"></app-audio-waveform> -->
+              <audio [src]="item.url" autoplay controls hidden></audio>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Layer 3: THE UI OVERLAY (Sits on top of everything else) -->
+    <div class="ui-overlay">
+      
+      <!-- Part A: The Top Bar (Header and Progress) -->
+      <div class="top-bar">
+        <div class="progress-bar">
+          @for (item of items; track item.id; let i = $index) {
+            <div class="progress-segment" [class.active]="i === currentIndex()" [class.visited]="i < currentIndex()">
+              <div class="progress-fill"></div>
+            </div>
+          }
+        </div>
+        <div class="header-info">
+          @if (activeItem(); as item) {
+            <div class="author-details">
+              <img [src]="item.authorPhotoURL || 'assets/avatar-placeholder.png'" class="author-avatar" alt="Author avatar">
+              <div class="author-text">
+                <span class="author-name">{{ item.authorName }}</span>
+                <span class="time-ago">{{ item.createdAt.toDate() | date:'shortTime' }}</span>
+              </div>
+            </div>
+          }
+          <button class="close-btn" (click)="close()">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Part B: The Invisible Touch Zones (The middle, expandable area) -->
+      <div class="touch-zones">
+        <div class="zone-left" (click)="prev()"></div>
+        <div class="zone-right" (click)="next()"></div>
+      </div>
+
+      <!-- Part C: The Floating Action Button (At the bottom) -->
+      <div class="fab-container">
+        <button mat-fab class="glass-fab" [matMenuTriggerFor]="addMenu" aria-label="Add Memory">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Layer 4: Modals (Topmost layer, appears on top of the UI Overlay) -->
+    @if(showRecordAudio()) {
+      <div class="inline-recorder-overlay" (click)="onAudioRecorderClosed()">
+        <div (click)="$event.stopPropagation()">
+          <app-record-audio
+            (audioSaved)="onAudioSaved($event)"
+            (closed)="onAudioRecorderClosed()">
+          </app-record-audio>
+        </div>
+      </div>
+    }
+
+    <!-- Ancillary elements (no visual layer) -->
+    <mat-menu #addMenu="matMenu" xPosition="before" yPosition="above" class="glass-menu">
+      <button mat-menu-item (click)="fileInput.click()">
+        <mat-icon>photo_library</mat-icon>
+        <span>Add Photo</span>
+      </button>
+      <button mat-menu-item (click)="toggleRecordAudio()">
+        <mat-icon>mic</mat-icon>
+        <span>Record Audio</span>
+      </button>
+    </mat-menu>
+
+    <input #fileInput type="file" hidden (change)="onFileSelected($event)" accept="image/*">
+
+  } @else {
+    <!-- Loading State -->
+    <div style="color: white; padding: 20px; text-align: center;">Loading memories...</div>
+  }
+}

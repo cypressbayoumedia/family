@@ -1,9 +1,6 @@
 <!-- 
   WIZ'S NOTES:
-  This is the complete, cleaned-up HTML. The redundant menu definitions have been
-  removed. We now define the user menu and the switcher submenu only ONCE at the
-  bottom of the file. Both the desktop and mobile trigger buttons point to this
-  single menu definition, which is the correct and efficient Angular Material pattern.
+  Updated to include Story Capsules integration.
 -->
 @if (authService.loading()) {
   <p class="loading-indicator">Loading your Family Circle...</p>
@@ -35,7 +32,6 @@
               </div>
               <span class="material-symbols-rounded more-icon-desktop">more_horiz</span>
             </button>
-            <!-- The menu panel itself is defined once at the bottom -->
           </div>
         </div>
       </aside>
@@ -50,10 +46,10 @@
            <div class="mobile-user-menu">
             <button class="user-menu-button" routerLink="/calendar">
               <span class="material-symbols-rounded"
-              [matBadge]="(upcomingEventsCount$ | async) || 0"
-          [matBadgeHidden]="(upcomingEventsCount$ | async) === 0"
-          matBadgeColor="warn"
-          aria-label="Upcoming events"
+                [matBadge]="upcomingEventsCount() || 0"
+                [matBadgeHidden]="upcomingEventsCount() === 0"
+                matBadgeColor="warn"
+                aria-label="Upcoming events"
               >calendar_month</span>
             </button>
              <button class="user-menu-button" [matMenuTriggerFor]="userMenu" aria-label="Open user menu" [matMenuTriggerData]="{name:  familiesService.activeFamily()?.name }">
@@ -61,29 +57,16 @@
              </button>
            </div>
         </header>
+        
+        <!-- Story Capsules Strip -->
+        <app-capsule-list 
+          [capsules]="capsules()"
+          (create)="showCreateCapsuleModal.set(true)">
+        </app-capsule-list>
+
         <app-post-list />
       </main>
 
-      <!-- =============================================================== -->
-      <!-- RIGHT COLUMN (Desktop Widgets)                                  -->
-      <!-- =============================================================== -->
-      <!-- <aside class="dashboard-right-column">
-        @if (familiesService.allUserFamilies().length > 1) {
-          <div class="widget">
-             <h3 class="widget-title">Active Family</h3>
-             <app-family-switcher></app-family-switcher>
-          </div>
-        }
-        <div class="widget">
-          <h3 class="widget-title">Calendar (Coming Soon)</h3>
-          <div class="widget-content"></div>
-        </div>
-        <div class="widget">
-          <h3 class="widget-title">Recent Activity (Coming Soon)</h3>
-          <div class="widget-content"></div>
-        </div>
-      </aside> -->
-      
       <!-- =============================================================== -->
       <!-- GLOBAL & MOBILE-ONLY ELEMENTS                                   -->
       <!-- =============================================================== -->
@@ -91,10 +74,7 @@
         <span class="material-symbols-rounded">add</span>
       </a>
 
-      <!-- 
-        SINGLE MENU DEFINITION FOR MULTIPLE TRIGGERS 
-        Both the desktop and mobile buttons link to this one menu.
-      -->
+      <!-- SINGLE MENU DEFINITION -->
       <mat-menu #userMenu="matMenu" xPosition="before">
         <ng-template matMenuContent let-name="name">
         @if (familiesService.allUserFamilies().length > 1) {
@@ -103,7 +83,6 @@
             <span>Switch Family</span>
             <br>
             <span class="small-text">{{name}}</span>
-            
           </button>
           <hr class="dropdown-divider">
         }
@@ -121,7 +100,7 @@
         </a>
         <a mat-menu-item routerLink="/calendar">
           <mat-icon class="material-symbols-rounded"
-          [matBadge]="(upcomingEventsCount$ | async) || 0">calendar_month</mat-icon>
+          [matBadge]="upcomingEventsCount() || 0">calendar_month</mat-icon>
           <span>Family Calendar</span>
           </a> 
         <button mat-menu-item (click)="authService.signOut()">
@@ -131,7 +110,7 @@
         </ng-template> 
       </mat-menu>
       
-      <!-- Single Submenu Definition for Switching Families -->
+      <!-- Family Switcher Submenu -->
       <mat-menu #familySwitcherMenu="matMenu">
         @for (family of familiesService.allUserFamilies(); track family.id) {
           <button mat-menu-item (click)="switchFamily(family.id)">
@@ -144,9 +123,17 @@
           </button>
         }
       </mat-menu>
+
+      <!-- Create Capsule Modal -->
+      @if (showCreateCapsuleModal()) {
+        <div class="modal-overlay" (click)="showCreateCapsuleModal.set(false)">
+          <div (click)="$event.stopPropagation()">
+            <app-capsule-create (close)="showCreateCapsuleModal.set(false)"></app-capsule-create>
+          </div>
+        </div>
+      }
+
     </div>
-
-
   } @else {
     <!-- Unauthenticated View -->
     <app-landing />

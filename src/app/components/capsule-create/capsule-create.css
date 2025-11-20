@@ -1,0 +1,43 @@
+/* --- Capsule Creation Form --- */
+.create-capsule-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: var(--bg-color);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.create-capsule-form h3 {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+}
+
+/* Use the global .form-input styles for the inputs */
+.create-capsule-form input[type="text"],
+.create-capsule-form input[type="date"] {
+  /* Inherit from global styles, just ensure full width */
+  width: 100%;
+  box-sizing: border-box; /* Important for width calculation */
+}
+
+/* Style the button using global .button-primary styles */
+.create-capsule-form button {
+  /* All styles inherited from .button and .button-primary */
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.create-capsule-form button:disabled {
+  background-color: #ccc; /* Muted background when disabled */
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  color: #888;
+}

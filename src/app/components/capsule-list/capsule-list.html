@@ -1,0 +1,13 @@
+<div class="capsules-strip">
+    <button class="capsule-item add-new" (click)="create.emit()">
+      <span class="plus-icon">+</span>
+      <span class="capsule-title">New Capsule</span>
+    </button>
+    
+    @for (capsule of capsules(); track capsule.id) {
+      <a [routerLink]="['/capsule', capsule.id]" class="capsule-item">
+        <img [src]="capsule.coverImageUrl || 'assets/placeholder-capsule.png'" alt="">
+        <span class="capsule-title">{{ capsule.title }}</span>
+      </a>
+    }
+  </div>

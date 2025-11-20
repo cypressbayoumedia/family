@@ -75,4 +75,10 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }
   },
+  {
+    path: 'capsule/:id',
+    loadComponent: () => import('./pages/capsule-details/capsule-details').then(m => m.CapsuleDetails),
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },
 ];
