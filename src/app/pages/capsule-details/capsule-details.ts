@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
 import { RecordAudio } from '../../components/record-audio/record-audio';
-import { AudioWaveform } from '../../components/audio-waveform/audio-waveform';
+// import { AudioWaveform } from '../../components/audio-waveform/audio-waveform';
 // Material
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,7 +21,6 @@ import { CapsulesService } from '../../core/capsules';
     MatIconModule, 
     MatMenuModule,
     RecordAudio,
-    AudioWaveform,
   ],
   templateUrl: './capsule-details.html',
   styleUrl: './capsule-details.css'
