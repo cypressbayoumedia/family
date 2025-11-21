@@ -1,8 +1,12 @@
 <div class="capsules-strip">
-    <button class="capsule-item add-new" (click)="create.emit()">
-      <span class="plus-icon">+</span>
-      <span class="capsule-title">New Capsule</span>
-    </button>
+  <button 
+  class="capsule-item add-new" 
+  (click)="create.emit()"
+  [disabled]="isAtCapsuleLimit()"
+  [title]="isAtCapsuleLimit() ? 'Upgrade to create more capsules' : 'Create a New Capsule'">
+  <span class="plus-icon">+</span>
+  <span class="capsule-title">New Capsule</span>
+</button>
     
     @for (capsule of capsules(); track capsule.id) {
       <a [routerLink]="['/capsule', capsule.id]" class="capsule-item">
@@ -11,3 +15,9 @@
       </a>
     }
   </div>
+
+  @if(isAtCapsuleLimit()) {
+    <div class="upgrade-prompt-small">
+      <p>You've used your 1 free Story Capsule. <a routerLink="/pricing">Upgrade to Plus</a> for unlimited capsules!</p>
+    </div>
+  }

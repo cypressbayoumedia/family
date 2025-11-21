@@ -5,6 +5,7 @@
     background-color: var(--bg-color); /* Dark background from your image */
     padding: 0.5rem 1rem;
     border-radius: 30px; /* Pill shape */
+   
   }
   
   .play-button {
@@ -19,6 +20,7 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    
   }
   
   .play-button:disabled {
@@ -29,6 +31,7 @@
   .waveform-container {
     flex-grow: 1; /* Allows the waveform to fill the remaining space */
     min-width: 0; /* Important for flexbox to allow shrinking */
+    
   }
   
   /* Optional: Add a spinning animation for the loading icon */

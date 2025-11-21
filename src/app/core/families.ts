@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, effect, OnDestroy } from '@angular/core';
+import { Injectable, inject, signal, effect,computed, OnDestroy } from '@angular/core'; 
 import { Router } from '@angular/router';
 import { Firestore, doc, docData, setDoc, collection, addDoc, updateDoc, arrayUnion, where, query, collectionData, getDoc, writeBatch } from '@angular/fire/firestore';
 import { AuthService } from './auth';
@@ -21,6 +21,7 @@ export interface Family {
   name: string;
   members: { uid: string; role: string; }[];
   subscription: { type: string, payingUser?: string, stripeSubscriptionId?: string, stripeCustomerId?: string };
+  capsuleCount?: number;
 }
 
 @Injectable({
@@ -61,10 +62,16 @@ export class Families implements OnDestroy {
     });
   }
 
-  /**
-   * Creates a new family document in Firestore and links the current user to it.
-   * @param familyName The desired name for the new family.
-   */
+  public readonly isAtCapsuleLimit = computed(() => {
+    const family = this.activeFamily();
+    if (!family) return false;
+
+    const isFree = !family.subscription || family.subscription.type === 'free';
+    const count = family.capsuleCount || 0;
+    
+    return isFree && count >= 1;
+  });
+
   async createFamily(familyName: string, userName?: string): Promise<void> {
     const user = this.authService.currentUser();
     if (!user) throw new Error("User must be logged in.");
@@ -78,7 +85,8 @@ export class Families implements OnDestroy {
       name: familyName,
       createdAt: new Date(),
       members: [{ uid: user.uid, role: 'admin' }],
-      subscription: { type: 'free' }
+      subscription: { type: 'free' },
+      capsuleCount: 0,
     });
 
     // 2. Update the user's profile with the new membership and set it as active

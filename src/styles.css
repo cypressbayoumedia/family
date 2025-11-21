@@ -353,3 +353,9 @@ h2 {
 .icon-button:hover {
   background-color: var(--bg-color);
 }
+.mobile-fab { display: none; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background-color: var(--accent-color); color: var(--text-color); border-radius: 50%; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 99; text-decoration: none; }
+.mobile-fab .material-symbols-rounded { font-size: 28px; }
+
+@media (max-width: 768px) {
+  .mobile-fab { display: flex; }
+}

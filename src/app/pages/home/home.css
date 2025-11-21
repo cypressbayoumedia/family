@@ -8,15 +8,6 @@
 /* ==========================================================================
    1. ROOT VARIABLES & GLOBAL STYLES
    ========================================================================== */
-   :root {
-    --bg-color: #FDFBF7;
-    --text-color: #333333;
-    --accent-color: #F6C0B5;
-    --accent-color-darker: #E5A89B;
-    --border-color: #e0e0e0;
-    --font-heading: 'Roboto Mono', monospace;
-    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background-color: var(--bg-color); color: var(--text-color); font-family: var(--font-body); }
   
@@ -85,8 +76,7 @@
   .button { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 99px; text-decoration: none; font-family: var(--font-heading); font-weight: 700; border: none; cursor: pointer; }
   .button-primary { background-color: var(--accent-color); color: var(--text-color); transition: background-color 0.2s; }
   .button-primary:hover { color: var(--bg-color); background-color: var(--accent-color-darker); }
-  .mobile-fab { display: none; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background-color: var(--accent-color); color: var(--text-color); border-radius: 50%; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 99; text-decoration: none; }
-  .mobile-fab .material-symbols-rounded { font-size: 28px; }
+
   .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
   .modal-content { background-color: #fff; border-radius: 12px; padding: 2rem; }
   
@@ -103,7 +93,6 @@
     .dashboard-main { border: none; padding-top: 60px; }
     .feed-header { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 100; }
     .mobile-user-menu { display: flex; }
-    .mobile-fab { display: flex; }
   }
 
   

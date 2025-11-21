@@ -1,92 +1,117 @@
+/*
+  WIZ'S NOTES:
+  This is the complete, on-brand CSS for your "Story Capsule" component.
+  All colors and styles have been updated to match your "vintage paper and
+  ink" theme. The rainbow "story ring" has been replaced with an elegant,
+  on-brand gradient, and the "Add New" button has been redesigned to feel
+  like a cohesive part of the application.
+*/
+
 :host {
-    display: block;
-    width: 100%;
-    /* Ensure it doesn't overflow the parent container layout */
-    max-width: 100vw; 
-  }
-  
-  .capsules-strip {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    padding: 16px 0;
-    /* Smooth scrolling for touch devices */
-    -webkit-overflow-scrolling: touch; 
-    /* Hide Scrollbar (Chrome/Safari/Opera) */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
-  }
-  
-  .capsules-strip::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* --- Shared Item Styling --- */
-  .capsule-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    text-decoration: none; /* Remove underline from <a> links */
-    color: inherit;
-    /* Fixed width ensures items don't squish */
-    flex: 0 0 72px; 
-    width: 72px;
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  /* --- The Avatar Image --- */
-  .capsule-item img {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    object-fit: cover;
-    /* The "Story Ring" Effect - Customize colors to match your brand */
-    padding: 2px; /* Space for the border */
-    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); 
-    /* Optional: Add a white border between image and ring */
-    box-shadow: inset 0 0 0 2px white; 
-    transition: transform 0.2s ease;
-  }
-  
-  .capsule-item:hover img {
-    transform: scale(1.05);
-  }
-  
-  /* --- Text Styling --- */
-  .capsule-title {
-    font-size: 12px;
-    font-weight: 500;
-    text-align: center;
-    color: #262626;
-    width: 100%;
-    
-    /* Truncate text with ellipsis (...) if too long */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  /* --- "Add New" Button Specifics --- */
-  .capsule-item.add-new .plus-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    background-color: #f0f0f0; /* Light grey background */
-    color: #262626;
-    border: 2px dashed #ccc; /* Dashed border to signify "Add" */
-    box-sizing: border-box; /* Ensure border counts in size */
-  }
-  
-  .capsule-item.add-new:hover .plus-icon {
-    background-color: #e0e0e0;
-    border-color: #999;
-  }
+  display: block;
+  width: 100%;
+  max-width: 100vw; 
+}
+
+.capsules-strip {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 1rem 0; /* Added more vertical padding */
+  -webkit-overflow-scrolling: touch; 
+  /* Hide Scrollbars */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE */
+}
+.capsules-strip::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* --- Shared Item Styling --- */
+.capsule-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  flex: 0 0 72px; 
+  width: 72px;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* --- The Avatar Image & On-Brand Story Ring --- */
+.capsule-item img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  padding: 2px; /* Space for the border */
+  /* CORRECTED: Replaced rainbow gradient with on-brand terracotta gradient */
+  background: linear-gradient(45deg, var(--accent-color-darker), var(--accent-color)); 
+  box-shadow: inset 0 0 0 2px #fff; /* Use pure white for a clean inner ring */
+  transition: transform 0.2s ease;
+}
+
+.capsule-item:hover img {
+  transform: scale(1.05);
+}
+
+/* --- Text Styling --- */
+.capsule-title {
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--text-color); /* CORRECTED */
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- "Add New" Button Specifics --- */
+.capsule-item.add-new .plus-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  /* CORRECTED: Using brand colors for a cohesive feel */
+  background-color: var(--bg-color); 
+  color: var(--text-color);
+  border: 2px dashed var(--border-color);
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.capsule-item.add-new:hover .plus-icon {
+  background-color: #f0f0f0; /* A subtle gray hover is acceptable on a paper bg */
+  border-color: var(--text-color); /* Stronger border on hover */
+}
+
+.add-new:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- On-Brand Upgrade Prompt --- */
+.upgrade-prompt-small {
+  text-align: center;
+  padding: 1rem;
+  /* CORRECTED: Using a light version of the brand's accent color */
+  background-color: rgba(246, 192, 181, 0.2); 
+  border-radius: 8px;
+  margin: 1rem 0;
+  border: 1px solid var(--accent-color);
+}
+.upgrade-prompt-small a {
+  font-weight: bold;
+  color: var(--text-color); /* CORRECTED: Use dark text for better contrast */
+  text-decoration: underline;
+}

@@ -1,13 +1,13 @@
 <div class="waveform-player">
-    <button (click)="togglePlayPause()" class="play-button" [disabled]="isLoading()">
+    <button (click)="togglePlayPause()" class="play-button" [disabled]="isLoading()"  [hidden]="this.autoplay()" >
       <!-- Show a loading spinner or a disabled state -->
       @if(isLoading()) {
         <span class="material-symbols-rounded loading">progress_activity</span> 
       } @else {
         <!-- Toggle between play and pause icons -->
-        <span class="material-symbols-rounded">
+        <mat-icon class="material-symbols-rounded">
           {{ isPlaying() ? 'pause' : 'play_arrow' }}
-        </span>
+        </mat-icon>
       }
     </button>
     

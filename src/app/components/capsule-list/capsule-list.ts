@@ -1,7 +1,8 @@
 // src/app/capsules/capsule-home-display.component.ts
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Capsule} from '../../core/capsules';
+import { Families } from '../../core/families';
 
 @Component({
   selector: 'app-capsule-list',
@@ -13,4 +14,7 @@ import { Capsule} from '../../core/capsules';
 export class CapsuleList {
   capsules = input.required<Capsule[]>();
   create = output<void>();
+
+  private familiesService = inject(Families);
+  isAtCapsuleLimit = this.familiesService.isAtCapsuleLimit;
 }

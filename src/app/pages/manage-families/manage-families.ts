@@ -7,7 +7,7 @@ import { Functions, httpsCallable } from '@angular/fire/functions';
 // Import necessary services
 import { Families } from '../../core/families';
 import { AuthService } from '../../core/auth';
-
+import { StripeService } from '../../core/stripe';
 @Component({
   selector: 'app-manage-families',
   imports: [CommonModule, FormsModule, RouterLink],
@@ -17,6 +17,7 @@ import { AuthService } from '../../core/auth';
 export class ManageFamilies {
   private familiesService = inject(Families);
   private authService = inject(AuthService);
+  private stripeService = inject(StripeService)
   private functions = inject(Functions);
 
   // --- Signals for Form Inputs ---
@@ -96,25 +97,15 @@ export class ManageFamilies {
     this.isLoading.set(true);
     this.subError.set(null);
     try {
-      const checkoutData = {
-        priceId: this.priceId,
-        email: this.currentUser()?.email,
-        familyId: this.activeFamily()?.id
-      };
-      
-      const createCheckout = httpsCallable(this.functions, 'createStripeCheckout');
-      const result = await createCheckout(checkoutData) as any;
-
-      if (result.data.url) {
-        window.location.href = result.data.url;
-      } else {
-        throw new Error('Could not create checkout session.');
-      }
+      // The component's job is simple: call the service.
+      await this.stripeService.redirectToCheckout(this.priceId);
+      // The user is redirected, so no need to set isLoading to false here.
     } catch (error: any) {
-      this.subError.set(error.message || 'An unexpected error occurred.');
-      this.isLoading.set(false);
+      this.subError.set(error.message);
+      this.isLoading.set(false); // Only set to false if an error occurs.
     }
   }
+
 
   /**
    * Redirects the user to the Stripe billing portal.
@@ -123,20 +114,10 @@ export class ManageFamilies {
     this.isLoading.set(true);
     this.subError.set(null);
     try {
-      const portalData = {
-        customerId: this.activeFamily()?.subscription?.stripeCustomerId
-      };
-
-      const createPortal = httpsCallable(this.functions, 'createBillingPortal');
-      const result = await createPortal(portalData) as any;
-
-      if (result.data.url) {
-        window.location.href = result.data.url;
-      } else {
-        throw new Error('Could not open billing portal.');
-      }
+      // The component's job is simple: call the service.
+      await this.stripeService.redirectToBillingPortal();
     } catch (error: any) {
-      this.subError.set(error.message || 'An unexpected error occurred.');
+      this.subError.set(error.message);
       this.isLoading.set(false);
     }
   }

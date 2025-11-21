@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, output } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CapsulesService } from '../../core/capsules';
+import { Families } from '../../core/families';
 
 @Component({
   selector: 'app-capsule-create',
@@ -38,6 +39,7 @@ import { CapsulesService } from '../../core/capsules';
   styleUrls: ['./capsule-create.css']
 })
 export class CapsuleCreate {
+  private familiesService = inject(Families);
   private capsulesService = inject(CapsulesService);
   private router = inject(Router);
   
@@ -48,6 +50,10 @@ export class CapsuleCreate {
 
   async createCapsule() {
     try {
+      if (this.familiesService.isAtCapsuleLimit()) {
+        alert("You have reached the capsule limit for the free plan. Please upgrade.");
+        return;
+      }
       const newId = await this.capsulesService.createCapsule(
         this.title, 
         new Date(this.eventDate)

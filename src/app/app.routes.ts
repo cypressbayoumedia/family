@@ -80,5 +80,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/capsule-details/capsule-details').then(m => m.CapsuleDetails),
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },{
+    path: 'pricing',
+    loadComponent: () => import('./pages/pricing/pricing').then(m => m.Pricing),
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin }
   },
 ];

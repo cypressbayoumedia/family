@@ -1,11 +1,11 @@
 import { Component, input, signal, ViewChild, ElementRef, AfterViewInit, OnDestroy, effect, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import WaveSurfer from 'wavesurfer.js';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-audio-waveform',
-  standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './audio-waveform.html',
   styleUrl: './audio-waveform.css',
 })

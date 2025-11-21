@@ -6,9 +6,9 @@ export {joinFamily} from './join_family'
 
 export {createWelcomePost} from './welcome_post'
 
-export { onCommentDeleted } from './comment_count'
+export { onCommentDeleted,onCommentCreated  } from './comment_count'
 
-export { onCommentCreated } from './comment_count'
+export {onCapsuleDeleted, onCapsuleCreated} from './capsule_count'
 
 //Stripe
 export { createStripeCheckout } from './create_stripe_checkout';

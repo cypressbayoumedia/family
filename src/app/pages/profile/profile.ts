@@ -32,8 +32,8 @@ export class Profile implements OnInit {
   currentUser = this.authService.currentUser;
   allUserFamilies = this.familiesService.allUserFamilies;
 
-  private priceId = 'price_1STlkCJblgCw5364qsohDh7t';
-
+  // private priceId = 'price_1STlkCJblgCw5364qsohDh7t';
+  subError = signal<string | null>(null);
 
   ngOnInit(): void {
     this.editableName.set(this.currentUser()?.displayName || '');
@@ -95,47 +95,18 @@ export class Profile implements OnInit {
     }
   }
 
-  goToCheckout(): void {
-    const currentUser = this.authService.currentUser();
-    const email = currentUser?.email;
-    if (!email) {
-      this.errorMessage.set('You must be logged in to subscribe.');
-      return;
-    }
-    const familyId = this.familiesService.activeFamilyId();
-    if (!familyId) {
-        this.errorMessage.set('You must have an active family to subscribe.');
-        return;
-    }
-
+  async goToBillingPortal(): Promise<void> {
     this.isLoading.set(true);
-    this.stripeService.createCheckoutSession(this.priceId, email, familyId).subscribe(session => {
-      if (session && session.data.url) {
-        window.location.href = session.data.url;
-      } else {
-        this.errorMessage.set('Could not create checkout session.');
-      }
+    this.subError.set(null);
+    try {
+      // The component's job is simple: call the service.
+      await this.stripeService.redirectToBillingPortal();
+    } catch (error: any) {
+      this.subError.set(error.message);
       this.isLoading.set(false);
-    });
+    }
   }
 
-  goToBillingPortal(): void {
-    const customerId = this.familiesService.activeFamily()?.subscription?.stripeCustomerId;
-    if (!customerId) {
-      this.errorMessage.set('Could not find a subscription to manage.');
-      return;
-    }
-
-    this.isLoading.set(true);
-    this.stripeService.createBillingPortal(customerId).subscribe(result => {
-      if (result && result.data.url) {
-        window.location.href = result.data.url;
-      } else {
-        this.errorMessage.set('Could not open billing portal.');
-      }
-      this.isLoading.set(false);
-    });
-  }
 
   private resetMessages(): void {
     this.successMessage.set(null);
