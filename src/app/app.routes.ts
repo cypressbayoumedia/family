@@ -7,6 +7,10 @@ import {
 import { Login } from './entry/login/login';
 import { Signup } from './entry/signup/signup';
 import { JoinHub } from './entry/join-hub/join-hub';
+import { JoinComponent } from './pages/join/join';
+import { AdminInvite } from './pages/admin-invite/admin-invite';
+import { adminGuard } from './core/admin.guard'; // Import the new guard
+
 // A pipe function for redirecting unauthorized users to the login page.
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
 
@@ -58,9 +62,14 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }
   },
-  { 
-    path: 'invited-to-join/:inviteId', 
-    component: JoinHub,
+  {
+    path: 'join',
+    component: JoinComponent,
+  },
+  {
+    path: 'admin-invite',
+    component: AdminInvite,
+    canActivate: [adminGuard] // Protect the route with the new guard
   },
   {
     path: 'calendar',

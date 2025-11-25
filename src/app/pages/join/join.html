@@ -1,0 +1,12 @@
+<div class="join-container">
+  @if (isLoading) {
+    <mat-spinner></mat-spinner>
+    <p>Loading...</p>
+  } @else if (error) {
+    <div class="error-message">
+      <h2>Error</h2>
+      <p>{{ error }}</p>
+      <a mat-flat-button color="primary" routerLink="/login">Go to Login</a>
+    </div>
+  }
+</div>

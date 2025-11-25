@@ -198,4 +198,14 @@ async joinFamily(familyId: string, userName?: string): Promise<void> {
   ngOnDestroy(): void {
     this.cleanupSubscriptions();
   }
+
+  async updateFamilyName(newName: string): Promise<void> {
+    const user = this.authService.currentUser();
+    if (!user) throw new Error("User must be logged in.");
+    const familyId = this.activeFamilyId();
+    if (!familyId) throw new Error("Family must be selected.");
+    const familyRef = doc(this.firestore, `families/${familyId}`);
+    await updateDoc(familyRef, { name: newName });
+  }
+   
 }

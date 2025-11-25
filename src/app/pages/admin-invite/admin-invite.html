@@ -1,0 +1,31 @@
+<div class="invite-container">
+  <div class="invite-card">
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h2 class="invite-title">Invite a New Member</h2>
+    <p class="invite-subtitle">Enter the details below to send an invitation.</p>
+
+    <form (ngSubmit)="sendInvite()" class="invite-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Full Name</mat-label>
+        <mat-icon matPrefix>person_outline</mat-icon>
+        <input matInput [(ngModel)]="name" name="name" placeholder="Enter full name" required />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email Address</mat-label>
+        <mat-icon matPrefix>email_outline</mat-icon>
+        <input matInput type="email" [(ngModel)]="email" name="email" placeholder="Enter email address" required />
+      </mat-form-field>
+
+      <button mat-raised-button [disabled]="isButtonDisabled()" type="submit" class="invite-button">
+        @if (loading()) {
+          <mat-spinner diameter="24"></mat-spinner>
+        } @else {
+          <span>Send Invite</span>
+        }
+      </button>
+    </form>
+  </div>
+</div>

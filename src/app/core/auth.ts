@@ -31,15 +31,15 @@ import { deleteUser } from '@angular/fire/auth';
   providedIn: 'root',
 })
 export class AuthService implements OnDestroy {
-  private readonly auth: Auth = inject(Auth);
-  private readonly firestore: Firestore = inject(Firestore);
-  private readonly router: Router = inject(Router);
-  private readonly storage = getStorage();
+  public readonly auth: Auth = inject(Auth);
+  public readonly firestore: Firestore = inject(Firestore);
+  public readonly router: Router = inject(Router);
+  public readonly storage = getStorage();
   public readonly currentUser = signal<User | null>(null);
   public readonly loading = signal<boolean>(true);
 
-  private readonly authState$: Observable<User | null> = authState(this.auth);
-  private authStateSubscription: Subscription;
+  public readonly authState$: Observable<User | null> = authState(this.auth);
+  public authStateSubscription: Subscription;
   // private familiesService = inject(Families);
 
   constructor() {
