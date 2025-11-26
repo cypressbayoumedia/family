@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, OnDestroy } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   Auth,
@@ -12,66 +12,60 @@ import {
   updateProfile,
   User
 } from '@angular/fire/auth';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
-  arrayUnion,
   doc,
   Firestore,
-  getDoc,
   setDoc,
   updateDoc,
-  writeBatch
 } from '@angular/fire/firestore';
-import { Observable, Subscription } from 'rxjs';
-import { Families } from './families';
 import { getFunctions, httpsCallable } from '@angular/fire/functions';
-import { getStorage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage'; // <-- Import Storage functions
+import { getStorage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 import { deleteUser } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService implements OnDestroy {
-  public readonly auth: Auth = inject(Auth);
-  public readonly firestore: Firestore = inject(Firestore);
-  public readonly router: Router = inject(Router);
-  public readonly storage = getStorage();
-  public readonly currentUser = signal<User | null>(null);
-  public readonly loading = signal<boolean>(true);
+export class AuthService {
+  private readonly auth: Auth = inject(Auth);
+  private readonly firestore: Firestore = inject(Firestore);
+  private readonly router: Router = inject(Router);
+  private readonly storage = getStorage();
 
-  public readonly authState$: Observable<User | null> = authState(this.auth);
-  public authStateSubscription: Subscription;
-  // private familiesService = inject(Families);
+  public readonly user$ = authState(this.auth);
+  public readonly currentUser = toSignal(this.user$, { initialValue: null });
+  public readonly loading = signal<boolean>(false);
+
 
   constructor() {
-    this.authStateSubscription = this.authState$.subscribe((user) => {
-      this.currentUser.set(user);
-      this.loading.set(false);
-    });
+    // No subscription needed anymore, toSignal handles it.
   }
 
   /**
    * Signs up a new user and navigates them to the welcome/onboarding component.
    */
   async signUpWithEmail(name: string, email: string, password: string, inviteId?: string) {
+    this.loading.set(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-     
+
       await this.createUserProfile(userCredential.user, { name });
        if(inviteId){
-        
         await this.switchActiveFamily(inviteId)
         await this.joinFamily(inviteId)
       }
       // ADDED: Navigate new users to the welcome page to create/join a family.
       await this.updateUserDisplayName(name);
 
-      
-      this.router.navigate(['/welcome']); 
-      
+
+      this.router.navigate(['/welcome']);
+
       return userCredential;
     } catch (error) {
       console.error("Error during email sign up:", error);
       throw error;
+    } finally {
+      this.loading.set(false);
     }
   }
 
@@ -88,10 +82,10 @@ export class AuthService implements OnDestroy {
     const user = this.currentUser();
     if (!user) throw new Error("User must be logged in.");
     if (userName) await this.updateUserDisplayName(userName);
-  
+
     const functions = getFunctions();
     const joinFamilyCallable = httpsCallable(functions, 'joinFamily');
-  
+
     try {
       const result = await joinFamilyCallable({ familyId });
       console.log('Successfully joined family:', result.data);
@@ -111,19 +105,22 @@ export class AuthService implements OnDestroy {
    * Signs in an existing user and navigates them to the main dashboard.
    */
   async signInWithEmail(email: string, password: string, inviteId?: string) {
+    this.loading.set(true);
     try {
       const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
-      
+
       if(inviteId){
         await this.joinFamily(inviteId)
         await this.switchActiveFamily(inviteId)
       }
       this.router.navigate(['']);
-      
+
       return userCredential;
     } catch (error) {
       console.error("Error during email sign in:", error);
       throw error;
+    } finally {
+        this.loading.set(false);
     }
   }
 
@@ -132,12 +129,13 @@ export class AuthService implements OnDestroy {
    * and existing users to the dashboard.
    */
   async signInWithGoogle(inviteId?: string) {
+    this.loading.set(true);
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(this.auth, provider);
 
       const additionalInfo = getAdditionalUserInfo(userCredential);
-     
+
       if (additionalInfo?.isNewUser) {
         // This is a new user signing up with Google
         await this.createUserProfile(userCredential.user);
@@ -156,20 +154,25 @@ export class AuthService implements OnDestroy {
         }
         this.router.navigate(['']);
       }
-      
+
       return userCredential;
     } catch (error) {
       console.error("Error during Google sign in:", error);
       throw error;
+    } finally {
+      this.loading.set(false);
     }
   }
 
   async signOut() {
+    this.loading.set(true);
     try {
       await signOut(this.auth);
       this.router.navigate(['/login']);
     } catch (error) {
       console.error("Error during sign out:", error);
+    } finally {
+      this.loading.set(false);
     }
   }
 
@@ -177,9 +180,9 @@ export class AuthService implements OnDestroy {
     if (!user) {
       throw new Error("User object is missing for profile creation.");
     }
-    
+
     const userDocRef = doc(this.firestore, `users/${user.uid}`);
-    
+
     const userData = {
       uid: user.uid,
       email: user.email,
@@ -187,7 +190,7 @@ export class AuthService implements OnDestroy {
       createdAt: new Date(),
       ...additionalData
     };
-    
+
     await setDoc(userDocRef, userData);
   }
 
@@ -204,7 +207,7 @@ export class AuthService implements OnDestroy {
 
     // 3. THE FIX: Set the signal to the LIVE currentUser from the Auth SDK,
     // which is now updated. Do NOT create a copy.
-    this.currentUser.set(this.auth.currentUser);
+    // this.currentUser.set(this.auth.currentUser); <-- NO LONGER NEEDED toSignal will update it.
   }
 
   /**
@@ -213,6 +216,7 @@ export class AuthService implements OnDestroy {
   async updateProfilePicture(file: File): Promise<void> {
     const user = this.currentUser();
     if (!user) throw new Error("User must be logged in to update their picture.");
+    this.loading.set(true);
 
     const filePath = `users/${user.uid}/profile.${file.name.split('.').pop()}`;
     const storageRef = ref(this.storage, filePath);
@@ -225,9 +229,9 @@ export class AuthService implements OnDestroy {
     // Update the Firestore document
     const userDocRef = doc(this.firestore, `users/${user.uid}`);
     await updateDoc(userDocRef, { photoURL });
-
+    this.loading.set(false);
     // THE FIX: Again, set the signal to the now-updated LIVE currentUser.
-    this.currentUser.set(this.auth.currentUser);
+    // this.currentUser.set(this.auth.currentUser); <-- NO LONGER NEEDED toSignal will update it.
   }
 
   /**
@@ -237,6 +241,7 @@ export class AuthService implements OnDestroy {
     const user = this.currentUser();
     if (!user) throw new Error("No user is currently logged in to delete.");
 
+    this.loading.set(true);
     try {
       // Now, 'user' is the live User instance, so this call will succeed.
       await deleteUser(user);
@@ -244,11 +249,10 @@ export class AuthService implements OnDestroy {
     } catch (error: any) {
       console.error("Error deleting account:", error);
       throw new Error("Account deletion failed. Please sign out and sign in again before retrying.");
+    } finally {
+        this.loading.set(false);
     }
   }
 
-
-  ngOnDestroy() {
-    this.authStateSubscription.unsubscribe();
-  }
+  // ngOnDestroy is no longer needed because toSignal handles the subscription.
 }

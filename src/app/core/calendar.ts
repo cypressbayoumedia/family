@@ -1,8 +1,8 @@
-import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, addDoc, query, where, orderBy, collectionData, doc, updateDoc, deleteDoc, Timestamp, getDocs } from '@angular/fire/firestore';
-import { Observable, combineLatest, of, BehaviorSubject } from 'rxjs';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Firestore, collection, addDoc, query, where, orderBy, collectionData, doc, updateDoc, deleteDoc, Timestamp, FirestoreDataConverter, DocumentData, QueryDocumentSnapshot, SnapshotOptions } from '@angular/fire/firestore';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
+import { combineLatest, of, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { Families, FamilyMember } from './families';
 import { AuthService } from './auth';
 
@@ -36,92 +36,135 @@ export interface CalendarEvent {
   ownerColor?: string; // UI helper
 }
 
+// --- Converters ---
+const calendarEventConverter: FirestoreDataConverter<CalendarEvent> = {
+  toFirestore: (event: CalendarEvent): DocumentData => {
+    return {
+      title: event.title,
+      startAt: Timestamp.fromDate(event.start),
+      endAt: Timestamp.fromDate(event.end),
+      isAllDay: event.isAllDay,
+      location: event.location,
+      description: event.description,
+      type: event.type,
+      createdBy: event.createdBy,
+      invitedUserIds: event.invitedUserIds,
+      rsvps: event.rsvps,
+    };
+  },
+  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions): CalendarEvent => {
+    const data = snapshot.data(options)!;
+    return {
+      id: snapshot.id,
+      title: data['title'],
+      start: (data['startAt'] as Timestamp).toDate(),
+      end: (data['endAt'] as Timestamp).toDate(),
+      isAllDay: data['isAllDay'],
+      location: data['location'],
+      description: data['description'],
+      type: 'custom', // Firestore only stores custom events
+      createdBy: data['createdBy'],
+      invitedUserIds: data['invitedUserIds'],
+      rsvps: data['rsvps'],
+    } as CalendarEvent;
+  }
+};
+
+const eventItemConverter: FirestoreDataConverter<EventItem> = {
+  toFirestore: (item: EventItem): DocumentData => ({ ...item }),
+  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions): EventItem => {
+    const data = snapshot.data(options)!;
+    return { id: snapshot.id, ...data } as EventItem;
+  }
+};
+
+const chatMessageConverter: FirestoreDataConverter<ChatMessage> = {
+  toFirestore: (message: ChatMessage): DocumentData => ({ ...message }),
+  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions): ChatMessage => {
+    const data = snapshot.data(options)!;
+    return { id: snapshot.id, ...data } as ChatMessage;
+  }
+};
+
+
 @Injectable({ providedIn: 'root' })
 export class Calendar {
   private afs = inject(Firestore);
   private familiesService = inject(Families);
   private authService = inject(AuthService);
 
-  // Tracks the currently viewed month (defaults to today)
-  currentViewDate$ = new BehaviorSubject<Date>(new Date());
+  public currentViewDate = signal<Date>(new Date());
 
-  /**
-   * Gets events for the specific month currently being viewed.
-   */
-  getEventsForCurrentMonth(): Observable<CalendarEvent[]> {
-    const familyId$ = toObservable(this.familiesService.activeFamilyId);
-    const members$ = toObservable(this.familiesService.activeFamilyMembers);
+  private readonly monthlyEvents$ = combineLatest([
+    toObservable(this.familiesService.activeFamilyId),
+    toObservable(this.currentViewDate)
+  ]).pipe(
+    switchMap(([familyId, viewDate]) => {
+      if (!familyId) return of([]);
 
-    return combineLatest([familyId$, this.currentViewDate$, members$]).pipe(
-      switchMap(([familyId, viewDate, members]) => {
-        if (!familyId) return of([]);
+      const startOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
+      const endOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0, 23, 59, 59);
 
-        // Calculate start/end of the month for Firestore query
-        const startOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
-        const endOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0, 23, 59, 59);
+      const eventsRef = collection(this.afs, `families/${familyId}/events`).withConverter(calendarEventConverter);
+      const q = query(eventsRef, where('startAt', '>=', startOfMonth), where('startAt', '<=', endOfMonth));
 
-        const eventsRef = collection(this.afs, `families/${familyId}/events`);
-        
-        // Query: Get events that start within this month range
-        // Note: This is a basic range query. 
-        const q = query(
-          eventsRef, 
-          where('startAt', '>=', startOfMonth),
-          where('startAt', '<=', endOfMonth)
-        );
+      return collectionData(q);
+    })
+  );
 
-        return collectionData(q, { idField: 'id' }).pipe(
-          map(events => {
-            const customEvents = events.map(e => this.docToEvent(e, members));
-            const birthdayEvents = this.generateBirthdaysForMonth(members, viewDate);
-            return [...customEvents, ...birthdayEvents].sort((a, b) => a.start.getTime() - b.start.getTime());
-          })
-        );
-      })
-    );
-  }
+  private readonly upcomingEvents$ = toObservable(this.familiesService.activeFamilyId).pipe(
+    switchMap(familyId => {
+      if (!familyId) return of([]);
+      const eventsRef = collection(this.afs, `families/${familyId}/events`).withConverter(calendarEventConverter);
+      const q = query(eventsRef, where('startAt', '>=', new Date()), orderBy('startAt', 'asc'));
+      return collectionData(q);
+    })
+  );
 
-  getUpcomingEvents(): Observable<CalendarEvent[]> {
-    const familyId$ = toObservable(this.familiesService.activeFamilyId);
-    const members$ = toObservable(this.familiesService.activeFamilyMembers);
+  private readonly monthlyFirestoreEvents = toSignal(this.monthlyEvents$, { initialValue: [] });
+  private readonly upcomingFirestoreEvents = toSignal(this.upcomingEvents$, { initialValue: [] });
 
-    return combineLatest([familyId$, members$]).pipe(
-      switchMap(([familyId, members]) => {
-        if (!familyId) return of([]);
+  public readonly eventsForCurrentMonth = computed(() => {
+    const events = this.monthlyFirestoreEvents();
+    const members = this.familiesService.activeFamilyMembers();
+    const viewDate = this.currentViewDate();
+    const customEvents = events.map(e => this.addOwnerColor(e, members));
+    const birthdayEvents = this.generateBirthdaysForMonth(members, viewDate);
+    return [...customEvents, ...birthdayEvents].sort((a, b) => a.start.getTime() - b.start.getTime());
+  });
 
-        const eventsRef = collection(this.afs, `families/${familyId}/events`);
-        
-        // Query: All events starting from Right Now
-        const q = query(
-          eventsRef, 
-          where('startAt', '>=', new Date()),
-          orderBy('startAt', 'asc')
-        );
+  public readonly upcomingEvents = computed(() => {
+    const events = this.upcomingFirestoreEvents();
+    const members = this.familiesService.activeFamilyMembers();
+    const customEvents = events.map(e => this.addOwnerColor(e, members));
+    const birthdayEvents = this.generateUpcomingBirthdays(members);
+    return [...customEvents, ...birthdayEvents].sort((a, b) => a.start.getTime() - b.start.getTime());
+  });
 
-        return collectionData(q, { idField: 'id' }).pipe(
-          map(events => {
-            // 1. Convert Firestore docs to Event objects
-            const customEvents = events.map(e => this.docToEvent(e, members));
-            
-            // 2. Generate upcoming birthdays (next 12 months)
-            const birthdayEvents = this.generateUpcomingBirthdays(members);
-            
-            // 3. Merge and Sort
-            return [...customEvents, ...birthdayEvents].sort((a, b) => a.start.getTime() - b.start.getTime());
-          })
-        );
-      })
-    );
-  }
 
-  // --- Sub-Feature: Potluck ---
-  
+  // --- Sub-Features ---
+
   getEventItems(eventId: string): Observable<EventItem[]> {
     const familyId = this.familiesService.activeFamilyId();
-    if (!familyId) return of([]);
-    // Path is now .../events/{id}/items
-    const col = collection(this.afs, `families/${familyId}/events/${eventId}/items`);
-    return collectionData(col, { idField: 'id' }) as Observable<EventItem[]>;
+    return of(familyId).pipe(
+      switchMap(id => {
+        if (!id || !eventId) return of([]);
+        const itemsCol = collection(this.afs, `families/${id}/events/${eventId}/items`).withConverter(eventItemConverter);
+        return collectionData(itemsCol);
+      })
+    );
+  }
+
+  getEventChat(eventId: string): Observable<ChatMessage[]> {
+    const familyId = this.familiesService.activeFamilyId();
+    return of(familyId).pipe(
+      switchMap(id => {
+        if (!id || !eventId) return of([]);
+        const chatCol = collection(this.afs, `families/${id}/events/${eventId}/discussion`).withConverter(chatMessageConverter);
+        const q = query(chatCol, orderBy('createdAt', 'asc'));
+        return collectionData(q);
+      })
+    );
   }
 
   async addEventItem(eventId: string, itemName: string): Promise<void> {
@@ -141,16 +184,6 @@ export class Calendar {
       claimedByUserId: claim ? user.uid : null,
       claimedByName: claim ? user.displayName || 'Family Member' : null
     });
-  }
-
-  // --- Sub-Feature: Discussion Board ---
-
-  getEventChat(eventId: string): Observable<ChatMessage[]> {
-    const familyId = this.familiesService.activeFamilyId();
-    if (!familyId) return of([]);
-    const col = collection(this.afs, `families/${familyId}/events/${eventId}/discussion`);
-    const q = query(col, orderBy('createdAt', 'asc'));
-    return collectionData(q, { idField: 'id' }) as Observable<ChatMessage[]>;
   }
 
   async postMessage(eventId: string, text: string): Promise<void> {
@@ -173,26 +206,31 @@ export class Calendar {
     const familyId = this.familiesService.activeFamilyId();
     const user = this.authService.currentUser();
     const members = this.familiesService.activeFamilyMembers();
-    if (!familyId || !user) return;
+    if (!familyId || !user || !data.start) return;
 
-    // Default: Invite everyone if specific IDs not provided
     const invitedUserIds = data.invitedUserIds || members.map(m => m.uid);
-    const rsvps = invitedUserIds.reduce((acc, uid) => ({ ...acc, [uid]: 'pending' }), {} as Record<string, string>);
-    // Auto-set creator as attending
+    const rsvps = invitedUserIds.reduce((acc, uid) => {
+      acc[uid] = 'pending';
+      return acc;
+    }, {} as { [userId: string]: 'attending' | 'maybe' | 'not_attending' | 'pending' });
     rsvps[user.uid] = 'attending';
 
-    const col = collection(this.afs, `families/${familyId}/events`);
-    await addDoc(col, {
-      title: data.title,
-      startAt: Timestamp.fromDate(data.start!),
-      endAt: Timestamp.fromDate(data.end || data.start!),
+    const newEvent: CalendarEvent = {
+      id: '', // Firestore will generate
+      title: data.title || 'New Event',
+      start: data.start,
+      end: data.end || data.start,
       isAllDay: data.isAllDay ?? true,
       location: data.location || '',
       description: data.description || '',
       createdBy: user.uid,
       invitedUserIds,
-      rsvps
-    });
+      rsvps,
+      type: 'custom'
+    };
+
+    const col = collection(this.afs, `families/${familyId}/events`).withConverter(calendarEventConverter);
+    await addDoc(col, newEvent);
   }
 
   async updateRsvp(eventId: string, status: 'attending' | 'maybe' | 'not_attending'): Promise<void> {
@@ -206,38 +244,28 @@ export class Calendar {
   async deleteEvent(eventId: string): Promise<void> {
     const familyId = this.familiesService.activeFamilyId();
     if(!familyId) return;
-    // Note: In a real app, delete subcollections (chat/potluck) via Cloud Functions to avoid orphans.
     await deleteDoc(doc(this.afs, `families/${familyId}/events/${eventId}`));
   }
 
   // --- Helpers ---
-
-  private docToEvent(doc: any, members: FamilyMember[]): CalendarEvent {
-    const creator = members.find(m => m.uid === doc.createdBy);
-    return {
-      ...doc,
-      id: doc.id,
-      start: doc.startAt.toDate(),
-      end: doc.endAt.toDate(),
-      type: 'custom',
-      ownerColor: creator?.color || '#BB7F6A' // Assumes FamilyMember has a 'color' property
-    };
+  private addOwnerColor(event: CalendarEvent, members: readonly FamilyMember[]): CalendarEvent {
+    const creator = members.find(m => m.uid === event.createdBy);
+    return { ...event, ownerColor: creator?.color || '#BB7F6A' };
   }
 
-  private generateBirthdaysForMonth(members: FamilyMember[], viewDate: Date): CalendarEvent[] {
+  private generateBirthdaysForMonth(members: readonly FamilyMember[], viewDate: Date): CalendarEvent[] {
     const month = viewDate.getMonth();
     const year = viewDate.getFullYear();
     
     return members
       .filter(m => {
-        if (!m.birthday) return false; // Format YYYY-MM-DD
-        const bMonth = new Date(m.birthday).getMonth(); // 0-11
-        // Note: This simple check ignores timezone edge cases for simplicity
+        if (!m.birthday) return false; 
+        const bMonth = new Date(m.birthday).getMonth(); 
         return bMonth === month;
       })
       .map(m => {
         const bDate = new Date(m.birthday!);
-        const thisYearBday = new Date(year, month, bDate.getDate() + 1); // +1 handles timezone drift in simple conversions
+        const thisYearBday = new Date(year, month, bDate.getDate() + 1);
         return {
           id: `bday_${m.uid}_${year}`,
           title: `${m.name}'s Birthday`,
@@ -252,17 +280,16 @@ export class Calendar {
       });
   }
 
-  private generateUpcomingBirthdays(members: FamilyMember[]): CalendarEvent[] {
+  private generateUpcomingBirthdays(members: readonly FamilyMember[]): CalendarEvent[] {
     const today = new Date();
     const currentYear = today.getFullYear();
     
     return members
-      .filter(m => m.birthday) // Only members with birthdays
+      .filter(m => m.birthday)
       .map(m => {
-        const birthDate = new Date(m.birthday! + 'T00:00:00'); // Ensure YYYY-MM-DD is parsed correctly
+        const birthDate = new Date(m.birthday! + 'T00:00:00');
         let targetDate = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
 
-        // If birthday has passed this year, move to next year
         if (targetDate < today) {
           targetDate.setFullYear(currentYear + 1);
         }

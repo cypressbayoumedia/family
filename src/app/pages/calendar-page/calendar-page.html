@@ -55,25 +55,23 @@
       <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
     </div>
     <div class="cal-grid">
-      @if (monthEvents$ | async; as events) {
-        @for (day of calendarGrid(); track $index) {
-          <div class="cal-day" [class.empty]="!day.date" [class.today]="day.isToday" (click)="openCreateModal(day.date)">
-            @if (day.date) {
-              <span class="day-number">{{ day.day }}</span>
-              <div class="day-events">
-                @for (event of getEventsForDay(day.date, events); track event.id) {
-                  <div class="event-pill" [class.birthday]="event.type === 'birthday'" [style.backgroundColor]="event.type === 'custom' ? event.ownerColor : ''" (click)="$event.stopPropagation(); openEvent(event)">
-                    @if(event.type === 'custom'){
-                        <span class="dot"></span>
-                    }
-                    
-                    {{ event.title }}
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        }
+      @for (day of calendarGrid(); track $index) {
+        <div class="cal-day" [class.empty]="!day.date" [class.today]="day.isToday" (click)="openCreateModal(day.date)">
+          @if (day.date) {
+            <span class="day-number">{{ day.day }}</span>
+            <div class="day-events">
+              @for (event of getEventsForDay(day.date, monthEvents()); track event.id) {
+                <div class="event-pill" [class.birthday]="event.type === 'birthday'" [style.backgroundColor]="event.type === 'custom' ? event.ownerColor : ''" (click)="$event.stopPropagation(); openEvent(event)">
+                  @if(event.type === 'custom'){
+                      <span class="dot"></span>
+                  }
+                  
+                  {{ event.title }}
+                </div>
+              }
+            </div>
+          }
+        </div>
       }
     </div>
   }
@@ -81,7 +79,7 @@
   <!-- VIEW 2: LIST VIEW -->
   @if (viewMode() === 'list') {
     <div class="list-view-container">
-      @for (event of listEvents$ | async; track event.id) {
+      @for (event of listEvents(); track event.id) {
         <div class="list-card" (click)="openEvent(event)">
           <div class="date-badge" [style.background-color]="getEventColor(event)">
             <span class="date-day">{{ event.start | date:'d' }}</span>

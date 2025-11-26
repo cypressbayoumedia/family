@@ -13,11 +13,11 @@
     <!-- Header -->
     <header class="modal-header">
       <div class="header-content">
-        <span class="type-badge" [class.birthday]="event.type === 'birthday'">
-          {{ event.type === 'birthday' ? '🎂 Birthday' : '📅 Event' }}
+        <span class="type-badge" [class.birthday]="event().type === 'birthday'">
+          {{ event().type === 'birthday' ? '🎂 Birthday' : '📅 Event' }}
         </span>
-        <h3>{{ event.title }}</h3>
-        <p class="sub-text">{{ event.start | date:'fullDate' }} • {{ event.start | date:'shortTime' }}</p>
+        <h3>{{ event().title }}</h3>
+        <p class="sub-text">{{ event().start | date:'fullDate' }} • {{ event().start | date:'shortTime' }}</p>
       </div>
       <button class="icon-button modal-close-button" (click)="close.emit()">
         <span class="material-symbols-rounded">close</span>
@@ -25,7 +25,7 @@
     </header>
 
     <!-- Tabs (Only for Custom Events) -->
-    @if (event.type === 'custom') {
+    @if (event().type === 'custom') {
       <div class="tabs">
         <button [class.active]="activeTab() === 'details'" (click)="activeTab.set('details')">Details</button>
         <button [class.active]="activeTab() === 'items'" (click)="activeTab.set('items')">To-Bring</button>
@@ -40,20 +40,20 @@
         <!-- TAB: DETAILS -->
         @case ('details') {
           <div class="tab-content">
-            <p class="event-description">{{ event.description || 'No description provided.' }}</p>
+            <p class="event-description">{{ event().description || 'No description provided.' }}</p>
             
-            @if (event.location) {
+            @if (event().location) {
               <p class="location-info">
                 <span class="material-symbols-rounded">location_on</span>
-                {{ event.location }}
+                {{ event().location }}
               </p>
             }
             
-            @if (event.type === 'custom') {
+            @if (event().type === 'custom') {
               <div class="event-rsvp">
-                <button [class.active]="myRsvp === 'attending'" (click)="setRsvp('attending')">Going</button>
-                <button [class.active]="myRsvp === 'maybe'" (click)="setRsvp('maybe')">Maybe</button>
-                <button [class.active]="myRsvp === 'not_attending'" (click)="setRsvp('not_attending')">No</button>
+                <button [class.active]="myRsvp() === 'attending'" (click)="setRsvp('attending')">Going</button>
+                <button [class.active]="myRsvp() === 'maybe'" (click)="setRsvp('maybe')">Maybe</button>
+                <button [class.active]="myRsvp() === 'not_attending'" (click)="setRsvp('not_attending')">No</button>
               </div>
             }
           </div>
@@ -63,12 +63,12 @@
         @case ('items') {
           <div class="tab-content">
             <div class="input-group">
-              <input type="text" [(ngModel)]="newItemName" placeholder="Add item (e.g. Chips, Tent)..." (keyup.enter)="addItem()">
+              <input type="text" [ngModel]="newItemName()" (ngModelChange)="newItemName.set($event)" placeholder="Add item (e.g. Chips, Tent)..." (keyup.enter)="addItem()">
               <button class="button-secondary button-small" (click)="addItem()">Add</button>
             </div>
             
             <ul class="item-list">
-              @for (item of items$ | async; track item.id) {
+              @for (item of items(); track item.id) {
                 <li>
                   <div class="item-info">
                     <span class="item-name" [class.claimed]="!!item.claimedByUserId">{{ item.name }}</span>
@@ -82,7 +82,7 @@
                   @if (!item.claimedByUserId) {
                     <button class="button-primary button-small" (click)="toggleClaim(item, true)">Claim</button>
                   }
-                  @if (item.claimedByUserId === currentUser?.uid) {
+                  @if (item.claimedByUserId === currentUser()?.uid) {
                     <button class="icon-button button-small" (click)="toggleClaim(item, false)" title="Unclaim item">
                       <span class="material-symbols-rounded">close</span>
                     </button>
@@ -99,10 +99,10 @@
         @case ('chat') {
           <div class="tab-content chat-layout">
             <div class="chat-feed">
-              @for (msg of chatMessages$ | async; track msg.id) {
-                <div class="chat-message" [class.mine]="msg.senderId === currentUser?.uid">
+              @for (msg of chatMessages(); track msg.id) {
+                <div class="chat-message" [class.mine]="msg.senderId === currentUser()?.uid">
                   <div class="chat-bubble">
-                    @if (msg.senderId !== currentUser?.uid) {
+                    @if (msg.senderId !== currentUser()?.uid) {
                       <span class="sender-name">{{ msg.senderName }}</span>
                     }
                     {{ msg.text }}
@@ -113,7 +113,7 @@
               }
             </div>
             <div class="input-group chat-input-group">
-              <input [(ngModel)]="chatInput" placeholder="Message..." (keyup.enter)="sendMessage()">
+              <input [ngModel]="chatInput()" (ngModelChange)="chatInput.set($event)" placeholder="Message..." (keyup.enter)="sendMessage()">
               <button class="button-secondary button-small" (click)="sendMessage()">Send</button>
             </div>
           </div>

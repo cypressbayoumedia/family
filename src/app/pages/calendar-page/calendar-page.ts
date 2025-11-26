@@ -5,6 +5,7 @@ import { Calendar, CalendarEvent } from '../../core/calendar';
 import { AuthService } from '../../core/auth';
 import { EventDetail } from '../event-detail/event-detail';
 import { RouterLink } from '@angular/router'
+
 @Component({
   selector: 'app-calendar-page',
   imports: [CommonModule, FormsModule, DatePipe, EventDetail, RouterLink],
@@ -16,81 +17,73 @@ export class CalendarPage {
   calendarService = inject(Calendar);
   authService = inject(AuthService);
 
-  // Current Month View State
-  viewDate = signal(new Date());
-  monthEvents$ = this.calendarService.getEventsForCurrentMonth();
-
-  // SOURCE 2: For the List (Shows everything in the future)
-  listEvents$ = this.calendarService.getUpcomingEvents();
+  // Signals for view state
+  viewDate = this.calendarService.currentViewDate;
   viewMode = signal<'calendar' | 'list'>(
     (localStorage.getItem('calViewPref') as 'calendar' | 'list') || 'calendar'
   );
-  // Events source
-  events$ = this.calendarService.getEventsForCurrentMonth();
+
+  // Directly use the signals from the service
+  monthEvents = this.calendarService.eventsForCurrentMonth;
+  listEvents = this.calendarService.upcomingEvents;
+
   setViewMode(mode: 'calendar' | 'list') {
     this.viewMode.set(mode);
     localStorage.setItem('calViewPref', mode);
   }
+
   getEventColor(event: CalendarEvent): string {
-    // If it's a custom event, use the owner's color. If birthday, use pink.
-    if (event.type === 'birthday') return '#e91e63'; // Pink
-    return event.ownerColor || '#bcaaa4'; // Default to the "Terracotta" color from your image
+    if (event.type === 'birthday') return '#e91e63';
+    return event.ownerColor || '#bcaaa4';
   }
-  // Logic to build the calendar grid
+
   calendarGrid = computed(() => {
     const date = this.viewDate();
     const year = date.getFullYear();
     const month = date.getMonth();
     
-    const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 (Sun) - 6 (Sat)
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const days = [];
-    
-    // Previous Month Padding
     for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push({ day: null, date: null }); 
+      days.push({ day: null, date: null, isToday: false }); 
     }
-    
-    // Actual Days
     for (let i = 1; i <= daysInMonth; i++) {
+      const dayDate = new Date(year, month, i);
       days.push({ 
         day: i, 
-        date: new Date(year, month, i),
-        isToday: this.isSameDate(new Date(), new Date(year, month, i))
+        date: dayDate,
+        isToday: this.isSameDate(new Date(), dayDate)
       });
     }
 
     return days;
   });
 
-  // Selected Event for Modal
   selectedEvent = signal<CalendarEvent | null>(null);
   showCreateModal = signal(false);
 
-  // Simple Create Form Data
   newEventData = {   
     title: '', 
     date: '', 
-    time: '12:00', // Default Time
+    time: '12:00',
     location: '', 
     description: '',
-     type: 'custom' 
-    };
+    type: 'custom' 
+  };
 
   changeMonth(delta: number) {
     const current = this.viewDate();
     const newDate = new Date(current.getFullYear(), current.getMonth() + delta, 1);
     this.viewDate.set(newDate);
-    this.calendarService.currentViewDate$.next(newDate);
   }
 
   openEvent(event: CalendarEvent) {
     this.selectedEvent.set(event);
   }
 
-  // Helper to filter events for a specific day in the grid
-  getEventsForDay(date: Date | null, allEvents: CalendarEvent[] | null): CalendarEvent[] {
+  getEventsForDay(date: Date | null, allEvents: readonly CalendarEvent[] | null): CalendarEvent[] {
     if (!date || !allEvents) return [];
     return allEvents.filter(e => this.isSameDate(e.start, date));
   }
@@ -104,36 +97,32 @@ export class CalendarPage {
   async createFullEvent() {
     if(!this.newEventData.title || !this.newEventData.date) return;
 
-    // Merge Date and Time strings into one Date object
     const dateTimeString = `${this.newEventData.date}T${this.newEventData.time}:00`;
     const startDate = new Date(dateTimeString);
 
     await this.calendarService.createEvent({
       title: this.newEventData.title,
       start: startDate,
-      end: startDate, // MVP: 1 hour duration or same end time
-      isAllDay: false, // We now have time, so it's not always all-day
+      end: startDate, 
+      isAllDay: false, 
       location: this.newEventData.location,
       description: this.newEventData.description
     });
 
-    // Reset and close
     this.showCreateModal.set(false);
     this.newEventData = { title: '', date: '', time: '12:00', location: '', description: '', type: 'custom' };
   }
 
   openCreateModal(date: Date | null) {
-    if (!date) return; // Ignore empty padding days
+    if (!date) return;
 
-    // Format Date to YYYY-MM-DD for the input field
-    // We use this trick to ensure we get the Local date, not UTC
     const offset = date.getTimezoneOffset(); 
     const localDate = new Date(date.getTime() - (offset * 60 * 1000)); 
     const dateString = localDate.toISOString().split('T')[0];
 
     this.newEventData = { 
       title: '', 
-      date: dateString, // <--- Pre-fill the date
+      date: dateString, 
       time: '12:00', 
       location: '', 
       description: '',
@@ -142,5 +131,4 @@ export class CalendarPage {
     
     this.showCreateModal.set(true);
   }
-
 }

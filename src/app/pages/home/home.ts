@@ -1,8 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
 
 // Material
 import { MatMenuModule } from '@angular/material/menu';
@@ -55,11 +54,8 @@ export class Home {
   // Data Signals
   capsules = toSignal(this.capsulesService.getActiveCapsules(), { initialValue: [] });
   
-  // Converting existing Observable logic to Signal for template consistency
-  upcomingEventsCount = toSignal(
-    this.calendarService.getUpcomingEvents().pipe(map(events => events.length)), 
-    { initialValue: 0 }
-  );
+  // Computed signal for the count of upcoming events
+  upcomingEventsCount = computed(() => this.calendarService.upcomingEvents().length);
 
   switchFamily(familyId: string) {
     this.authService.switchActiveFamily(familyId);

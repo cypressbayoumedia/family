@@ -1,81 +1,99 @@
-import { Component, EventEmitter, Input, Output, inject, signal, OnInit, computed } from '@angular/core';
+import { Component, input, output, inject, signal, computed } from '@angular/core';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Calendar, CalendarEvent, EventItem, ChatMessage } from '../../core/calendar';
 import { AuthService } from '../../core/auth';
-import { Families, FamilyMember } from '../../core/families'; // Import Families
-import { Observable } from 'rxjs';
+import { Families, FamilyMember } from '../../core/families';
+import { of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-event-detail',
-
   imports: [CommonModule, FormsModule],
   templateUrl: './event-detail.html',
   styleUrls: ['./event-detail.css']
 })
-export class EventDetail implements OnInit {
-  @Input({ required: true }) event!: CalendarEvent;
-  @Output() close = new EventEmitter<void>();
+export class EventDetail {
+  event = input.required<CalendarEvent>();
+  close = output<void>();
 
-  calendarService = inject(Calendar);
-  authService = inject(AuthService);
-  familiesService = inject(Families); // Inject Families Service
+  private calendarService = inject(Calendar);
+  private authService = inject(AuthService);
+  private familiesService = inject(Families); 
   
-  currentUser = this.authService.currentUser();
-  members = this.familiesService.activeFamilyMembers; // Signal for members
+  currentUser = this.authService.currentUser;
+  members = this.familiesService.activeFamilyMembers;
 
   activeTab = signal<'details' | 'items' | 'chat'>('details');
-  items$!: Observable<EventItem[]>;
-  chatMessages$!: Observable<ChatMessage[]>;
   
-  // New Inputs
-  newItemName = '';
-  chatInput = '';
+  newItemName = signal('');
+  chatInput = signal('');
 
-  ngOnInit() {
-    if (this.event.type === 'custom') {
-      this.items$ = this.calendarService.getEventItems(this.event.id);
-      this.chatMessages$ = this.calendarService.getEventChat(this.event.id);
+  private eventId = computed(() => this.event().id);
+
+  private items$ = toObservable(this.eventId).pipe(
+    switchMap(id => id ? this.calendarService.getEventItems(id) : of([]))
+  );
+  items = toSignal(this.items$, { initialValue: [] as EventItem[] });
+
+  private chatMessages$ = toObservable(this.eventId).pipe(
+    switchMap(id => id ? this.calendarService.getEventChat(id) : of([]))
+  );
+  chatMessages = toSignal(this.chatMessages$, { initialValue: [] as ChatMessage[] });
+
+  myRsvp = computed(() => {
+    const user = this.currentUser();
+    const rsvps = this.event().rsvps;
+    if (!user || !rsvps) return 'pending';
+    return rsvps[user.uid] || 'pending';
+  });
+
+  guestsByStatus = computed(() => (status: 'attending' | 'maybe' | 'not_attending' | 'pending') => {
+    const rsvps = this.event().rsvps;
+    const members = this.members();
+    if (!rsvps) return [];
+    
+    return Object.entries(rsvps)
+      .filter(([_, s]) => s === status)
+      .map(([uid]) => members.find(m => m.uid === uid))
+      .filter((m): m is FamilyMember => !!m);
+  });
+
+  setRsvp(status: 'attending' | 'maybe' | 'not_attending') {
+    const eventId = this.eventId();
+    if (eventId) {
+      this.calendarService.updateRsvp(eventId, status);
+      // Optimistic update
+      const currentEvent = this.event();
+      const currentUser = this.currentUser();
+      if(currentEvent && currentUser) {
+        currentEvent.rsvps[currentUser.uid] = status;
+      }
     }
   }
 
-  // --- RSVP Logic ---
-
-  get myRsvp(): string {
-    if (!this.currentUser || !this.event.rsvps) return 'pending';
-    return this.event.rsvps[this.currentUser.uid] || 'pending';
-  }
-
-  setRsvp(status: 'attending' | 'maybe' | 'not_attending') {
-    this.calendarService.updateRsvp(this.event.id, status);
-    this.event.rsvps[this.currentUser!.uid] = status; // Optimistic UI update
-  }
-
-  // Helper to get lists of members for specific statuses
-  getGuestsByStatus(status: 'attending' | 'maybe' | 'not_attending' | 'pending'): FamilyMember[] {
-    if (!this.event.rsvps) return [];
-    
-    // Filter RSVPs by status, then map to Member objects
-    return Object.entries(this.event.rsvps)
-      .filter(([uid, s]) => s === status)
-      .map(([uid]) => this.members().find(m => m.uid === uid))
-      .filter((m): m is FamilyMember => !!m); // Remove undefineds
-  }
-
-  // --- Other Actions ---
   async addItem() {
-    if (!this.newItemName.trim()) return;
-    await this.calendarService.addEventItem(this.event.id, this.newItemName);
-    this.newItemName = '';
+    const eventId = this.eventId();
+    const itemName = this.newItemName().trim();
+    if (eventId && itemName) {
+      await this.calendarService.addEventItem(eventId, itemName);
+      this.newItemName.set('');
+    }
   }
 
   toggleClaim(item: EventItem, claim: boolean) {
-    if(item.id) this.calendarService.claimEventItem(this.event.id, item.id, claim);
+    const eventId = this.eventId();
+    if (eventId && item.id) {
+      this.calendarService.claimEventItem(eventId, item.id, claim);
+    }
   }
 
   async sendMessage() {
-    if (!this.chatInput.trim()) return;
-    await this.calendarService.postMessage(this.event.id, this.chatInput);
-    this.chatInput = '';
+    const eventId = this.eventId();
+    const text = this.chatInput().trim();
+    if (eventId && text) {
+      await this.calendarService.postMessage(eventId, text);
+      this.chatInput.set('');
+    }
   }
 }
