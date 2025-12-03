@@ -100,7 +100,7 @@ export class Families {
       const membersQuery = query(collection(this.firestore, 'users'), where('familyId', '==', familyId)).withConverter(familyMemberConverter);
       return collectionData(membersQuery);
     })
-  );
+  )
 
   private allUserFamilies$ = this.user$.pipe(
     switchMap(user => {
