@@ -5,6 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
 import { RecordAudio } from '../../components/record-audio/record-audio';
 import { AudioWaveform } from '../../components/audio-waveform/audio-waveform';
+import { CapsuleGuide } from '../../components/capsule-guide/capsule-guide';
 // Material
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,7 +21,8 @@ import { CapsulesService } from '../../core/capsules';
     MatIconModule,
     MatMenuModule,
     RecordAudio,
-    AudioWaveform
+    AudioWaveform,
+    CapsuleGuide
   ],
   templateUrl: './capsule-details.html',
   styleUrl: './capsule-details.css'
@@ -29,6 +31,8 @@ export class CapsuleDetails {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private capsulesService = inject(CapsulesService);
+
+  showGuide = signal(false);
 
   // 1. Fetch Capsule Data
   capsule = toSignal(
@@ -49,10 +53,56 @@ export class CapsuleDetails {
   currentIndex = signal(0);
 
   // 4. Computed Active Item
+  // 4. Computed Active Item
   activeItem = computed(() => {
     const items = this.content();
     return items && items.length > 0 ? items[this.currentIndex()] : null;
   });
+
+  // 5. Lock & Timer Logic
+  now = signal(Date.now()); // Updates every minute
+
+  isLocked = computed(() => {
+    const capsule = this.capsule();
+    if (!capsule?.expiresAt) return false;
+    return this.now() > capsule.expiresAt.toMillis();
+  });
+
+  isUpcoming = computed(() => {
+    const capsule = this.capsule();
+    if (!capsule?.eventDate) return false;
+    return this.now() < capsule.eventDate.toMillis();
+  });
+
+  timeRemaining = computed(() => {
+    const capsule = this.capsule();
+    if (!capsule?.expiresAt || !capsule?.eventDate) return '';
+
+    const now = this.now();
+
+    // Check if upcoming
+    if (now < capsule.eventDate.toMillis()) {
+      const diff = capsule.eventDate.toMillis() - now;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      if (days > 0) return `Opens in ${days}d ${hours}h`;
+      return `Opens in ${hours}h`;
+    }
+
+    const diff = capsule.expiresAt.toMillis() - now;
+    if (diff <= 0) return 'Sealed';
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m left`;
+  });
+
+  constructor() {
+    // Update 'now' every minute to refresh the timer/lock status
+    setInterval(() => {
+      this.now.set(Date.now());
+    }, 60000);
+  }
 
   showRecordAudio = signal(false);
 

@@ -19,13 +19,13 @@ export class EventDetail {
 
   private calendarService = inject(Calendar);
   private authService = inject(AuthService);
-  private familiesService = inject(Families); 
-  
+  private familiesService = inject(Families);
+
   currentUser = this.authService.currentUser;
   members = this.familiesService.activeFamilyMembers;
 
   activeTab = signal<'details' | 'items' | 'chat'>('details');
-  
+
   newItemName = signal('');
   chatInput = signal('');
 
@@ -41,36 +41,7 @@ export class EventDetail {
   );
   chatMessages = toSignal(this.chatMessages$, { initialValue: [] as ChatMessage[] });
 
-  myRsvp = computed(() => {
-    const user = this.currentUser();
-    const rsvps = this.event().rsvps;
-    if (!user || !rsvps) return 'pending';
-    return rsvps[user.uid] || 'pending';
-  });
 
-  guestsByStatus = computed(() => (status: 'attending' | 'maybe' | 'not_attending' | 'pending') => {
-    const rsvps = this.event().rsvps;
-    const members = this.members();
-    if (!rsvps) return [];
-    
-    return Object.entries(rsvps)
-      .filter(([_, s]) => s === status)
-      .map(([uid]) => members.find(m => m.uid === uid))
-      .filter((m): m is FamilyMember => !!m);
-  });
-
-  setRsvp(status: 'attending' | 'maybe' | 'not_attending') {
-    const eventId = this.eventId();
-    if (eventId) {
-      this.calendarService.updateRsvp(eventId, status);
-      // Optimistic update
-      const currentEvent = this.event();
-      const currentUser = this.currentUser();
-      if(currentEvent && currentUser) {
-        currentEvent.rsvps[currentUser.uid] = status;
-      }
-    }
-  }
 
   async addItem() {
     const eventId = this.eventId();

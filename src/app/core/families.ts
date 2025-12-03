@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, Injector, runInInjectionContext } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   Firestore, doc, docData, setDoc, collection, addDoc, updateDoc, arrayUnion, where, query, collectionData, writeBatch, FirestoreDataConverter, DocumentData, QueryDocumentSnapshot, SnapshotOptions
@@ -73,15 +73,19 @@ export class Families {
   private readonly authService: AuthService = inject(AuthService);
   private readonly router: Router = inject(Router);
 
+  private readonly injector = inject(Injector);
+
   // --- Core Observables ---
   private user$ = this.authService.user$;
 
   private activeFamilyId$ = this.user$.pipe(
     switchMap(user => {
       if (!user) return of(null);
-      return docData(doc(this.firestore, `users/${user.uid}`)).pipe(
-        filter((userData): userData is DocumentData => userData !== undefined),
-        map(userData => userData['activeFamilyId'] as string | null)
+      return runInInjectionContext(this.injector, () =>
+        docData(doc(this.firestore, `users/${user.uid}`)).pipe(
+          filter((userData): userData is DocumentData => userData !== undefined),
+          map(userData => userData['activeFamilyId'] as string | null)
+        )
       );
     })
   );
@@ -89,30 +93,36 @@ export class Families {
   private activeFamily$ = this.activeFamilyId$.pipe(
     switchMap(familyId => {
       if (!familyId) return of(null);
-      const familyDoc = doc(this.firestore, `families/${familyId}`).withConverter(familyConverter);
-      return docData(familyDoc);
+      return runInInjectionContext(this.injector, () => {
+        const familyDoc = doc(this.firestore, `families/${familyId}`).withConverter(familyConverter);
+        return docData(familyDoc);
+      });
     })
   );
 
   private activeFamilyMembers$ = this.activeFamilyId$.pipe(
     switchMap(familyId => {
       if (!familyId) return of([]);
-      const membersQuery = query(collection(this.firestore, 'users'), where('familyId', '==', familyId)).withConverter(familyMemberConverter);
-      return collectionData(membersQuery);
+      return runInInjectionContext(this.injector, () => {
+        const membersQuery = query(collection(this.firestore, 'users'), where('familyId', '==', familyId)).withConverter(familyMemberConverter);
+        return collectionData(membersQuery);
+      });
     })
   )
 
   private allUserFamilies$ = this.user$.pipe(
     switchMap(user => {
       if (!user) return of([]);
-      return docData(doc(this.firestore, `users/${user.uid}`)).pipe(
-        filter((userData): userData is DocumentData => userData !== undefined),
-        switchMap(userData => {
-          const familyIds = userData['familyMemberships']?.map((m: any) => m.familyId) || [];
-          if (familyIds.length === 0) return of([]);
-          const familiesQuery = query(collection(this.firestore, 'families'), where('__name__', 'in', familyIds)).withConverter(familyConverter);
-          return collectionData(familiesQuery);
-        })
+      return runInInjectionContext(this.injector, () =>
+        docData(doc(this.firestore, `users/${user.uid}`)).pipe(
+          filter((userData): userData is DocumentData => userData !== undefined),
+          switchMap(userData => {
+            const familyIds = userData['familyMemberships']?.map((m: any) => m.familyId) || [];
+            if (familyIds.length === 0) return of([]);
+            const familiesQuery = query(collection(this.firestore, 'families'), where('__name__', 'in', familyIds)).withConverter(familyConverter);
+            return collectionData(familiesQuery);
+          })
+        )
       );
     })
   );

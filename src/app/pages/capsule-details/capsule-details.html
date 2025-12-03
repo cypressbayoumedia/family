@@ -49,6 +49,28 @@
         </div>
       </div>
       }
+
+      <!-- Lock Status Badge (Centered) -->
+      @if (isLocked() || isUpcoming() || timeRemaining()) {
+      <div class="lock-status" [class.locked]="isLocked()" [class.upcoming]="isUpcoming()">
+        @if (isLocked()) {
+        <span class="material-symbols-rounded icon">lock</span>
+        <span class="text">Sealed Heirloom</span>
+        } @else if (isUpcoming()) {
+        <span class="material-symbols-rounded icon">event</span>
+        <span class="text">{{ timeRemaining() }}</span>
+        } @else {
+        <span class="material-symbols-rounded icon">hourglass_top</span>
+        <span class="text">{{ timeRemaining() }}</span>
+        }
+      </div>
+      }
+
+      <!-- Help Button -->
+      <button class="help-btn" (click)="showGuide.set(true)">
+        <span class="material-symbols-rounded">help</span>
+      </button>
+
       <button class="close-btn" (click)="close()">
         <span class="material-symbols-rounded">close</span>
       </button>
@@ -64,16 +86,17 @@
   <!-- Part C: The Floating Action Button (At the bottom) -->
   <div class="fab-container">
     <!-- Download Button (Moved here) -->
-    <!-- Download Button (Moved here) -->
     @if (activeItem(); as item) {
     <button class="action-fab secondary" (click)="downloadMedia(item.url, item.type, $event)" title="Download Media">
       <span class="material-symbols-rounded">download</span>
     </button>
     }
 
+    @if (!isLocked() && !isUpcoming()) {
     <button class="action-fab primary" [matMenuTriggerFor]="addMenu" aria-label="Add Memory">
       <span class="material-symbols-rounded">add</span>
     </button>
+    }
   </div>
 </div>
 
@@ -85,6 +108,10 @@
     </app-record-audio>
   </div>
 </div>
+}
+
+@if(showGuide()) {
+<app-capsule-guide (close)="showGuide.set(false)"></app-capsule-guide>
 }
 
 <!-- Ancillary elements (no visual layer) -->
@@ -107,7 +134,59 @@
 <input #cameraInput type="file" hidden (change)="onFileSelected($event)" accept="image/*" capture="environment">
 
 } @else {
-<!-- Loading State -->
-<div style="color: white; padding: 20px; text-align: center;">Loading memories...</div>
+<!-- EMPTY STATE: Start the Story -->
+<div class="empty-state-container">
+  <div class="empty-content">
+    <div class="empty-icon">
+      <span class="material-symbols-rounded">auto_stories</span>
+    </div>
+    <h2>Start the Story</h2>
+    <p>This capsule is open for 36 hours. Add photos and audio to create a permanent heirloom.</p>
+
+    @if (!isLocked() && !isUpcoming()) {
+    <button class="button button-primary" [matMenuTriggerFor]="addMenuEmpty">
+      Add First Memory
+    </button>
+    } @else if (isUpcoming()) {
+    <div class="upcoming-badge">
+      <span class="material-symbols-rounded">event</span>
+      <span>{{ timeRemaining() }}</span>
+    </div>
+    }
+  </div>
+
+  <button class="close-btn-floating" (click)="close()">
+    <span class="material-symbols-rounded">close</span>
+  </button>
+
+  <!-- Re-use menu for empty state -->
+  <mat-menu #addMenuEmpty="matMenu" xPosition="after" yPosition="above" class="glass-menu">
+    <button mat-menu-item (click)="galleryInput.click()">
+      <mat-icon>photo_library</mat-icon>
+      <span>From Library</span>
+    </button>
+    <button mat-menu-item (click)="cameraInput.click()">
+      <mat-icon>photo_camera</mat-icon>
+      <span>Take Photo</span>
+    </button>
+    <button mat-menu-item (click)="toggleRecordAudio()">
+      <mat-icon>mic</mat-icon>
+      <span>Record Audio</span>
+    </button>
+  </mat-menu>
+
+  <!-- Hidden inputs need to be here too if the main block is hidden -->
+  <input #galleryInput type="file" hidden (change)="onFileSelected($event)" accept="image/*">
+  <input #cameraInput type="file" hidden (change)="onFileSelected($event)" accept="image/*" capture="environment">
+
+  @if(showRecordAudio()) {
+  <div class="inline-recorder-overlay" (click)="onAudioRecorderClosed()">
+    <div (click)="$event.stopPropagation()">
+      <app-record-audio (audioSaved)="onAudioSaved($event)" (closed)="onAudioRecorderClosed()">
+      </app-record-audio>
+    </div>
+  </div>
+  }
+</div>
 }
 }

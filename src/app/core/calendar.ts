@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal, Injector, runInInjectionContext } from '@angular/core';
 import { Firestore, collection, addDoc, query, where, orderBy, collectionData, doc, updateDoc, deleteDoc, Timestamp, FirestoreDataConverter, DocumentData, QueryDocumentSnapshot, SnapshotOptions } from '@angular/fire/firestore';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { combineLatest, of, Observable } from 'rxjs';
@@ -93,6 +93,8 @@ export class Calendar {
   private familiesService = inject(Families);
   private authService = inject(AuthService);
 
+  private injector = inject(Injector);
+
   public currentViewDate = signal<Date>(new Date());
 
   private readonly monthlyEvents$ = combineLatest([
@@ -105,19 +107,22 @@ export class Calendar {
       const startOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
       const endOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0, 23, 59, 59);
 
-      const eventsRef = collection(this.afs, `families/${familyId}/events`).withConverter(calendarEventConverter);
-      const q = query(eventsRef, where('startAt', '>=', startOfMonth), where('startAt', '<=', endOfMonth));
-
-      return collectionData(q);
+      return runInInjectionContext(this.injector, () => {
+        const eventsRef = collection(this.afs, `families/${familyId}/events`).withConverter(calendarEventConverter);
+        const q = query(eventsRef, where('startAt', '>=', startOfMonth), where('startAt', '<=', endOfMonth));
+        return collectionData(q);
+      });
     })
   );
 
   private readonly upcomingEvents$ = toObservable(this.familiesService.activeFamilyId).pipe(
     switchMap(familyId => {
       if (!familyId) return of([]);
-      const eventsRef = collection(this.afs, `families/${familyId}/events`).withConverter(calendarEventConverter);
-      const q = query(eventsRef, where('startAt', '>=', new Date()), orderBy('startAt', 'asc'));
-      return collectionData(q);
+      return runInInjectionContext(this.injector, () => {
+        const eventsRef = collection(this.afs, `families/${familyId}/events`).withConverter(calendarEventConverter);
+        const q = query(eventsRef, where('startAt', '>=', new Date()), orderBy('startAt', 'asc'));
+        return collectionData(q);
+      });
     })
   );
 
@@ -178,7 +183,7 @@ export class Calendar {
     const familyId = this.familiesService.activeFamilyId();
     const user = this.authService.currentUser();
     if (!familyId || !user) return;
-    
+
     const docRef = doc(this.afs, `families/${familyId}/events/${eventId}/items/${itemId}`);
     await updateDoc(docRef, {
       claimedByUserId: claim ? user.uid : null,
@@ -243,7 +248,7 @@ export class Calendar {
 
   async deleteEvent(eventId: string): Promise<void> {
     const familyId = this.familiesService.activeFamilyId();
-    if(!familyId) return;
+    if (!familyId) return;
     await deleteDoc(doc(this.afs, `families/${familyId}/events/${eventId}`));
   }
 
@@ -256,11 +261,11 @@ export class Calendar {
   private generateBirthdaysForMonth(members: readonly FamilyMember[], viewDate: Date): CalendarEvent[] {
     const month = viewDate.getMonth();
     const year = viewDate.getFullYear();
-    
+
     return members
       .filter(m => {
-        if (!m.birthday) return false; 
-        const bMonth = new Date(m.birthday).getMonth(); 
+        if (!m.birthday) return false;
+        const bMonth = new Date(m.birthday).getMonth();
         return bMonth === month;
       })
       .map(m => {
@@ -283,7 +288,7 @@ export class Calendar {
   private generateUpcomingBirthdays(members: readonly FamilyMember[]): CalendarEvent[] {
     const today = new Date();
     const currentYear = today.getFullYear();
-    
+
     return members
       .filter(m => m.birthday)
       .map(m => {

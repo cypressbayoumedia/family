@@ -12,3 +12,4 @@ export * from "./welcome_post";
 export * from "./join_family";
 export * from './admin_invite';
 export * from './exchange_code';
+export * from './notifications';

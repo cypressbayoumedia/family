@@ -20,6 +20,7 @@ import { PostList } from '../../posts/post-list/post-list';
 import { Landing } from '../landing/landing';
 import { CapsuleList } from '../../components/capsule-list/capsule-list';
 import { CapsuleCreate } from '../../components/capsule-create/capsule-create';
+import { NotificationBell } from '../../components/notification-bell/notification-bell';
 
 @Component({
   selector: 'app-home',
@@ -36,7 +37,8 @@ import { CapsuleCreate } from '../../components/capsule-create/capsule-create';
     PostList,
     Landing,
     CapsuleList,
-    CapsuleCreate
+    CapsuleCreate,
+    NotificationBell
   ],
   providers: [AuthService, Families],
   templateUrl: './home.html',
@@ -50,10 +52,10 @@ export class Home {
 
   // Signals
   showCreateCapsuleModal = signal(false);
-  
+
   // Data Signals
   capsules = toSignal(this.capsulesService.getActiveCapsules(), { initialValue: [] });
-  
+
   // Computed signal for the count of upcoming events
   upcomingEventsCount = computed(() => this.calendarService.upcomingEvents().length);
 

@@ -11,27 +11,27 @@
     <span class="material-symbols-rounded">arrow_back</span>
     Back to Family Feed
   </a>
-  
+
   <!-- HEADER -->
   <header class="page-header">
     <!-- Left Side: Title & Navigation -->
     <div class="month-nav">
       @if (viewMode() === 'calendar') {
-        <button (click)="changeMonth(-1)" class="icon-button">
-          <span class="material-symbols-rounded">chevron_left</span>
-        </button>
+      <button (click)="changeMonth(-1)" class="icon-button">
+        <span class="material-symbols-rounded">chevron_left</span>
+      </button>
       }
       <h2>
         @if (viewMode() === 'calendar') {
-          {{ viewDate() | date:'MMMM yyyy' }}
+        {{ viewDate() | date:'MMMM yyyy' }}
         } @else {
-          Upcoming Events
+        Upcoming Events
         }
       </h2>
       @if (viewMode() === 'calendar') {
-        <button (click)="changeMonth(1)" class="icon-button">
-          <span class="material-symbols-rounded">chevron_right</span>
-        </button>
+      <button (click)="changeMonth(1)" class="icon-button">
+        <span class="material-symbols-rounded">chevron_right</span>
+      </button>
       }
     </div>
 
@@ -46,102 +46,113 @@
         </button>
       </div>
       <button class="button-primary button" (click)="showCreateModal.set(true)">+ New</button>
+      <button class="icon-button" (click)="showGuide.set(true)" title="How it works">
+        <span class="material-symbols-rounded">help</span>
+      </button>
     </div>
   </header>
 
   <!-- VIEW 1: CALENDAR GRID -->
   @if (viewMode() === 'calendar') {
-    <div class="weekday-row">
-      <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-    </div>
-    <div class="cal-grid">
-      @for (day of calendarGrid(); track $index) {
-        <div class="cal-day" [class.empty]="!day.date" [class.today]="day.isToday" (click)="openCreateModal(day.date)">
-          @if (day.date) {
-            <span class="day-number">{{ day.day }}</span>
-            <div class="day-events">
-              @for (event of getEventsForDay(day.date, monthEvents()); track event.id) {
-                <div class="event-pill" [class.birthday]="event.type === 'birthday'" [style.backgroundColor]="event.type === 'custom' ? event.ownerColor : ''" (click)="$event.stopPropagation(); openEvent(event)">
-                  @if(event.type === 'custom'){
-                      <span class="dot"></span>
-                  }
-                  
-                  {{ event.title }}
-                </div>
-              }
-            </div>
+  <div class="weekday-row">
+    <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+  </div>
+  <div class="cal-grid">
+    @for (day of calendarGrid(); track $index) {
+    <div class="cal-day" [class.empty]="!day.date" [class.today]="day.isToday" (click)="openCreateModal(day.date)">
+      @if (day.date) {
+      <span class="day-number">{{ day.day }}</span>
+      <div class="day-events">
+        @for (event of getEventsForDay(day.date, monthEvents()); track event.id) {
+        <div class="event-pill" [class.birthday]="event.type === 'birthday'"
+          [style.backgroundColor]="event.type === 'custom' ? event.ownerColor : ''"
+          (click)="$event.stopPropagation(); openEvent(event)">
+          @if(event.type === 'custom'){
+          <span class="dot"></span>
           }
+
+          {{ event.title }}
         </div>
+        }
+      </div>
       }
     </div>
+    }
+  </div>
   }
 
   <!-- VIEW 2: LIST VIEW -->
   @if (viewMode() === 'list') {
-    <div class="list-view-container">
-      @for (event of listEvents(); track event.id) {
-        <div class="list-card" (click)="openEvent(event)">
-          <div class="date-badge" [style.background-color]="getEventColor(event)">
-            <span class="date-day">{{ event.start | date:'d' }}</span>
-            <span class="date-month">{{ event.start | date:'MMM' }}.</span>
-          </div>
-          <div class="card-content">
-            <div class="card-time">{{ event.isAllDay ? 'All Day' : (event.start | date:'shortTime') }}</div>
-            <h3 class="card-title">{{ event.title }}</h3>
-            @if (event.location) {
-              <div class="card-loc">
-                <span class="material-symbols-rounded icon-tiny">location_on</span>
-                {{ event.location }}
-              </div>
-            }
-          </div>
+  <div class="list-view-container">
+    @for (event of listEvents(); track event.id) {
+    <div class="list-card" (click)="openEvent(event)">
+      <div class="date-badge" [style.background-color]="getEventColor(event)">
+        <span class="date-day">{{ event.start | date:'d' }}</span>
+        <span class="date-month">{{ event.start | date:'MMM' }}.</span>
+      </div>
+      <div class="card-content">
+        <div class="card-time">{{ event.isAllDay ? 'All Day' : (event.start | date:'shortTime') }}</div>
+        <h3 class="card-title">{{ event.title }}</h3>
+        @if (event.location) {
+        <div class="card-loc">
+          <span class="material-symbols-rounded icon-tiny">location_on</span>
+          {{ event.location }}
         </div>
-      } @empty {
-        <div class="empty-state">
-          <p>No upcoming events found.</p>
-          <button class="button-primary" (click)="showCreateModal.set(true)">Plan Something</button>
-        </div>
-      }
+        }
+      </div>
     </div>
+    } @empty {
+    <div class="empty-state">
+      <p>No upcoming events found.</p>
+      <button class="button-primary" (click)="showCreateModal.set(true)">Plan Something</button>
+    </div>
+    }
+  </div>
   }
 
   <!-- MODAL: CREATE EVENT FORM -->
   @if(showCreateModal()) {
-    <div class="modal-overlay" (click)="showCreateModal.set(false)">
-      <div class="modal-content input-group" (click)="$event.stopPropagation()">
-        <h3>Plan a New Moment</h3>
+  <div class="modal-overlay" (click)="showCreateModal.set(false)">
+    <div class="modal-content input-group" (click)="$event.stopPropagation()">
+      <h3>Plan a New Moment</h3>
+      <div class="form-group">
+        <label>Event Title</label>
+        <input type="text" [(ngModel)]="newEventData.title" placeholder="e.g., Family BBQ, Sarah's Graduation"
+          autofocus>
+      </div>
+      <div class="form-row">
         <div class="form-group">
-          <label>Event Title</label>
-          <input type="text" [(ngModel)]="newEventData.title" placeholder="e.g., Family BBQ, Sarah's Graduation" autofocus>
-        </div>
-        <div class="form-row"> 
-          <div class="form-group">
-            <label>Date</label>
-            <input type="date" [(ngModel)]="newEventData.date">
-          </div>
-          <div class="form-group">
-            <label>Time</label>
-            <input type="time" [(ngModel)]="newEventData.time">
-          </div>
+          <label>Date</label>
+          <input type="date" [(ngModel)]="newEventData.date">
         </div>
         <div class="form-group">
-          <label>Location</label>
-          <input type="text" [(ngModel)]="newEventData.location" placeholder="e.g., Grandma's House, Central Park">
-        </div>
-        <div class="form-group">
-          <label>Description (Optional)</label>
-          <textarea [(ngModel)]="newEventData.description" rows="3" placeholder="Add details..."></textarea>
-        </div>
-        <div class="form-actions">
-          <button class="button-secondary" (click)="showCreateModal.set(false)">Cancel</button>
-          <button class="button-primary" (click)="createFullEvent()">Create Event</button>
+          <label>Time</label>
+          <input type="time" [(ngModel)]="newEventData.time">
         </div>
       </div>
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" [(ngModel)]="newEventData.location" placeholder="e.g., Grandma's House, Central Park">
+      </div>
+      <div class="form-group">
+        <label>Description (Optional)</label>
+        <textarea [(ngModel)]="newEventData.description" rows="3" placeholder="Add details..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="button-secondary" (click)="showCreateModal.set(false)">Cancel</button>
+        <button class="button-primary" (click)="createFullEvent()">Create Event</button>
+      </div>
     </div>
+  </div>
   }
 
   <!-- MODAL: EVENT DETAIL VIEW -->
   @if (selectedEvent()) {
-    <app-event-detail [event]="selectedEvent()!" (close)="selectedEvent.set(null)"></app-event-detail> 
+  <app-event-detail [event]="selectedEvent()!" (close)="selectedEvent.set(null)"></app-event-detail>
+  }
+
+  <!-- MODAL: GUIDE -->
+  @if (showGuide()) {
+  <app-calendar-guide (close)="showGuide.set(false)"></app-calendar-guide>
   }
 </div>

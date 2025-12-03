@@ -1,11 +1,54 @@
 {
   "name": "The Familee.",
-  "short_name": "The Familee",
+  "short_name": "The Familee.",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
+  "id": "the-familee-app",
+  "description": "A private, secure space for your family to share moments, plan events, and stay connected.",
+  "orientation": "portrait",
+  "categories": [
+    "social",
+    "family",
+    "lifestyle"
+  ],
+  "shortcuts": [
+    {
+      "name": "New Post",
+      "short_name": "Post",
+      "url": "/create-post",
+      "icons": [
+        {
+          "src": "icons/shortcut_post.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Calendar",
+      "short_name": "Calendar",
+      "url": "/calendar",
+      "icons": [
+        {
+          "src": "icons/shortcut_calendar.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "My Profile",
+      "short_name": "Profile",
+      "url": "/profile",
+      "icons": [
+        {
+          "src": "icons/shortcut_profile.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
   "icons": [
     {
       "purpose": "maskable",
@@ -35,6 +78,18 @@
       "purpose": "maskable",
       "sizes": "128x128",
       "src": "icons/maskable_icon_x128.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "144x144",
+      "src": "icons/maskable_icon_x144.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "152x152",
+      "src": "icons/maskable_icon_x152.png",
       "type": "image/png"
     },
     {

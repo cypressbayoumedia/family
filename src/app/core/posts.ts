@@ -1,4 +1,4 @@
-import { inject, Injectable, computed } from '@angular/core';
+import { inject, Injectable, computed, Injector, runInInjectionContext } from '@angular/core';
 import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, doc, docData } from '@angular/fire/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 import { v4 as uuidv4 } from 'uuid';
@@ -35,10 +35,12 @@ export class Posts {
   private readonly familiesService = inject(Families);
 
 
+  private readonly injector = inject(Injector);
+
   public readonly posts$: Observable<Post[]>;
 
   constructor() {
-    
+
     const familyId$ = toObservable(this.familiesService.activeFamilyId);
 
 
@@ -49,9 +51,11 @@ export class Posts {
           return of([]);
         }
         // If there IS a familyId, fetch the posts for that specific family.
-        const postsCollection = collection(this.afs, `families/${familyId}/posts`);
-        const postsQuery = query(postsCollection, orderBy('createdAt', 'desc'));
-        return collectionData(postsQuery, { idField: 'id' }) as Observable<Post[]>;
+        return runInInjectionContext(this.injector, () => {
+          const postsCollection = collection(this.afs, `families/${familyId}/posts`);
+          const postsQuery = query(postsCollection, orderBy('createdAt', 'desc'));
+          return collectionData(postsQuery, { idField: 'id' }) as Observable<Post[]>;
+        });
       })
     );
   }
@@ -60,10 +64,12 @@ export class Posts {
     if (!familyId || !postId) {
       return of(undefined); // Return nothing if IDs are missing
     }
-    const postDocRef = doc(this.afs, `families/${familyId}/posts/${postId}`);
-    return docData(postDocRef, { idField: 'id' }) as Observable<Post>;
+    return runInInjectionContext(this.injector, () => {
+      const postDocRef = doc(this.afs, `families/${familyId}/posts/${postId}`);
+      return docData(postDocRef, { idField: 'id' }) as Observable<Post>;
+    });
   }
-  
+
   async addPost(postContent: { content: string }, imageFile?: File | null, audioFile?: File | null): Promise<void> {
     const user = this.authService.currentUser();
     const familyId = this.familiesService.activeFamilyId();

@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { Calendar, CalendarEvent } from '../../core/calendar';
 import { AuthService } from '../../core/auth';
 import { EventDetail } from '../event-detail/event-detail';
-import { RouterLink } from '@angular/router'
+import { RouterLink, RouterModule } from '@angular/router'
+import { CalendarGuide } from '../../components/calendar-guide/calendar-guide';
 
 @Component({
   selector: 'app-calendar-page',
-  imports: [CommonModule, FormsModule, DatePipe, EventDetail, RouterLink],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, EventDetail, CalendarGuide, RouterLink],
   templateUrl: './calendar-page.html',
   styleUrls: ['./calendar-page.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,9 +21,7 @@ export class CalendarPage {
 
   // Signals for view state
   viewDate = this.calendarService.currentViewDate;
-  viewMode = signal<'calendar' | 'list'>(
-    (localStorage.getItem('calViewPref') as 'calendar' | 'list') || 'calendar'
-  );
+  viewMode = signal<'calendar' | 'list'>('calendar');
 
   // Directly use the signals from the service
   monthEvents = this.calendarService.eventsForCurrentMonth;
@@ -41,18 +41,18 @@ export class CalendarPage {
     const date = this.viewDate();
     const year = date.getFullYear();
     const month = date.getMonth();
-    
+
     const firstDayOfMonth = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const days = [];
     for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push({ day: null, date: null, isToday: false }); 
+      days.push({ day: null, date: null, isToday: false });
     }
     for (let i = 1; i <= daysInMonth; i++) {
       const dayDate = new Date(year, month, i);
-      days.push({ 
-        day: i, 
+      days.push({
+        day: i,
         date: dayDate,
         isToday: this.isSameDate(new Date(), dayDate)
       });
@@ -63,14 +63,15 @@ export class CalendarPage {
 
   selectedEvent = signal<CalendarEvent | null>(null);
   showCreateModal = signal(false);
+  showGuide = signal(false);
 
-  newEventData = {   
-    title: '', 
-    date: '', 
+  newEventData = {
+    title: '',
+    date: '',
     time: '12:00',
-    location: '', 
+    location: '',
     description: '',
-    type: 'custom' 
+    type: 'custom'
   };
 
   changeMonth(delta: number) {
@@ -89,13 +90,13 @@ export class CalendarPage {
   }
 
   private isSameDate(d1: Date, d2: Date): boolean {
-    return d1.getDate() === d2.getDate() && 
-           d1.getMonth() === d2.getMonth() && 
-           d1.getFullYear() === d2.getFullYear();
+    return d1.getDate() === d2.getDate() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getFullYear() === d2.getFullYear();
   }
 
   async createFullEvent() {
-    if(!this.newEventData.title || !this.newEventData.date) return;
+    if (!this.newEventData.title || !this.newEventData.date) return;
 
     const dateTimeString = `${this.newEventData.date}T${this.newEventData.time}:00`;
     const startDate = new Date(dateTimeString);
@@ -103,8 +104,8 @@ export class CalendarPage {
     await this.calendarService.createEvent({
       title: this.newEventData.title,
       start: startDate,
-      end: startDate, 
-      isAllDay: false, 
+      end: startDate,
+      isAllDay: false,
       location: this.newEventData.location,
       description: this.newEventData.description
     });
@@ -116,19 +117,19 @@ export class CalendarPage {
   openCreateModal(date: Date | null) {
     if (!date) return;
 
-    const offset = date.getTimezoneOffset(); 
-    const localDate = new Date(date.getTime() - (offset * 60 * 1000)); 
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - (offset * 60 * 1000));
     const dateString = localDate.toISOString().split('T')[0];
 
-    this.newEventData = { 
-      title: '', 
-      date: dateString, 
-      time: '12:00', 
-      location: '', 
+    this.newEventData = {
+      title: '',
+      date: dateString,
+      time: '12:00',
+      location: '',
       description: '',
-      type: 'custom' 
+      type: 'custom'
     };
-    
+
     this.showCreateModal.set(true);
   }
 }

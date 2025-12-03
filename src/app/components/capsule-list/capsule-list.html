@@ -1,23 +1,31 @@
 <div class="capsules-strip">
-  <button 
-  class="capsule-item add-new" 
-  (click)="create.emit()"
-  [disabled]="isAtCapsuleLimit()"
-  [title]="isAtCapsuleLimit() ? 'Upgrade to create more capsules' : 'Create a New Capsule'">
-  <span class="plus-icon">+</span>
-  <span class="capsule-title">New Capsule</span>
-</button>
-    
-    @for (capsule of capsules(); track capsule.id) {
-      <a [routerLink]="['/capsule', capsule.id]" class="capsule-item">
-        <img [src]="capsule.coverImageUrl || 'assets/placeholder-capsule.png'" alt="">
-        <span class="capsule-title">{{ capsule.title }}</span>
-      </a>
-    }
-  </div>
+  <button class="capsule-item add-new" (click)="create.emit()" [disabled]="isAtCapsuleLimit()"
+    [title]="isAtCapsuleLimit() ? 'Upgrade to create more capsules' : 'Create a New Capsule'">
+    <span class="plus-icon">+</span>
+    <span class="capsule-title">New Capsule</span>
+  </button>
 
-  @if(isAtCapsuleLimit()) {
-    <div class="upgrade-prompt-small">
-      <p>You've used your 1 free Story Capsule. <a routerLink="/pricing">Upgrade to Plus</a> for unlimited capsules!</p>
+  @for (capsule of capsules(); track capsule.id) {
+  <a [routerLink]="['/capsule', capsule.id]" class="capsule-item">
+    <img [src]="capsule.coverImageUrl || '/assets/placeholder-capsule.png'" alt="">
+    <div class="capsule-overlay">
+      <span class="capsule-title">{{ capsule.title }}</span>
+      <!-- Lock Indicator -->
+      @if (capsule.expiresAt && capsule.expiresAt.toMillis() < Date.now()) { <span class="status-badge locked">
+        <span class="material-symbols-rounded">lock</span>
+        </span>
+        } @else {
+        <span class="status-badge active">
+          <span class="material-symbols-rounded">hourglass_top</span>
+        </span>
+        }
     </div>
+  </a>
   }
+</div>
+
+@if(isAtCapsuleLimit()) {
+<div class="upgrade-prompt-small">
+  <p>Preserve every moment. <a routerLink="/pricing">Upgrade to Plus</a> for unlimited Heirloom Capsules!</p>
+</div>
+}
