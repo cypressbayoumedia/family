@@ -82,6 +82,8 @@ body {
   line-height: 1.6;
   background-color: var(--background-color);
   color: var(--text-primary);
+  padding-bottom: env(safe-area-inset-bottom);
+  /* Ensure content doesn't get hidden behind home indicator */
 }
 
 h1,
@@ -569,7 +571,8 @@ h2 {
 .mobile-fab {
   display: none;
   position: fixed;
-  bottom: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  /* Respect safe area */
   right: 20px;
   width: 56px;
   height: 56px;

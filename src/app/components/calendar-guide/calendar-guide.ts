@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, output } from '@angular/core';
 
 @Component({
-    selector: 'app-calendar-guide',
-    standalone: true,
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `
+  selector: 'app-calendar-guide',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <div class="guide-overlay" (click)="close.emit()">
       <div class="guide-card" (click)="$event.stopPropagation()">
         <div class="icon-header">
@@ -40,7 +40,7 @@ import { Component, ChangeDetectionStrategy, output } from '@angular/core';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .guide-overlay {
       position: fixed;
       top: 0;
@@ -150,8 +150,27 @@ import { Component, ChangeDetectionStrategy, output } from '@angular/core';
       from { transform: translateY(20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
+
+    @media (max-width: 600px) {
+      .guide-overlay {
+        align-items: flex-end;
+        padding: 0;
+      }
+
+      .guide-card {
+        border-radius: 24px 24px 0 0;
+        max-width: 100%;
+        padding: 32px 24px calc(32px + env(safe-area-inset-bottom)) 24px; /* Dynamic safe area padding */
+        animation: slideUpMobile 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+    }
+
+    @keyframes slideUpMobile {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
   `]
 })
 export class CalendarGuide {
-    close = output<void>();
+  close = output<void>();
 }
