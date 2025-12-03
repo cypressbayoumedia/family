@@ -1,15 +1,6 @@
-<!-- 
-  WIZ'S NOTES:
-  This is a complete redesign focused on a smoother, more integrated user experience.
-  1.  New "Composer" Layout: The layout now includes the user's avatar, making it feel like a personal journal entry, not a generic form.
-  2.  Integrated Audio Recorder: The biggest UX win. The jarring modal is gone. The audio recorder now appears *inline*, directly within the composer when the mic is clicked. This is a seamless, non-disruptive flow.
-  3.  Improved Action Bar: The media buttons now have labels ("Add Photo", "Record Audio") for clarity and are grouped logically. The "Post" button is the clear, primary call to action.
-  4.  Auto-Resizing Textarea: While this is a logic change, the structure is designed for it. A textarea that grows with the content feels much more modern and fluid.
-  5.  Better Hierarchy: The back link is now cleaner and more distinct from the main composer card, improving the overall visual flow.
--->
 
 <div class="composer-container">
-  
+
   <div class="composer-header">
     <a routerLink="/" class="back-link">
       <span class="material-symbols-rounded">arrow_back</span>
@@ -17,99 +8,81 @@
     </a>
   </div>
 
-  <div class="composer-card">
-    <div class="composer-user-info">
-      <div class="user-avatar">
-        <!-- Assume currentUser().photoURL is available -->
-        <img [src]="currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed={{this.authService.currentUser()?.displayName}}'" alt="Your avatar">
+  <div class="composer-content">
+    <div class="user-info">
+      <div class="avatar">
+        <img
+          [src]="currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed={{this.authService.currentUser()?.displayName}}'"
+          alt="Avatar">
       </div>
-      <div class="user-name">
-        <h4>{{ currentUser()?.displayName || 'Family Member' }}</h4>
-      </div>
+      <span class="user-name">{{ currentUser()?.displayName || 'Family Member' }}</span>
     </div>
 
-    <div class="composer-body">
-      <!-- NOTE: This textarea should be configured to auto-resize its height as the user types. -->
-      <textarea 
-        class="composer-textarea" 
-        [(ngModel)]="content" 
-        placeholder="Share a story, a photo, or a quick hello...">
-      </textarea>
+    <textarea class="composer-textarea" [(ngModel)]="content" placeholder="Share a story, a photo, or a quick hello...">
+    </textarea>
 
-      <!-- Media previews are now cleaner and grouped -->
-      <div class="media-preview-area">
-        @if (imagePreviewUrl(); as imageUrl) {
-          <div class="preview-item image-preview">
-            <img [src]="imageUrl" alt="Image preview">
-            <button class="remove-media-button" (click)="removeImage()" title="Remove image">
-              <span class="material-symbols-rounded">close</span>
-            </button>
-          </div>
-        }
-        @if (audioPreviewUrl(); as audioUrl) {
-          <div class="preview-item audio-preview">
-            <<app-audio-waveform [audioUrl]="audioUrl!"/> 
-            <button class="remove-media-button" (click)="removeAudio()" title="Remove audio">
-              <span class="material-symbols-rounded">close</span>
-            </button>
-          </div>
-        }
+    <!-- Media Previews -->
+    <div class="media-preview-area">
+      @if (imagePreviewUrl(); as imageUrl) {
+      <div class="preview-item image-preview">
+        <img [src]="imageUrl" alt="Image preview">
+        <button class="remove-media-button" (click)="removeImage()" title="Remove image">
+          <span class="material-symbols-rounded">close</span>
+        </button>
       </div>
-
-      <!-- INLINE AUDIO RECORDER: Replaces the modal overlay -->
-      @if (showRecordAudio()) {
-        <div class="audio-recorder-inline">
-          <app-record-audio 
-            (audioSaved)="onAudioSaved($event)" 
-            (closed)="onAudioRecorderClosed()">
-          </app-record-audio>
-        </div>
       }
-
-      @if (showDoodleCanvas()) {
-        <div class="doodle-creator-inline">
-          <app-doodle-create
-            (doodleSaved)="onDoodleSaved($event)"
-            (closed)="onDoodleClosed()">
-          </app-doodle-create>
-        </div>
+      @if (audioPreviewUrl(); as audioUrl) {
+      <div class="preview-item audio-preview">
+        <app-audio-waveform [audioUrl]="audioUrl!" />
+        <button class="remove-media-button" (click)="removeAudio()" title="Remove audio">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
       }
     </div>
 
-    <!-- The new, improved actions footer -->
-    <div class="composer-actions">
-      <div class="media-buttons">
-        <label for="image-upload" class="action-button">
-          <span class="material-symbols-rounded">image</span>
-          <!-- Add Photo -->
-        </label>
-        <input 
-          id="image-upload" 
-          type="file" 
-          (change)="onImageSelected($event)" 
-          (click)="$event.target.value = ''"
-          accept="image/*" 
-          hidden>
-        
-        <button (click)="toggleRecordAudio()" class="action-button" [class.active]="showRecordAudio()">
-          <span class="material-symbols-rounded">mic</span>
-          <!-- Record Audio -->
-        </button>
+    <!-- Inline Tools -->
+    @if (showRecordAudio()) {
+    <div class="inline-tool-container">
+      <app-record-audio (audioSaved)="onAudioSaved($event)" (closed)="onAudioRecorderClosed()">
+      </app-record-audio>
+    </div>
+    }
 
-        <!--Doodles-->
-        <button (click)="toggleDoodleCanvas()" class="action-button" [class.active]="showDoodleCanvas()">
-          <span class="material-symbols-rounded">draw</span>
-        </button>
-      </div>
-      
-      <div class="submit-area">
-        @if (errorMessage()) {
-          <span class="error-message">{{ errorMessage() }}</span>
-        }
-        <button class="submit-button" (click)="addPost()" [disabled]="isSubmitting() || (!content().trim() && !imagePreviewUrl() && !audioPreviewUrl())">
-          {{ isSubmitting() ? 'Posting...' : 'Post' }}
-        </button>
-      </div>
+    @if (showDoodleCanvas()) {
+    <div class="inline-tool-container">
+      <app-doodle-create (doodleSaved)="onDoodleSaved($event)" (closed)="onDoodleClosed()">
+      </app-doodle-create>
+    </div>
+    }
+  </div>
+
+  <!-- Native Footer Actions -->
+  <div class="composer-footer">
+    <div class="action-icons">
+      <label for="image-upload" class="icon-button" title="Add Photo">
+        <span class="material-symbols-rounded">image</span>
+      </label>
+      <input id="image-upload" type="file" (change)="onImageSelected($event)" (click)="$event.target.value = ''"
+        accept="image/*" hidden>
+
+      <button (click)="toggleRecordAudio()" class="icon-button" [class.active]="showRecordAudio()" title="Record Audio">
+        <span class="material-symbols-rounded">mic</span>
+      </button>
+
+      <button (click)="toggleDoodleCanvas()" class="icon-button" [class.active]="showDoodleCanvas()" title="Doodle">
+        <span class="material-symbols-rounded">brush</span> <!-- Changed icon to brush for doodle -->
+      </button>
+    </div>
+
+    <div class="submit-area">
+      @if (errorMessage()) {
+      <span class="error-message">{{ errorMessage() }}</span>
+      }
+      <button class="post-button" (click)="addPost()"
+        [disabled]="isSubmitting() || (!content().trim() && !imagePreviewUrl() && !audioPreviewUrl())">
+        {{ isSubmitting() ? 'Posting...' : 'Post' }}
+      </button>
     </div>
   </div>
 </div>

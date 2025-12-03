@@ -1,14 +1,70 @@
-/* You can add global styles to this file, and also import other style files */
+/* Modern Color Palette - Vintage Stationery Theme */
 :root {
-  --bg-color: #FDFBF7; /* Vintage Stationery */
-  --text-color: #333333; /* Ink Grey */
-  --accent-color: #E5A89B; /* Muted Terracotta */
-  --accent-color-darker: #BB7F6A; /* For hover states */
+  /* Brand Core Colors */
+  --bg-color: #FDFBF7;
+  /* Vintage Stationery */
+  --text-color: #333333;
+  /* Ink Grey */
+  --accent-color: #E5A89B;
+  /* Muted Terracotta */
+  --accent-color-darker: #BB7F6A;
+  /* For hover states */
   --border-color: #969484;
-  --font-heading: 'Roboto Mono', monospace;
-  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto Mono, Helvetica, Arial, sans-serif;
+
+  /* Semantic Mappings */
+  --primary-color: var(--accent-color);
+  --primary-hover: var(--accent-color-darker);
+  --primary-light: #fdf2f0;
+  /* Light terracotta tint */
+
+  --secondary-color: #969484;
+  /* Using border color as secondary/neutral accent */
+  --secondary-hover: #7d7b6d;
+
+  /* Neutral Colors */
+  --background-color: var(--bg-color);
+  --surface-color: #ffffff;
+  --text-primary: var(--text-color);
+  --text-secondary: #5c5c5c;
+  --text-muted: #858585;
+
+  /* Status Colors */
+  --success-color: #10b981;
+  --error-color: #ef4444;
+  --warning-color: #f59e0b;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: 'Roboto Mono', monospace;
+  /* User requested Roboto Mono for headings */
+  --font-heading: var(--font-serif);
+  --font-body: var(--font-sans);
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Border Radius - Soft & Rounded */
+  --radius-sm: 0.5rem;
+  --radius-md: 1rem;
+  --radius-lg: 2rem;
+  /* 32px for cards */
+  --radius-xl: 9999px;
+  /* Pill shape */
+  --radius-full: 9999px;
 }
 
+/* Global Reset & Base Styles */
 html {
   font-family: var(--font-body);
   background-color: var(--bg-color);
@@ -20,15 +76,167 @@ html {
 body {
   margin: 0;
   height: 100%;
-  font-family: 'Roboto Mono', monospace !important;
+  font-family: var(--font-heading) !important;
+  /* Enforce Roboto Mono as requested */
   font-optical-sizing: auto;
   line-height: 1.6;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-primary);
+  margin-top: 0;
+  font-weight: 600;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--primary-hover);
 }
 
 .material-symbols-rounded {
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
+/* Utility Classes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+.card {
+  background-color: var(--surface-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border-color);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-xl);
+  /* Pill shape */
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-size: 0.875rem;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: white;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--background-color);
+  border-color: var(--text-muted);
+}
+
+.btn-danger {
+  background-color: var(--error-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.mt-md {
+  margin-top: var(--spacing-md);
+}
+
+.mb-md {
+  margin-bottom: var(--spacing-md);
+}
+
+.my-lg {
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Legacy Styles (kept for compatibility) */
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -45,7 +253,7 @@ body {
 
 .form-input {
   padding: 0.8rem 1rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   font-size: 1rem;
   background-color: var(--bg-color);
@@ -62,7 +270,8 @@ body {
 .button-secondary {
   display: inline-block;
   padding: 0.85rem 1.75rem;
-  border-radius: 8px;
+  border-radius: var(--radius-xl);
+  /* Pill shape */
   font-family: var(--font-heading);
   font-weight: 700;
   text-decoration: none;
@@ -101,7 +310,8 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100dvh; /* Dynamic viewport height */
+  height: 100dvh;
+  /* Dynamic viewport height */
   background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
@@ -111,7 +321,7 @@ body {
 
 .modal-content {
   background-color: #fff;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 2rem;
 }
 
@@ -162,7 +372,7 @@ body {
 .auth-card {
   background-color: white;
   padding: 2.5rem;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   width: 100%;
   max-width: 400px;
@@ -198,7 +408,8 @@ h2 {
   padding: 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  box-sizing: border-box; /* Important for padding */
+  box-sizing: border-box;
+  /* Important for padding */
 }
 
 .auth-button,
@@ -206,7 +417,7 @@ h2 {
   width: 100%;
   padding: 0.8rem;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-xl);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -350,12 +561,34 @@ h2 {
   color: #555;
   transition: background-color 0.2s;
 }
+
 .icon-button:hover {
   background-color: var(--bg-color);
 }
-.mobile-fab { display: none; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background-color: var(--accent-color); color: var(--text-color); border-radius: 50%; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 99; text-decoration: none; }
-.mobile-fab .material-symbols-rounded { font-size: 28px; }
+
+.mobile-fab {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 99;
+  text-decoration: none;
+}
+
+.mobile-fab .material-symbols-rounded {
+  font-size: 28px;
+}
 
 @media (max-width: 768px) {
-  .mobile-fab { display: flex; }
+  .mobile-fab {
+    display: flex;
+  }
 }

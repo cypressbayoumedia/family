@@ -11,7 +11,7 @@ import { DoodleCreate } from '../../components/doodle-create/doodle-create';
 
 @Component({
   selector: 'app-post-create',
-  imports: [FormsModule, CommonModule, RecordAudio, RouterModule, AudioWaveform,DoodleCreate],
+  imports: [FormsModule, CommonModule, RecordAudio, RouterModule, AudioWaveform, DoodleCreate],
   templateUrl: './post-create.html',
   styleUrl: './post-create.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,7 +21,7 @@ export class PostCreate implements OnDestroy {
   private postsService = inject(Posts);
   private authService = inject(AuthService); // <-- Inject AuthService
   private router = inject(Router);
-  
+
   // --- All your existing signals for content and media are perfect ---
   content = signal('');
   imageFile = signal<File | null>(null);
@@ -51,7 +51,7 @@ export class PostCreate implements OnDestroy {
       );
       this.resetForm();
       // Navigate back to the main feed on success
-      this.router.navigate(['/']); 
+      this.router.navigate(['/']);
     } catch (error: any) {
       console.error("Failed to create post:", error);
       this.errorMessage.set('Failed to create post. Please try again.');
@@ -92,7 +92,11 @@ export class PostCreate implements OnDestroy {
   }
 
   toggleRecordAudio(): void {
-    this.showRecordAudio.update(value => !value);
+    const newState = !this.showRecordAudio();
+    this.showRecordAudio.set(newState);
+    if (newState) {
+      this.showDoodleCanvas.set(false);
+    }
   }
 
   removeImage(): void {
@@ -128,7 +132,11 @@ export class PostCreate implements OnDestroy {
   }
 
   toggleDoodleCanvas(): void {
-    this.showDoodleCanvas.update(value => !value);
+    const newState = !this.showDoodleCanvas();
+    this.showDoodleCanvas.set(newState);
+    if (newState) {
+      this.showRecordAudio.set(false);
+    }
   }
 
   /**

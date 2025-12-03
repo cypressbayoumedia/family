@@ -1,23 +1,26 @@
 /*
-  CSS for the improved Post Card Component
+  CSS for the improved Post Card Component - Vintage Brand Aligned
 */
 
 .post-card {
-  background-color: #fffdf6;
-  border: .5px solid var(--border-color);
-  border-radius: 24px;
-  margin-bottom: 1.5rem;
-  margin-top: 1.5rem;
-  overflow: hidden; /* Ensures child elements respect the border radius */
-  transition: box-shadow 0.2s ease-in-out;
-  margin-left: .5rem;
-  margin-right: .5rem;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  /* Soft rounded corners */
+  margin-bottom: var(--spacing-lg);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+  box-shadow:
+    4px 4px 0px rgba(150, 148, 132, 0.2),
+    /* Offset shadow */
+    0 0 0 1px var(--border-color) inset;
 }
 
-
-
 .post-card:hover {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  box-shadow:
+    6px 6px 0px rgba(150, 148, 132, 0.3),
+    0 0 0 1px var(--border-color) inset;
+  transform: translate(-2px, -2px);
 }
 
 /* === Header === */
@@ -25,83 +28,120 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.25rem;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  background-color: rgba(253, 251, 247, 0.5);
+  /* Subtle tint matching bg */
 }
 
-.author-details { display: flex; align-items: center; gap: 0.75rem; }
+.author-details {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
 
 .avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   overflow: hidden;
-  background-color: var(--accent-color);
+  background-color: var(--primary-light);
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid var(--border-color);
 }
 
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .avatar-fallback {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: var(--text-color);
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--accent-color-darker);
 }
 
-.author-info { display: flex; flex-direction: column; }
-.author-name { font-weight: 700; }
-.post-timestamp { font-size: 0.8rem; color: #666; }
-.options-button { background: none; border: none; cursor: pointer; color: #666; }
+.author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-name {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: var(--font-serif);
+}
+
+.post-timestamp {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+}
+
+.options-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  transition: background-color 0.2s;
+}
+
+.options-button:hover {
+  background-color: var(--bg-color);
+  color: var(--text-secondary);
+}
 
 /* === Body === */
 .post-body {
-  padding: 0 1.25rem;
+  padding: var(--spacing-lg);
   cursor: pointer;
 }
 
 .post-content {
-  color: var(--text-color);
+  color: var(--text-secondary);
   line-height: 1.6;
-  white-space: pre-wrap; /* Respects line breaks in user input */
-  margin-bottom: 1rem;
+  white-space: pre-wrap;
+  margin-bottom: var(--spacing-md);
+  font-size: 1rem;
+  font-family: var(--font-sans);
 }
 
 .image-container {
   width: 100%;
-  aspect-ratio: 16 / 9; /* Prevents layout jump as images load */
-  border-radius: 8px;
+  aspect-ratio: 16 / 9;
+  border-radius: 2px;
   overflow: hidden;
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-md);
   border: 1px solid var(--border-color);
+  background-color: var(--bg-color);
 }
-.post-image { width: 100%; height: 100%; object-fit: cover; }
-.post-audio { width: 100%; }
 
-/* === Special Doodle-Post Styling === */
-.post-card.doodle-post {
-  /* Makes Doodles feel special */
-  background-color: #FFFDF5; 
-  border-left: 4px solid var(--accent-color);
+.post-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-.doodle-prompt {
-  font-family: var(--font-heading);
-  color: #555;
-  margin-bottom: 0.5rem;
-  font-style: italic;
+
+.post-audio {
+  width: 100%;
 }
 
 /* === Footer === */
 .post-footer {
-  padding: 0.5rem 1.25rem;
- 
-  margin-top: 1rem;
+  padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-md);
+  border-top: 1px solid transparent;
 }
 
 .footer-actions {
   display: flex;
-  gap: 1.5rem;
+  gap: var(--spacing-lg);
 }
 
 .action-button {
@@ -109,16 +149,20 @@
   border: none;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #555;
-  font-weight: 600;
-  font-size: 0.9rem;
+  gap: var(--spacing-xs);
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.875rem;
   cursor: pointer;
-  padding: 0.25rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-family: var(--font-serif);
 }
 
 .action-button:hover {
-  color: var(--text-color);
+  color: var(--accent-color-darker);
+  background-color: var(--primary-light);
 }
 
 .action-button .material-symbols-rounded {

@@ -1,233 +1,288 @@
-
 /* --- 1. Main Page Layout --- */
 .profile-page-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem 4rem 1.5rem;
-  }
-  
-  .profile-card {
-    background-color: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  }
-  
-  .profile-card h2 {
-    font-family: var(--font-heading);
-    font-size: 2rem;
-    text-align: center;
-    margin: 0 0 2rem 0;
-  }
-  
-  /* --- 2. Profile Picture Section --- */
-  .profile-picture-section {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 2rem;
-  }
-  
-  .profile-picture-wrapper {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    cursor: pointer;
-    overflow: hidden;
-  }
-  
-  .profile-picture-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  
-  .edit-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-  }
-  
-  .profile-picture-wrapper:hover .edit-overlay {
-    opacity: 1;
-  }
-  
-  .edit-overlay .material-symbols-rounded {
-    font-size: 36px;
-  }
-  
-  /* --- 3. User Details Form --- */
-  .details-section {
-    padding-bottom: 2rem;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid var(--border-color);
-  }
-  
-  .form-group {
-    margin-bottom: 1.25rem;
-  }
-  
-  .form-group label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    font-size: 1rem;
-    background-color: var(--bg-color);
-    box-sizing: border-box; 
-  }
-  
-  .form-group input:disabled {
-    background-color: #f0f0f0;
-    color: #888;
-    cursor: not-allowed;
-  }
-  
-  /* --- 4. Shared Button Styles --- */
-  .button-primary, .button-secondary, .button-danger, .button-premium {
-    width: 100%;
-    display: inline-block;
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 1rem;
-    text-align: center;
-    text-decoration: none;
-    border: 1px solid transparent;
-    cursor: pointer;
-    box-sizing: border-box;
-  }
-  
-  .button-primary {
-    background-color: var(--accent-color);
-    color: var(--text-color);
-  }
-  .button-primary:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  .button-secondary {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    border-color: var(--border-color);
-  }
-  
-  .button-danger {
-    background-color: #e53e3e;
-    color: #fff;
-    border: none;
-  }
-  .button-danger:hover {
-    background-color: #c53030;
-  }
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg) 4rem;
+}
 
-  .button-premium {
-    background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
-    color: #fff;
-    border: none;
-    transition: transform 0.2s;
-  }
-  .button-premium:hover {
-    transform: translateY(-2px);
-  }
-  
-  
-  /* --- 5. Feedback Messages --- */
-  .feedback {
-    padding: 0.75rem;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    margin-top: 1rem;
-    text-align: center;
-  }
-  .feedback.success { color: #270; background-color: #DFF2BF; }
-  .feedback.error { color: #D8000C; background-color: #FFD2D2; }
-  
-  
-  /* --- 6. My Families Section --- */
-  .families-section {
-    padding-bottom: 2rem;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid var(--border-color);
-  }
-  
-  .families-section h3 {
-    font-family: var(--font-heading);
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-  }
-  
-  .families-section ul {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 1.5rem;
-  }
-  
-  .families-section li {
-    background-color: var(--bg-color);
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-  }
-  
-  /* --- 7. Subscription Section --- */
-  .subscription-section {
-    padding: 2rem 0;
-    text-align: center;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 2rem;
-  }
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-lg);
+  font-weight: 500;
+  transition: color 0.2s;
+}
 
-  .subscription-section h3 {
-    font-family: var(--font-heading);
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-  }
+.back-link:hover {
+  color: var(--primary-color);
+}
 
-  .subscription-section p {
-    margin-bottom: 1.5rem;
-    color: var(--text-color-light);
-  }
-  
-  /* --- 8. Danger Zone --- */
-  .danger-zone {
-    background-color: #fff5f5;
-    border: 1px solid #e53e3e;
-    border-radius: 12px;
-    padding: 1.5rem;
-  }
-  
-  .danger-zone h3 {
-    font-family: var(--font-heading);
-    font-size: 1.25rem;
-    color: #c53030;
-    margin-bottom: 0.5rem;
-  }
-  
-  .danger-zone p {
-    color: #e53e3e;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-  }
+.profile-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  /* Soft rounded corners */
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-md);
+}
+
+.profile-card h2 {
+  font-family: var(--font-sans);
+  font-size: 1.75rem;
+  text-align: center;
+  margin: 0 0 var(--spacing-xl) 0;
+  color: var(--text-primary);
+}
+
+/* --- 2. Profile Picture Section --- */
+.profile-picture-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.profile-picture-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  overflow: hidden;
+  border: 4px solid var(--background-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-picture-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.profile-picture-wrapper:hover .edit-overlay {
+  opacity: 1;
+}
+
+.edit-overlay .material-symbols-rounded {
+  font-size: 36px;
+}
+
+/* --- 3. User Details Form --- */
+.details-section {
+  padding-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  background-color: var(--background-color);
+  box-sizing: border-box;
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.form-group input:disabled {
+  background-color: #f3f4f6;
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* --- 4. Shared Button Styles --- */
+.button-primary,
+.button-secondary,
+.button-danger,
+.button-premium {
+  width: 100%;
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.button-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.button-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.button-primary:disabled {
+  background-color: var(--primary-light);
+  cursor: not-allowed;
+}
+
+.button-secondary {
+  background-color: white;
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.button-secondary:hover {
+  background-color: var(--background-color);
+  border-color: var(--text-muted);
+}
+
+.button-danger {
+  background-color: var(--error-color);
+  color: white;
+}
+
+.button-danger:hover {
+  background-color: #dc2626;
+}
+
+.button-premium {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-md);
+}
+
+.button-premium:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+
+/* --- 5. Feedback Messages --- */
+.feedback {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-top: var(--spacing-md);
+  text-align: center;
+}
+
+.feedback.success {
+  color: #065f46;
+  background-color: #d1fae5;
+}
+
+.feedback.error {
+  color: #991b1b;
+  background-color: #fee2e2;
+}
+
+
+/* --- 6. My Families Section --- */
+.families-section {
+  padding-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.families-section h3 {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  margin-bottom: var(--spacing-md);
+  color: var(--text-primary);
+}
+
+.families-section ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: var(--spacing-lg);
+}
+
+.families-section li {
+  background-color: var(--background-color);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+}
+
+/* --- 7. Subscription Section --- */
+.subscription-section {
+  padding-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.subscription-section h3 {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-primary);
+}
+
+.subscription-section p {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* --- 8. Danger Zone --- */
+.danger-zone {
+  background-color: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.danger-zone h3 {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  color: var(--error-color);
+  margin-bottom: var(--spacing-xs);
+}
+
+.danger-zone p {
+  color: #9f1239;
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.9rem;
+}

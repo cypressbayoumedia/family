@@ -1,13 +1,10 @@
-<div class="post-list-container">
-  <!-- Just change 'posts' to 'posts$' to match the component property -->
+<div class="container post-list-container">
   @for (post of (posts$ | async); track post.id) {
     <app-post-item [post]="post"></app-post-item>
-    <span class="post-separator"></span>
   } @empty {
-    <!-- It's good practice to add an @empty block for when there are no posts -->
     <div class="empty-feed-message">
-      <p>Welcome to the family feed!</p>
-      <p>Be the first to share a post.</p>
+      <p class="text-xl font-bold">Welcome to the family feed!</p>
+      <p class="text-muted">Be the first to share a post.</p>
     </div>
   }
 </div>

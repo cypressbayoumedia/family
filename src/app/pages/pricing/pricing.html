@@ -1,52 +1,84 @@
 <div class="pricing-page-container">
+  <div class="pricing-content">
+    <a routerLink="/" class="back-link">
+      <span class="material-symbols-rounded">arrow_back</span>
+      Back to Home
+    </a>
+
     <div class="pricing-card">
-      <a routerLink="/" class="back-link">← Back</a>
-      
-      <header class="pricing-header">
-        <h2>Upgrade to Family Hub Plus</h2>
-        <p>Unlock all features to keep your family fully connected, creative, and secure.</p>
-      </header>
-  
-      <!-- Billing Cycle Toggle Switch -->
-      <div class="billing-toggle">
-        <span [class.active]="billingCycle() === 'month'">Monthly</span>
-        <div class="toggle-switch" (click)="billingCycle.set(billingCycle() === 'month' ? 'year' : 'month')">
-          <div class="toggle-knob" [class.toggled]="billingCycle() === 'year'"></div>
+      <div class="card-header">
+        <h2 class="premium-headline">Family Hub <span class="text-gradient">Plus</span></h2>
+        <p class="premium-subhead">Unlock the full potential of your family's digital legacy.</p>
+      </div>
+
+      <!-- Custom Toggle -->
+      <div class="billing-control">
+        <span class="billing-label" [class.active]="billingCycle() === 'month'"
+          (click)="billingCycle.set('month')">Monthly</span>
+        <div class="premium-toggle" (click)="billingCycle.set(billingCycle() === 'month' ? 'year' : 'month')">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb" [class.toggled]="billingCycle() === 'year'"></div>
         </div>
-        <span [class.active]="billingCycle() === 'year'">Yearly</span>
-        <span class="discount-badge">Save 17%!</span>
+        <span class="billing-label" [class.active]="billingCycle() === 'year'"
+          (click)="billingCycle.set('year')">Yearly</span>
+        <span class="save-badge" *ngIf="billingCycle() === 'year'">SAVE 17%</span>
       </div>
-  
-      <!-- Pricing Display -->
-      <div class="price-display">
-        @if(billingCycle() === 'month') {
-          <span class="price">$9.99</span>
-          <span class="period">/ month</span>
-        } @else {
-          <span class="price">$99</span>
-          <span class="period">/ year</span>
-        }
+
+      <!-- Price -->
+      <div class="price-section">
+        <div class="price-wrapper">
+          <span class="currency">$</span>
+          <span class="amount">{{ billingCycle() === 'month' ? '9.99' : '99' }}</span>
+        </div>
+        <span class="interval">/ {{ billingCycle() === 'month' ? 'month' : 'year' }}</span>
       </div>
-      
-      <!-- Feature List -->
-      <ul class="feature-list">
-        <li><span class="icon">✓</span> Unlimited Family Members</li>
-        <li><span class="icon">✓</span> Unlimited Story Capsules</li>
-        <li><span class="icon">✓</span> The Family Vault (Gifting)</li>
-        <li><span class="icon">✓</span> Add Members On Their Behalf (Coming Soon)</li>
-        <li><span class="icon">✓</span> 30-Day Location History (Coming Soon)</li>
+
+      <!-- Features Grid -->
+      <ul class="premium-features">
+        <li>
+          <span class="check-icon material-symbols-rounded">check_circle</span>
+          <span>Unlimited Family Members</span>
+        </li>
+        <li>
+          <span class="check-icon material-symbols-rounded">check_circle</span>
+          <span>Unlimited Story Capsules</span>
+        </li>
+        <li>
+          <span class="check-icon material-symbols-rounded">check_circle</span>
+          <span>The Family Vault (Gifting)</span>
+        </li>
+        <li>
+          <span class="check-icon material-symbols-rounded">check_circle</span>
+          <span>Add Members On Their Behalf</span>
+        </li>
+        <li>
+          <span class="check-icon material-symbols-rounded">check_circle</span>
+          <span>30-Day Location History</span>
+        </li>
+        <li>
+          <span class="check-icon material-symbols-rounded">check_circle</span>
+          <span>Priority Support</span>
+        </li>
       </ul>
-  
-      <!-- Error Message Display -->
+
+      <!-- Error Message -->
       @if(errorMessage()) {
-        <p class="error-message">{{ errorMessage() }}</p>
+      <div class="error-banner">
+        <span class="material-symbols-rounded">error</span>
+        {{ errorMessage() }}
+      </div>
       }
-  
-      <!-- Upgrade Button -->
-      <button class="upgrade-button" (click)="upgrade()" [disabled]="isLoading()">
-        {{ isLoading() ? 'Redirecting...' : 'Upgrade and Pay Securely' }}
+
+      <!-- CTA Button -->
+      <button class="premium-button" (click)="upgrade()" [disabled]="isLoading()">
+        <span *ngIf="!isLoading()">Upgrade to Plus</span>
+        <span *ngIf="isLoading()" class="loader"></span>
       </button>
-      
-      <p class="footer-text">Payments are securely processed by Stripe. You can cancel anytime.</p>
+
+      <p class="secure-text">
+        <span class="material-symbols-rounded">lock</span>
+        Secured by Stripe. Cancel anytime.
+      </p>
     </div>
   </div>
+</div>

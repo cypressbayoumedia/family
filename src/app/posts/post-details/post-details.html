@@ -8,73 +8,75 @@
 -->
 <div class="details-container">
   @if (post$ | async; as post) {
-    <!-- Main card containing the post -->
-    <div class="post-details-card">
-      <header class="details-header">
-        <a routerLink="/" class="back-link">
-          <span class="material-symbols-rounded">arrow_back</span>
-          Back to Feed
-        </a>
-      </header>
+  <!-- Main card containing the post -->
+  <div class="post-details-card">
+    <header class="details-header">
+      <a routerLink="/" class="back-link">
+        <span class="material-symbols-rounded">arrow_back</span>
+        Back to Feed
+      </a>
+    </header>
 
-      <div class="post-body">
-        <!-- Author Info is now part of the main body for a more article-like feel -->
-        <div class="author-info">
-          <div class="avatar">
-            @if (post.authorPhotoURL) {
-              <img [src]="post.authorPhotoURL || 'https://api.dicebear.com/9.x/glass/svg?seed={{post.authorName}}'" [alt]="post.authorName + ' avatar'">
-            } @else {
-              <span class="avatar-fallback">{{ post.authorName.charAt(0) }}</span>
-            }
-          </div>
-          <div>
-            <span class="author-name">{{ post.authorName }}</span>
-            <span class="post-timestamp">{{ post.createdAt?.toDate() | date:'medium' }}</span>
-          </div>
+    <div class="post-body">
+      <!-- Author Info is now part of the main body for a more article-like feel -->
+      <div class="author-info">
+        <div class="avatar">
+          @if (post.authorPhotoURL) {
+          <img [src]="post.authorPhotoURL || 'https://api.dicebear.com/9.x/glass/svg?seed={{post.authorName}}'"
+            [alt]="post.authorName + ' avatar'">
+          } @else {
+          <span class="avatar-fallback">{{ post.authorName.charAt(0) }}</span>
+          }
         </div>
-
-        @if (post.content) {
-          <p class="post-content">{{ post.content }}</p>
-        }
-        
-        <div class="post-media">
-          @if (post.imageUrl) {
-            <div class="image-container">
-              <img [src]="post.imageUrl" alt="Post image" class="post-image" (click)="zoomIn()" title="Click to zoom in">
-              <!-- A cleaner, overlaid download button -->
-              <a [href]="post.imageUrl" download class="download-button" title="Download Image">
-                <span class="material-symbols-rounded">download</span>
-              </a>
-            </div>
-          }
-          @if (post.audioUrl) {
-            <app-audio-waveform [audioUrl]="post.audioUrl!"/>
-          }
+        <div>
+          <span class="author-name">{{ post.authorName }}</span>
+          <span class="post-timestamp">{{ post.createdAt?.toDate() | date:'medium' }}</span>
         </div>
       </div>
-      <div class="details-comments">
-        @if (post.id) {
-          <app-comment-list [familyId]="post.familyId" [postId]="post.id"></app-comment-list>
+
+      @if (post.content) {
+      <p class="post-content">{{ post.content }}</p>
+      }
+
+      <div class="post-media">
+        @if (post.imageUrl) {
+        <div class="image-container">
+          <img [src]="post.imageUrl" alt="Post image" class="post-image" (click)="zoomIn()" title="Click to zoom in">
+          <!-- A cleaner, overlaid download button -->
+          <a [href]="post.imageUrl" (click)="downloadImage(post.imageUrl, $event)" class="download-button"
+            title="Download Image">
+            <span class="material-symbols-rounded">download</span>
+          </a>
+        </div>
+        }
+        @if (post.audioUrl) {
+        <app-audio-waveform [audioUrl]="post.audioUrl!" />
         }
       </div>
     </div>
+    <div class="details-comments">
+      @if (post.id) {
+      <app-comment-list [familyId]="post.familyId" [postId]="post.id"></app-comment-list>
+      }
+    </div>
+  </div>
 
 
   } @else {
-    <p class="loading-indicator">Loading post...</p>
+  <p class="loading-indicator">Loading post...</p>
   }
 </div>
 
 <!-- Improved ZOOM MODAL -->
 @if ((post$ | async)?.imageUrl; as imageUrl) {
-  @if (isImageZoomed()) {
-    <div class="zoom-modal-overlay" (click)="zoomOut()">
-      <div class="zoom-modal-content">
-        <button class="modal-close-button" (click)="zoomOut()" title="Close">
-          <span class="material-symbols-rounded">close</span>
-        </button>
-        <img [src]="imageUrl" alt="Zoomed post image">
-      </div>
-    </div>
-  }
+@if (isImageZoomed()) {
+<div class="zoom-modal-overlay" (click)="zoomOut()">
+  <div class="zoom-modal-content">
+    <button class="modal-close-button" (click)="zoomOut()" title="Close">
+      <span class="material-symbols-rounded">close</span>
+    </button>
+    <img [src]="imageUrl" alt="Zoomed post image">
+  </div>
+</div>
+}
 }

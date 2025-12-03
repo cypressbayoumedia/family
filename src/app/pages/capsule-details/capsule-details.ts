@@ -15,9 +15,9 @@ import { CapsulesService } from '../../core/capsules';
 @Component({
   selector: 'app-capsule-details',
   imports: [
-    CommonModule, 
-    MatButtonModule, 
-    MatIconModule, 
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
     MatMenuModule,
     RecordAudio,
     AudioWaveform
@@ -86,24 +86,24 @@ export class CapsuleDetails {
     if (!input.files?.length) return;
 
     const file = input.files[0];
-    
+
     // Simple type detection for MVP
     const type = file.type.startsWith('image') ? 'photo' : 'audio';
 
     await this.capsulesService.addContentToCapsule(capsule.id, file, type);
-    
+
     // Reset input
     input.value = '';
-    
+
     // Move index to the newly added item (optional, depends on Firestore latency)
     const items = this.content();
-    if (items) this.currentIndex.set(items.length); 
+    if (items) this.currentIndex.set(items.length);
   }
 
-   /**
-   * NEW METHOD: Toggles the visibility of the audio recorder.
-   */
-   toggleRecordAudio(): void {
+  /**
+  * NEW METHOD: Toggles the visibility of the audio recorder.
+  */
+  toggleRecordAudio(): void {
     this.showRecordAudio.update(value => !value);
   }
 
@@ -116,7 +116,7 @@ export class CapsuleDetails {
 
     // We can reuse the same service method
     await this.capsulesService.addContentToCapsule(capsule.id, file, 'audio');
-    
+
     // Close the recorder and advance to the new item
     this.showRecordAudio.set(false);
     const items = this.content();
@@ -128,5 +128,31 @@ export class CapsuleDetails {
    */
   onAudioRecorderClosed(): void {
     this.showRecordAudio.set(false);
+  }
+
+  /**
+   * NEW METHOD: Downloads the media (image or audio) to the user's device.
+   */
+  async downloadMedia(url: string, type: 'photo' | 'audio', event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const objectUrl = window.URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      const extension = type === 'photo' ? 'jpg' : 'mp3'; // Simple extension mapping
+      a.download = `capsule-memory-${Date.now()}.${extension}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(objectUrl);
+    } catch (error) {
+      console.error('Download failed:', error);
+      window.open(url, '_blank');
+    }
   }
 }

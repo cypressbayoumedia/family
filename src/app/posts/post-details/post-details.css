@@ -1,23 +1,35 @@
 /*
-  CSS for the Post Details page and its new features
+  CSS for the Post Details page and its new features - Vintage Brand Aligned
 */
 
 .details-container {
   max-width: 720px;
-  margin: 2rem auto;
-  padding: 1rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  background-image: radial-gradient(#969484 0.5px, transparent 0.5px);
+  background-size: 20px 20px;
+  /* Subtle dot grid pattern */
 }
 
 .post-details-card {
-  background-color: #fff;
+  background-color: var(--surface-color);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
+  /* 32px rounded corners */
   overflow: hidden;
+  box-shadow:
+    4px 4px 0px rgba(150, 148, 132, 0.2),
+    /* Offset shadow */
+    0 0 0 1px var(--border-color) inset;
 }
 
 .details-header {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
+  background-color: rgba(253, 251, 247, 0.5);
+  /* Subtle tint */
 }
 
 /* Re-using the back-link style for consistency */
@@ -28,38 +40,84 @@
   text-decoration: none;
   color: var(--text-color);
   font-weight: 600;
+  font-family: var(--font-heading);
 }
 
 .post-body {
-  padding: 1.5rem;
+  padding: 2rem;
 }
 
 /* Author info is styled similarly to the post card for consistency */
-.author-info { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
-.avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background-color: var(--accent-color); display: flex; align-items: center; justify-content: center; }
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
-.avatar-fallback { font-family: var(--font-heading); font-weight: 700; font-size: 1.5rem; color: var(--text-color); }
-.author-info > div:last-child { display: flex; flex-direction: column; }
-.author-name { font-weight: 700; font-size: 1.1rem; }
-.post-timestamp { font-size: 0.9rem; color: #666; }
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-fallback {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--accent-color-darker);
+}
+
+.author-info>div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+}
+
+.post-timestamp {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+}
 
 .post-content {
   font-size: 1.1rem;
   line-height: 1.7;
   white-space: pre-wrap;
-  color: #333;
+  color: var(--text-secondary);
   margin-bottom: 2rem;
+  font-family: var(--font-body);
 }
 
 .image-container {
   position: relative;
   margin-bottom: 1rem;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 
 .post-image {
   width: 100%;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  display: block;
   cursor: pointer;
 }
 
@@ -67,9 +125,9 @@
   position: absolute;
   bottom: 12px;
   right: 12px;
-  background-color: rgba(0,0,0,0.6);
-  color: white;
-  border: none;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -77,10 +135,14 @@
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
 }
+
 .download-button:hover {
-  background-color: rgba(0,0,0,0.8);
+  background-color: var(--surface-color);
+  transform: scale(1.05);
+  color: var(--accent-color);
 }
 
 .post-audio {
@@ -88,20 +150,31 @@
 }
 
 /* === Comments Section Styling === */
+.details-comments {
+  margin-top: 0;
+  /* Removed margin as it's inside the card now or handled by padding */
+  padding: 2rem;
+  border-top: 1px solid var(--border-color);
+  background-color: rgba(253, 251, 247, 0.3);
+}
+
 .comments-section {
-  background-color: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  margin-top: 2rem;
-  padding: 1.5rem;
+  /* Resetting previous styles if any */
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  margin-top: 0;
+  padding: 0;
 }
 
 .comments-header h3 {
   font-family: var(--font-heading);
   font-size: 1.25rem;
   margin: 0 0 1.5rem 0;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .comment-form-area {
@@ -114,48 +187,70 @@
 
 .comment-form-area textarea {
   width: 100%;
-  min-height: 80px;
-  border-radius: 8px;
+  min-height: 100px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   font-size: 1rem;
   font-family: var(--font-body);
+  padding: 1rem;
+  background-color: var(--bg-color);
+  resize: vertical;
+}
+
+.comment-form-area textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(229, 168, 155, 0.2);
 }
 
 /* === Zoom Modal Styling === */
 .zoom-modal-overlay {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background-color: rgba(0,0,0,0.8);
-  display: flex; align-items: center; justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(51, 51, 51, 0.9);
+  /* Ink Grey with opacity */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 2000;
   padding: 2rem;
+  backdrop-filter: blur(4px);
 }
 
 .zoom-modal-content {
   position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
 }
 
 .zoom-modal-content img {
   max-width: 100%;
-  max-height: 100%;
+  max-height: 90vh;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xl);
 }
 
 .modal-close-button {
   position: absolute;
-  top: -40px;
+  top: -50px;
   right: -10px;
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.2);
   border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: white;
-  font-size: 36px;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-/* Add this to your existing post-details.css file */
-
-.details-comments {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid #e5e7eb; /* A nice separator line */
+.modal-close-button:hover {
+  background-color: rgba(255, 255, 255, 0.4);
 }
