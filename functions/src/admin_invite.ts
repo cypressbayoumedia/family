@@ -49,6 +49,19 @@ export const createAdminInvite = onCall(async (request) => {
       );
     }
 
+    // Check Free Tier Limits (Max 1 invited member via Admin Invite)
+    if (familyData?.subscription?.type === 'free') {
+      const adminInviteCount = familyData.members?.filter((m: any) => m.joinedVia === 'admin_invite').length || 0;
+
+      // If count is already 1 (or more), block new invites.
+      if (adminInviteCount >= 1) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Free tier is limited to 1 Admin Invite (though you can have up to 10 members via other methods). Please upgrade to invite more family members via this secure method."
+        );
+      }
+    }
+
     // 4. Create User in Firebase Auth
     const userRecord = await auth.createUser({
       email: email,
@@ -67,18 +80,21 @@ export const createAdminInvite = onCall(async (request) => {
       familyMemberships: [{ familyId: familyId, role: "member" }],
     });
 
-    // 6. Add User to Family's members subcollection
+    // 6. Add User to Family's members subcollection with joinedVia tag
     batch.update(familyRef, {
-      members: FieldValue.arrayUnion({ uid: userRecord.uid, role: "member" }),
+      members: FieldValue.arrayUnion({ uid: userRecord.uid, role: "member", joinedVia: "admin_invite" }),
     });
 
     // 7. Generate and Store One-Time Login Code
     const code = crypto.randomBytes(20).toString("hex");
     const loginCodeRef = db.collection("loginCodes").doc(code);
+
+    // Set expiration for 48 hours from now
+    const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 hours
+
     batch.set(loginCodeRef, {
       uid: userRecord.uid,
-      // Set expiration for 48 hours from now
-      expiresAt: FieldValue.serverTimestamp(),
+      expiresAt: expiresAt, // Firestore Admin SDK handles Date objects automatically
     });
 
     await batch.commit();

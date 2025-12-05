@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed, Injector, runInInjectionContext } from '@angular/core';
-import { Firestore, collection, query, orderBy, limit, collectionData, doc, updateDoc, deleteDoc } from '@angular/fire/firestore';
+import { Firestore, collection, query, orderBy, limit, collectionData, doc, updateDoc, deleteDoc, Timestamp, FieldValue } from '@angular/fire/firestore';
 import { AuthService } from './auth';
 import { switchMap, of } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -13,7 +13,7 @@ export interface Notification {
     familyId: string;
     icon: string;
     read: boolean;
-    createdAt: any;
+    createdAt: Timestamp;
 }
 
 @Injectable({ providedIn: 'root' })

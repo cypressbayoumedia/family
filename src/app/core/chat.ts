@@ -1,5 +1,5 @@
-import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, where, doc, getDoc, setDoc, updateDoc, writeBatch } from '@angular/fire/firestore';
+import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, where, doc, getDoc, setDoc, updateDoc, writeBatch, Timestamp, FieldValue } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { AuthService } from './auth';
@@ -10,7 +10,7 @@ export interface Chat {
   id: string;
   members: string[];
   type: 'direct' | 'group';
-  lastMessage?: { text: string; createdAt: any };
+  lastMessage?: { text: string; createdAt: Timestamp };
   // Add other fields you might want for display, like names and photos of members
 }
 export interface Message {
@@ -19,7 +19,7 @@ export interface Message {
   senderId: string;
   senderName: string;
   senderPhotoURL?: string | null;
-  createdAt: any;
+  createdAt: Timestamp;
 }
 
 @Injectable({
@@ -28,6 +28,8 @@ export interface Message {
 export class Chat {
   private afs = inject(Firestore);
   private authService = inject(AuthService);
+
+  private injector = inject(Injector);
 
   private currentUser$ = toObservable(this.authService.currentUser);
 
@@ -38,9 +40,11 @@ export class Chat {
     return this.currentUser$.pipe(
       switchMap(user => {
         if (!user) return of([]);
-        const chatsCollection = collection(this.afs, 'chats');
-        const q = query(chatsCollection, where('members', 'array-contains', user.uid));
-        return collectionData(q, { idField: 'id' }) as Observable<Chat[]>;
+        return runInInjectionContext(this.injector, () => {
+          const chatsCollection = collection(this.afs, 'chats');
+          const q = query(chatsCollection, where('members', 'array-contains', user.uid));
+          return collectionData(q, { idField: 'id' }) as Observable<Chat[]>;
+        });
       })
     );
   }
@@ -50,9 +54,11 @@ export class Chat {
    */
   getChatMessages(chatId: string): Observable<Message[]> {
     if (!chatId) return of([]);
-    const messagesCollection = collection(this.afs, `chats/${chatId}/messages`);
-    const q = query(messagesCollection, orderBy('createdAt', 'asc'));
-    return collectionData(q, { idField: 'id' }) as Observable<Message[]>;
+    return runInInjectionContext(this.injector, () => {
+      const messagesCollection = collection(this.afs, `chats/${chatId}/messages`);
+      const q = query(messagesCollection, orderBy('createdAt', 'asc'));
+      return collectionData(q, { idField: 'id' }) as Observable<Message[]>;
+    });
   }
 
   /**
@@ -64,24 +70,25 @@ export class Chat {
 
     const messagesCollection = collection(this.afs, `chats/${chatId}/messages`);
     const chatDoc = doc(this.afs, `chats/${chatId}`);
-    
-    const newMessage: Omit<Message, 'id'> = {
+
+    // Cast to any for write operation involving serverTimestamp
+    const newMessage: any = {
       text,
       senderId: user.uid,
       senderName: user.displayName || 'Unknown User',
       senderPhotoURL: user.photoURL || null,
       createdAt: serverTimestamp()
     };
-    
+
     // Use a batch write to do both operations at once
     const batch = writeBatch(this.afs);
     const newMessageRef = doc(messagesCollection); // Create a new doc reference
-    
+
     batch.set(newMessageRef, newMessage);
-    batch.update(chatDoc, { 
+    batch.update(chatDoc, {
       lastMessage: { text, createdAt: serverTimestamp() }
     });
-    
+
     await batch.commit();
   }
 
@@ -95,10 +102,10 @@ export class Chat {
 
     // Create a canonical ID to prevent duplicate chat rooms.
     // The ID is always "lowerUID_higherUID".
-    const chatId = user.uid < otherUserId 
-      ? `${user.uid}_${otherUserId}` 
+    const chatId = user.uid < otherUserId
+      ? `${user.uid}_${otherUserId}`
       : `${otherUserId}_${user.uid}`;
-      
+
     const chatDoc = doc(this.afs, `chats/${chatId}`);
     const chatSnap = await getDoc(chatDoc);
 
@@ -109,7 +116,7 @@ export class Chat {
         type: 'direct'
       });
     }
-    
+
     return chatId;
   }
 }

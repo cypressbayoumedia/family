@@ -17,10 +17,10 @@
       ]
     },
     "stripe": {
-  "url": "https://mcp.stripe.com",
-  "headers": {
-    "Authorization": "Bearer sk_test_51KLvQ6JblgCw5364mANMlSBTUEyBHfzhVHMBMP5IlIwRqByhD7N6kj2DUU44KXeDKEu70Lg5ZqjwzEzj8g8gWF2d00eI9jm5ZR"
-  }
-}
+      "url": "https://mcp.stripe.com",
+      "headers": {
+        "Authorization": "Bearer sk_test_51KLvQ6JblgCw5364mANMlSBTUEyBHfzhVHMBMP5IlIwRqByhD7N6kj2DUU44KXeDKEu70Lg5ZqjwzEzj8g8gWF2d00eI9jm5ZR"
+      }
+    }
   }
 }

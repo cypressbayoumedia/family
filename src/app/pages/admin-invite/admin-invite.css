@@ -2,9 +2,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  background-color: #f4f7f6;
-  background-image: subtle-noise-texture.png;
+  min-height: 100vh;
+  /* Ensure full viewport height */
+  background-color: var(--bg-color);
+  background-image: url('/assets/subtle-noise-texture.png');
+  /* Assuming asset exists or fail gracefully */
+  background-blend-mode: multiply;
 }
 
 .invite-container {
@@ -12,73 +15,91 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding: 2rem;
+  padding: var(--spacing-md);
+  box-sizing: border-box;
 }
 
 .invite-card {
   position: relative;
   width: 100%;
-  max-width: 450px;
-  padding: 2.5rem;
-  background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  max-width: 480px;
+  padding: var(--spacing-xl);
+  background-color: var(--surface-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border-color);
   text-align: center;
 }
 
 .back-button {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
+  top: var(--spacing-md);
+  left: var(--spacing-md);
+  color: var(--text-secondary);
 }
 
 .invite-title {
+  font-family: var(--font-serif);
+  /* Use serif for headings as per theme? Or just bold sans */
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: #333;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
 }
 
 .invite-subtitle {
   font-size: 1rem;
-  color: #666;
-  margin-bottom: 2rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xl);
+  line-height: 1.5;
 }
 
 .invite-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-lg);
+}
+
+/* Material form field adjustments if needed, usually they adapt well */
+mat-form-field {
+  width: 100%;
 }
 
 .invite-button {
-  background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
+  background-color: var(--primary-color);
   color: white;
+  /* Ensure contrast */
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: var(--radius-full);
+  /* Pill shape for primary buttons */
   padding: 0.75rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
+  font-size: 1rem;
+  height: 48px;
+  /* Touch friendly */
 }
 
-.invite-button:hover {
+.invite-button:not(:disabled):hover {
+  background-color: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
 .invite-button:disabled {
-  background: #e0e0e0;
+  background-color: #e0e0e0;
+  /* Or a muted version of the brand color */
+  color: var(--text-muted);
   cursor: not-allowed;
   box-shadow: none;
-  transform: none;
 }
 
 .success-snackbar {
-  background-color: #4CAF50;
-  color: white;
+  background-color: var(--success-color) !important;
+  color: white !important;
 }
 
 .error-snackbar {
-  background-color: #f44336;
-  color: white;
+  background-color: var(--error-color) !important;
+  color: white !important;
 }

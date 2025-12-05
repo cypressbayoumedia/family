@@ -1,5 +1,5 @@
-import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData } from '@angular/fire/firestore';
+import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, Timestamp, FieldValue } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
 import { AuthService } from './auth';
 
@@ -10,7 +10,7 @@ export interface Comment {
   authorName: string;
   authorPhotoURL?: string | null;
   text: string;
-  createdAt: any;
+  createdAt: Timestamp;
 }
 
 @Injectable({
@@ -21,12 +21,16 @@ export class Comments {
   private authService = inject(AuthService);
 
 
+  private injector = inject(Injector);
+
   getCommentsForPost(familyId: string, postId: string): Observable<Comment[]> {
     if (!familyId || !postId) return of([]);
-    
-    const commentsCollection = collection(this.afs, `families/${familyId}/posts/${postId}/comments`);
-    const q = query(commentsCollection, orderBy('createdAt', 'asc')); // Oldest comments first
-    return collectionData(q, { idField: 'id' }) as Observable<Comment[]>;
+
+    return runInInjectionContext(this.injector, () => {
+      const commentsCollection = collection(this.afs, `families/${familyId}/posts/${postId}/comments`);
+      const q = query(commentsCollection, orderBy('createdAt', 'asc')); // Oldest comments first
+      return collectionData(q, { idField: 'id' }) as Observable<Comment[]>;
+    });
   }
 
   async addComment(familyId: string, postId: string, text: string): Promise<void> {
@@ -34,15 +38,16 @@ export class Comments {
     if (!user || !text.trim()) return;
 
     const commentsCollection = collection(this.afs, `families/${familyId}/posts/${postId}/comments`);
-    
-    const newComment: Omit<Comment, 'id'> = {
+
+    // Cast to any for write operation with serverTimestamp
+    const newComment: any = {
       text: text,
       authorId: user.uid,
       authorName: user.displayName || 'Unknown User',
       authorPhotoURL: user.photoURL || null,
       createdAt: serverTimestamp()
     };
-    
+
     await addDoc(commentsCollection, newComment);
   }
 }

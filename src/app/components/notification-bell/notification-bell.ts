@@ -48,7 +48,7 @@ import { MatBadgeModule } from '@angular/material/badge';
             <mat-icon class="material-symbols-rounded item-icon">{{ notif.icon }}</mat-icon>
             <div class="notif-content">
               <p class="notif-body">{{ notif.body }}</p>
-              <span class="notif-time">{{ notif.createdAt?.toDate() | date:'short' }}</span>
+              <span class="notif-time">{{ notif.createdAt.toDate() | date:'short' }}</span>
             </div>
             @if (!notif.read) {
               <span class="unread-dot"></span>

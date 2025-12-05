@@ -28,17 +28,25 @@ export const exchangeCodeForToken = onCall(async (request) => {
     }
 
     const loginCodeData = loginCodeDoc.data();
+    if (!loginCodeData) {
+      throw new HttpsError("not-found", "Code data is missing.");
+    }
 
-    // 3. Check for Expiration (optional but recommended)
-    // This example assumes you have a `createdAt` timestamp.
-    // A more robust solution would be a `expiresAt` field.
-    // const now = new Date();
-    // const createdAt = loginCodeData.createdAt.toDate();
-    // const expiresIn = 48 * 60 * 60 * 1000; // 48 hours
-    // if (now.getTime() - createdAt.getTime() > expiresIn) {
-    //   await loginCodeRef.delete(); // Clean up expired code
-    //   throw new HttpsError("deadline-exceeded", "Login code has expired.");
-    // }
+    // 3. Check for Expiration
+    if (loginCodeData.expiresAt) {
+      const now = new Date();
+      // Ensure specific timestamp conversion, assuming Firestore Timestamp
+      const expiresAt = loginCodeData.expiresAt.toDate ? loginCodeData.expiresAt.toDate() : new Date(loginCodeData.expiresAt);
+
+      if (now > expiresAt) {
+        await loginCodeRef.delete(); // Clean up expired code
+        throw new HttpsError("deadline-exceeded", "Login code has expired.");
+      }
+    } else {
+      // Fallback for legacy codes or errors
+      await loginCodeRef.delete();
+      throw new HttpsError("permission-denied", "Invalid code format.");
+    }
 
     const uid = loginCodeData?.uid;
 

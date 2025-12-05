@@ -15,15 +15,16 @@
       <!-- Smarter Avatar Logic -->
       <div class="avatar">
         @if (post().authorPhotoURL) {
-          <img [src]="post().authorPhotoURL || 'https://api.dicebear.com/9.x/glass/svg?seed={{post().authorName}}'" [alt]="post().authorName + ' avatar'">
+        <img [src]="post().authorPhotoURL || 'https://api.dicebear.com/9.x/glass/svg?seed={{post().authorName}}'"
+          [alt]="post().authorName + ' avatar'">
         } @else {
-          <span class="avatar-fallback">{{ post().authorName.charAt(0) }}</span>
+        <span class="avatar-fallback">{{ post().authorName.charAt(0) }}</span>
         }
       </div>
       <div class="author-info">
         <span class="author-name">{{ post().authorName }}</span>
         <!-- This assumes you create a custom `timeAgo` pipe for a better UX -->
-        <span class="post-timestamp">{{ post().createdAt?.toDate() | date: 'short'}}</span>
+        <span class="post-timestamp">{{ post().createdAt.toDate() | date: 'short'}}</span>
       </div>
     </div>
     <!-- Future: Options menu (delete, edit, etc.) -->
@@ -33,25 +34,25 @@
   </div>
 
   <!-- BODY: Clickable content area for navigation -->
-  <div class="post-body" (click)="navigateToPost(post().id)"> 
+  <div class="post-body" (click)="navigateToPost(post().id)">
     <!-- @if (post().type === 'doodle' && post().imageUrl) {
       <p class="doodle-prompt">...drew a Doodle for the family!</p>
     } -->
     @if (post().content) {
-      <p class="post-content">{{ post().content }}</p>
+    <p class="post-content">{{ post().content }}</p>
     }
-    
+
     <div class="post-media">
       @if (post().imageUrl) {
-        <!-- Add a container to enforce aspect ratio and prevent layout shifts -->
-        <div class="image-container">
-          <img [src]="post().imageUrl" alt="Post image" class="post-image" loading="lazy">
-        </div>
+      <!-- Add a container to enforce aspect ratio and prevent layout shifts -->
+      <div class="image-container">
+        <img [src]="post().imageUrl" alt="Post image" class="post-image" loading="lazy">
+      </div>
       }
       @if (post().audioUrl) {
-        <div (click)="$event.stopPropagation()">
-          <app-audio-waveform [audioUrl]="post().audioUrl!"/>
-        </div>
+      <div (click)="$event.stopPropagation()">
+        <app-audio-waveform [audioUrl]="post().audioUrl!" />
+      </div>
       }
     </div>
   </div>
@@ -60,7 +61,7 @@
   <div class="post-footer">
     <!-- Stop propagation on all footer actions -->
     <div class="footer-actions" (click)="$event.stopPropagation()">
-      <button (click)="navigateToPost(post().id)" class="action-button" >
+      <button (click)="navigateToPost(post().id)" class="action-button">
         <!-- (click)="navigateToPost()" -->
         <span class="material-symbols-rounded">chat_bubble_outline</span>
         <!-- Show real data, even if it's zero -->

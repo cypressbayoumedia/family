@@ -155,8 +155,10 @@ export class Calendar {
     return of(familyId).pipe(
       switchMap(id => {
         if (!id || !eventId) return of([]);
-        const itemsCol = collection(this.afs, `families/${id}/events/${eventId}/items`).withConverter(eventItemConverter);
-        return collectionData(itemsCol);
+        return runInInjectionContext(this.injector, () => {
+          const itemsCol = collection(this.afs, `families/${id}/events/${eventId}/items`).withConverter(eventItemConverter);
+          return collectionData(itemsCol);
+        });
       })
     );
   }
@@ -166,9 +168,11 @@ export class Calendar {
     return of(familyId).pipe(
       switchMap(id => {
         if (!id || !eventId) return of([]);
-        const chatCol = collection(this.afs, `families/${id}/events/${eventId}/discussion`).withConverter(chatMessageConverter);
-        const q = query(chatCol, orderBy('createdAt', 'asc'));
-        return collectionData(q);
+        return runInInjectionContext(this.injector, () => {
+          const chatCol = collection(this.afs, `families/${id}/events/${eventId}/discussion`).withConverter(chatMessageConverter);
+          const q = query(chatCol, orderBy('createdAt', 'asc'));
+          return collectionData(q);
+        });
       })
     );
   }

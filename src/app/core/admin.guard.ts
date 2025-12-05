@@ -20,12 +20,13 @@ export const adminGuard: CanActivateFn = () => {
   });
 
   const isAdmin = computed(() => {
-    return userRole() === 'admin' && family?.subscription?.type === 'paid';
+    // Only check if role is admin. Subscription limits are handled by backend.
+    return userRole() === 'admin';
   });
 
   if (isAdmin()) {
     return true;
   } else {
-    return router.parseUrl('/home');
+    return router.parseUrl('/');
   }
 };

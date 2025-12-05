@@ -13,3 +13,4 @@ export * from "./join_family";
 export * from './admin_invite';
 export * from './exchange_code';
 export * from './notifications';
+export * from './create_family';

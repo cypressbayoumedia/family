@@ -18,6 +18,12 @@ export interface FamilyMember {
   birthday?: string; // Optional for now
   role?: 'admin' | 'member';
   color?: string;
+  joinedVia?: 'admin_invite' | 'code';
+}
+
+export interface FamilyMembership {
+  familyId: string;
+  role: 'admin' | 'member';
 }
 
 export interface Family {
@@ -60,7 +66,8 @@ const familyMemberConverter: FirestoreDataConverter<FamilyMember> = {
       email: data['email'],
       birthday: data['birthday'],
       role: data['role'],
-      color: data['color']
+      color: data['color'],
+      joinedVia: data['joinedVia']
     } as FamilyMember;
   }
 };
@@ -117,10 +124,10 @@ export class Families {
         docData(doc(this.firestore, `users/${user.uid}`)).pipe(
           filter((userData): userData is DocumentData => userData !== undefined),
           switchMap(userData => {
-            const familyIds = userData['familyMemberships']?.map((m: any) => m.familyId) || [];
+            const familyIds = userData['familyMemberships']?.map((m: FamilyMembership) => m.familyId) || [];
             if (familyIds.length === 0) return of([]);
             const familiesQuery = query(collection(this.firestore, 'families'), where('__name__', 'in', familyIds)).withConverter(familyConverter);
-            return collectionData(familiesQuery);
+            return runInInjectionContext(this.injector, () => collectionData(familiesQuery));
           })
         )
       );
@@ -155,26 +162,21 @@ export class Families {
     if (userName) await this.authService.updateUserDisplayName(userName);
 
     this.isLoading.set(true);
-    const batch = writeBatch(this.firestore);
+    const functions = getFunctions();
+    const createFamilyCallable = httpsCallable(functions, 'createFamily');
 
-    // 1. Create the new family document
-    const familyRef = doc(collection(this.firestore, 'families')).withConverter(familyConverter);
-    batch.set(familyRef, {
-      id: '',
-      name: familyName,
-      members: [{ uid: user.uid, role: 'admin' }],
-      subscription: { type: 'free' },
-      capsuleCount: 0,
-    } as Family);
+    try {
+      const result: any = await createFamilyCallable({ familyName });
+      console.log('Successfully created family:', result.data);
+      // Navigation happens after success, similar to join
+    } catch (error: unknown) {
+      const err = error as Error;
+      console.error('Error creating family:', err.message);
+      throw new Error(err.message);
+    }
 
-    // 2. Update the user's profile with the new membership and set it as active
-    const userRef = doc(this.firestore, `users/${user.uid}`);
-    batch.update(userRef, {
-      activeFamilyId: familyRef.id,
-      familyMemberships: arrayUnion({ familyId: familyRef.id, role: 'admin' })
-    });
-
-    await batch.commit();
+    // Refresh active family is handled by the observables reacting to the user creation
+    // But we might want to wait slightly or just navigate.
     this.isLoading.set(false);
     this.router.navigate(['']);
   }
@@ -193,10 +195,11 @@ export class Families {
       const result = await joinFamilyCallable({ familyId });
       console.log('Successfully joined family:', result.data);
       this.router.navigate(['']);
-    } catch (error: any) {
-      console.error('Error joining family:', error.message);
+    } catch (error: unknown) {
+      const err = error as Error;
+      console.error('Error joining family:', err.message);
       alert('Error joining family')
-      throw new Error(error.message);
+      throw new Error(err.message);
     } finally {
       this.isLoading.set(false);
     }

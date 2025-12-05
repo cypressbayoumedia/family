@@ -1,5 +1,5 @@
 import { inject, Injectable, computed, Injector, runInInjectionContext } from '@angular/core';
-import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, doc, docData } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, doc, docData, Timestamp, FieldValue } from '@angular/fire/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { Observable, of } from 'rxjs';
@@ -21,7 +21,7 @@ export interface Post {
   content: string;
   imageUrl?: string;
   audioUrl?: string;
-  createdAt: any; // Stays as `any` for serverTimestamp compatibility
+  createdAt: Timestamp;
   commentCount?: number;
 }
 
@@ -87,7 +87,8 @@ export class Posts {
     };
 
     // --- Prepare the Post Data ---
-    const postData: Omit<Post, 'id'> = {
+    // Cast to any to allow serverTimestamp (FieldValue) which is not a Timestamp
+    const postData: any = {
       ...postContent,
       familyId: familyId,
       authorId: user.uid,

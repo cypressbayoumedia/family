@@ -14,31 +14,31 @@
       header, which allows for better layout control with CSS.
 -->
 <article class="comment-item">
-    <!-- The user's avatar -->
-    <div class="comment-avatar">
-      @if (comment.authorPhotoURL) {
-        <img [src]="comment.authorPhotoURL" [alt]="comment.authorName + ' avatar'">
-      } @else {
-        <div class="avatar-fallback">
-          <span>{{ comment.authorName.charAt(0) }}</span>
-        </div>
-      }
+  <!-- The user's avatar -->
+  <div class="comment-avatar">
+    @if (comment.authorPhotoURL) {
+    <img [src]="comment.authorPhotoURL" [alt]="comment.authorName + ' avatar'">
+    } @else {
+    <div class="avatar-fallback">
+      <span>{{ comment.authorName.charAt(0) }}</span>
     </div>
-  
-    <!-- The main content of the comment -->
-    <div class="comment-content">
-      <div class="comment-header">
-        <div class="author-info">
-          <span class="comment-author">{{ comment.authorName }}</span>
-          <span class="comment-timestamp">· {{ comment.createdAt?.toDate()|date}}</span>
-        </div>
-        <button class="options-button" title="Comment options">
-          <span class="material-symbols-rounded">more_horiz</span>
-        </button>
+    }
+  </div>
+
+  <!-- The main content of the comment -->
+  <div class="comment-content">
+    <div class="comment-header">
+      <div class="author-info">
+        <span class="comment-author">{{ comment.authorName }}</span>
+        <span class="comment-timestamp">· {{ comment.createdAt.toDate()|date}}</span>
       </div>
-      
-      <div class="comment-body">
-        <p class="comment-text">{{ comment.text }}</p>
-      </div>
+      <button class="options-button" title="Comment options">
+        <span class="material-symbols-rounded">more_horiz</span>
+      </button>
     </div>
-  </article>
+
+    <div class="comment-body">
+      <p class="comment-text">{{ comment.text }}</p>
+    </div>
+  </div>
+</article>
