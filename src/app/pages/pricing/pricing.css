@@ -211,30 +211,24 @@
   font-family: var(--font-serif);
 }
 
-/* Features */
-.premium-features {
-  list-style: none;
-  padding: 0;
+/* Plan Description */
+.plan-description {
+  font-size: 1.15rem;
+  /* Slightly larger */
+  color: var(--text-color);
+  line-height: 1.6;
+  text-align: center;
   margin: 0 0 2.5rem;
-  text-align: left;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  display: block;
+  font-weight: 400;
+  /* Lighter base weight */
+  padding: 0 1rem;
 }
 
-.premium-features li {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.95rem;
-}
-
-.check-icon {
-  color: var(--primary-color);
-  font-size: 1.25rem;
-  flex-shrink: 0;
+.plan-description strong {
+  font-weight: 700;
+  color: var(--accent-color-darker);
+  /* Highlight key features */
 }
 
 /* Button */

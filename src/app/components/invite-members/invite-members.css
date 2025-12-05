@@ -9,7 +9,8 @@
 .invite-page-container {
   max-width: 700px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 4rem 1.5rem; /* Extra bottom padding */
+  padding: 2rem 1.5rem 4rem 1.5rem;
+  /* Extra bottom padding */
 }
 
 .page-header {
@@ -31,7 +32,7 @@
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .invite-header {
@@ -102,7 +103,8 @@
   font-size: 1rem;
   font-weight: 700;
   border-radius: 8px;
-  width: 100%; /* Make button full width */
+  width: 100%;
+  /* Make button full width */
 }
 
 /* --- Separator --- */
@@ -114,13 +116,21 @@
   margin: 2.5rem 0;
   font-family: var(--font-heading);
 }
-.separator::before, .separator::after {
+
+.separator::before,
+.separator::after {
   content: '';
   flex: 1;
   border-bottom: 1px solid var(--border-color);
 }
-.separator:not(:empty)::before { margin-right: 1em; }
-.separator:not(:empty)::after { margin-left: 1em; }
+
+.separator:not(:empty)::before {
+  margin-right: 1em;
+}
+
+.separator:not(:empty)::after {
+  margin-left: 1em;
+}
 
 
 /* --- Email Form Styling --- */
@@ -146,14 +156,56 @@
   flex-shrink: 0;
 }
 
+/* --- Admin Method Special Styling --- */
+.admin-method {
+  background-color: #FDFBF7;
+  /* Vintage Paper */
+  border: 1px solid var(--accent-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.icon-inline {
+  vertical-align: middle;
+  font-size: 1.25rem;
+  margin-right: 0.5rem;
+  color: var(--accent-color);
+}
+
+/* Ensure button-secondary works as an anchor tag */
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background-color: white;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.button-secondary:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
 /* --- Responsive Adjustments --- */
 @media (max-width: 500px) {
   .invite-card {
     padding: 1.5rem;
   }
+
   .invite-header h3 {
     font-size: 1.5rem;
   }
+
   .email-form {
     flex-direction: column;
   }

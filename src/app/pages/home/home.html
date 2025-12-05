@@ -22,8 +22,38 @@
       </a>
     </div>
 
+    <!-- Quick Navigation to fill whitespace -->
+    <nav class="sidebar-nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+        <span class="material-symbols-rounded">home</span>
+        <span class="nav-label">Home</span>
+      </a>
+      <a routerLink="/calendar" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded">calendar_month</span>
+        <span class="nav-label">Calendar</span>
+        @if (upcomingEventsCount() > 0) {
+        <span class="nav-badge">{{ upcomingEventsCount() }}</span>
+        }
+      </a>
+
+      <!-- Notifications Item -->
+      <app-notification-bell [showLabel]="true"></app-notification-bell>
+
+      <a routerLink="/invite-members" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded">group_add</span>
+        <span class="nav-label">Members</span>
+      </a>
+      <a routerLink="/profile" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded">account_circle</span>
+        <span class="nav-label">Profile</span>
+      </a>
+      <a routerLink="/manage-circles" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded">settings</span>
+        <span class="nav-label">Settings</span>
+      </a>
+    </nav>
+
     <div class="sidebar-actions">
-      <app-notification-bell></app-notification-bell>
       <!-- Desktop User Menu Trigger -->
       <div class="user-menu">
         <button class="user-menu-button" [matMenuTriggerFor]="userMenu" aria-label="Open user menu"

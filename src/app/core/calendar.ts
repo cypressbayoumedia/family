@@ -96,6 +96,7 @@ export class Calendar {
 
   private injector = inject(Injector);
 
+  public readonly familyId = this.familiesService.activeFamilyId;
   public currentViewDate = signal<Date>(new Date());
 
   private readonly monthlyEvents$ = combineLatest([

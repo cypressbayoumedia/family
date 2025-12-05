@@ -32,29 +32,48 @@
     <!-- METHOD 1: SHARE A LINK -->
     <div class="invite-method">
       <h4 class="method-title">Share a Magic Link</h4>
-      <p class="method-description">Anyone with this link can join. Share it in a text, a group chat, or anywhere you like.</p>
+      <p class="method-description">Anyone with this link can join. Share it in a text, a group chat, or anywhere you
+        like.</p>
       <div class="invite-link-wrapper">
         <span class="invite-link">https://thefamilee.app/invited-to-join/{{familyId()}}</span>
       </div>
       <div class="invite-actions">
         @if (canShare()) {
-          <button class="button-primary" (click)="nativeShare()">
-            <span class="material-symbols-rounded">share</span>
-            Share Invite
-          </button>
+        <button class="button-primary" (click)="nativeShare()">
+          <span class="material-symbols-rounded">share</span>
+          Share Invite
+        </button>
         } @else {
-          <button class="copy-button" (click)="copyToClipboard()" [class.copied]="copied()">
-            @if (copied()) {
-              <span class="material-symbols-rounded">check</span>
-              <span>Copied!</span>
-            } @else {
-              <span class="material-symbols-rounded">content_copy</span>
-              <span>Copy Link</span>
-            }
-          </button>
+        <button class="copy-button" (click)="copyToClipboard()" [class.copied]="copied()">
+          @if (copied()) {
+          <span class="material-symbols-rounded">check</span>
+          <span>Copied!</span>
+          } @else {
+          <span class="material-symbols-rounded">content_copy</span>
+          <span>Copy Link</span>
+          }
+        </button>
         }
       </div>
     </div>
+
+    <!-- ADMIN ONLY SECTION -->
+    @if (isAdmin()) {
+    <div class="invite-method admin-method">
+      <h4 class="method-title">
+        <span class="material-symbols-rounded icon-inline">admin_panel_settings</span>
+        Admin Access
+      </h4>
+      <p class="method-description">
+        Create a secure 6-digit code for family members who don't use email or social logins.
+      </p>
+      <a routerLink="/admin-invite" class="button-secondary">
+        Create Passwordless Invite
+      </a>
+    </div>
+
+    <div class="separator">or</div>
+    }
 
     <!--<div class="separator">or</div>
 

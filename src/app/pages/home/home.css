@@ -223,6 +223,60 @@ body {
 }
 
 /* ==========================================================================
+     6. SIDEBAR NAVIGATION
+     ========================================================================== */
+.sidebar-nav {
+   display: flex;
+   flex-direction: column;
+   gap: 0.5rem;
+   margin-top: 1rem;
+   /* With justify-content: space-between on parent, this sits nicely in the middle
+      or we can let it hang from top by grouping.
+      For now, let's let it flow. */
+}
+
+.nav-item {
+   display: flex;
+   align-items: center;
+   gap: 0.75rem;
+   padding: 0.75rem 1rem;
+   text-decoration: none;
+   border-radius: 99px;
+   color: var(--text-secondary, #5c5c5c);
+   font-family: var(--font-heading);
+   font-weight: 600;
+   font-size: 1.1rem;
+   transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+   background-color: rgba(0, 0, 0, 0.03);
+   color: var(--text-color);
+}
+
+.nav-item.active {
+   background-color: var(--primary-light);
+   color: var(--accent-color-darker);
+   font-weight: 700;
+}
+
+.nav-item .material-symbols-rounded {
+   font-size: 1.5rem;
+   /* Fill icons on active state if supported? Angular Material icons are font based. 
+      Filled is usually a different font or variation. We'll stick to color change. */
+}
+
+.nav-badge {
+   margin-left: auto;
+   background-color: var(--error-color);
+   color: white;
+   font-size: 0.75rem;
+   font-weight: 700;
+   padding: 0.15rem 0.5rem;
+   border-radius: 99px;
+}
+
+/* ==========================================================================
      7. RESPONSIVE DESIGN
      ========================================================================== */
 @media (max-width: 1200px) {

@@ -14,3 +14,5 @@ export * from './admin_invite';
 export * from './exchange_code';
 export * from './notifications';
 export * from './create_family';
+export * from './calendar_feed';
+// End of exports

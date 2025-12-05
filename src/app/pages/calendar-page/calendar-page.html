@@ -45,6 +45,13 @@
           <span class="material-symbols-rounded">view_agenda</span>
         </button>
       </div>
+      <button class="button-secondary sync-btn" (click)="showSyncOptions()" [class.copied]="syncCopied()" title="Sync">
+        <span class="material-symbols-rounded">
+          {{ syncCopied() ? 'check' : 'sync' }}
+        </span>
+        <span class="sync-text">{{ syncCopied() ? 'Copied' : 'Sync' }}</span>
+      </button>
+
       <button class="button-primary button" (click)="showCreateModal.set(true)">+ New</button>
       <button class="icon-button" (click)="showGuide.set(true)" title="How it works">
         <span class="material-symbols-rounded">help</span>

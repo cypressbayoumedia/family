@@ -132,4 +132,31 @@ export class CalendarPage {
 
     this.showCreateModal.set(true);
   }
+  syncCopied = signal(false);
+
+  showSyncOptions() {
+    // In a real app, you might want to use a specific domain from env vars
+    // For now, we assume standard firebase function URL format
+    // region-project.cloudfunctions.net/calendarFeed
+    const projectId = 'family-businesses'; // Correct project ID
+    const region = 'us-central1';
+    const baseUrl = `https://${region}-${projectId}.cloudfunctions.net/calendarFeed`;
+    const familyId = this.calendarService.familyId();
+
+    const url = `${baseUrl}?familyId=${familyId}`;
+
+    // Check if on mobile to use native share, otherwise copy
+    if (navigator.share) {
+      navigator.share({
+        title: 'Family Calendar Feed',
+        text: 'Subscribe to our Familee Calendar:',
+        url: url
+      }).catch(() => { }); // Ignore cancel
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        this.syncCopied.set(true);
+        setTimeout(() => this.syncCopied.set(false), 2000);
+      });
+    }
+  }
 }

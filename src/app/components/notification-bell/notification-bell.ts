@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NotificationService } from '../../core/notifications';
@@ -21,22 +21,34 @@ import { MatBadgeModule } from '@angular/material/badge';
     MatBadgeModule
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None, // Allow styling of overlay panel
   template: `
-    <button mat-icon-button [matMenuTriggerFor]="notificationMenu" class="bell-button">
-      <mat-icon 
-        [matBadge]="unreadCount() || 0" 
-        [matBadgeHidden]="unreadCount() === 0" 
-        matBadgeColor="warn"
-        aria-hidden="false"
-        aria-label="Notifications"
-        class="material-symbols-rounded">
-        notifications
-      </mat-icon>
-    </button>
+    @if (showLabel()) {
+      <button class="sidebar-nav-btn" [matMenuTriggerFor]="notificationMenu">
+        <mat-icon class="material-symbols-rounded">notifications</mat-icon>
+        <span class="nav-label">Notifications</span>
+        @if (unreadCount() > 0) {
+           <span class="nav-badge">{{ unreadCount() }}</span>
+        }
+      </button>
+    } @else {
+      <button mat-icon-button [matMenuTriggerFor]="notificationMenu" class="bell-button">
+        <mat-icon 
+          [matBadge]="unreadCount() || 0" 
+          [matBadgeHidden]="unreadCount() === 0" 
+          matBadgeColor="warn"
+          aria-hidden="false"
+          aria-label="Notifications"
+          class="material-symbols-rounded">
+          notifications
+        </mat-icon>
+      </button>
+    }
 
-    <mat-menu #notificationMenu="matMenu" xPosition="before" class="notification-menu-panel">
+    <!-- Add panelClass for theming -->
+    <mat-menu #notificationMenu="matMenu" xPosition="after" panelClass="guide-themed-menu">
       <div class="menu-header" (click)="$event.stopPropagation()">
-        <h3>Notifications</h3>
+        <h3>NOTIFICATIONS</h3>
         @if (unreadCount() > 0) {
           <button class="mark-read-btn" (click)="markAllRead()">Mark all read</button>
         }
@@ -63,86 +75,112 @@ import { MatBadgeModule } from '@angular/material/badge';
     </mat-menu>
   `,
   styles: [`
-    .bell-button {
-      color: #555;
+    /* 
+      Guide-Themed Menu Override 
+      Targeting the mat-menu-panel via class added in template
+    */
+    .guide-themed-menu.mat-mdc-menu-panel {
+      background-color: #FDFBF7; /* Vintage Stationery */
+      border-radius: 24px;       /* Guide Card Radius */
+      min-width: 320px;
+      max-width: 360px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3); /* Deep lifted shadow */
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.05);
     }
 
-    /* Customizing the menu panel via global styles might be needed, 
-       but we can style the content inside. */
-    
+    .guide-themed-menu .mat-mdc-menu-content {
+      padding: 0 !important;
+    }
+
+    /* Header styling matching Guide 'h3' */
     .menu-header {
-      padding: 12px 16px;
-      border-bottom: 1px solid #f0f0f0;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      outline: none;
+      background-color: transparent;
     }
 
     .menu-header h3 {
       margin: 0;
-      font-size: 1rem;
+      font-family: 'Roboto Mono', monospace; /* Monospace for header */
+      font-size: 0.9rem;
       font-weight: 700;
-      color: var(--text-color);
+      letter-spacing: 0.05em;
+      color: #333;
+      text-transform: uppercase;
     }
 
     .mark-read-btn {
       background: none;
       border: none;
       color: var(--accent-color);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
-    
+
     .mark-read-btn:hover {
-      background-color: rgba(0,0,0,0.05);
+      text-decoration: underline;
     }
 
+    /* List Area */
     .notification-list {
-      max-height: 400px;
+      max-height: 480px;
       overflow-y: auto;
-      overflow-x: hidden;
-      min-width: 280px;
-      max-width: 320px;
     }
 
+    /* Items */
     .notification-item {
-      height: auto !important; /* Override mat-menu-item fixed height */
-      padding: 12px 16px !important;
-      line-height: normal !important;
+      height: auto !important;
+      min-height: 72px;
+      padding: 16px 24px !important;
       display: flex;
       align-items: flex-start;
-      white-space: normal !important; /* Allow text wrapping */
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      white-space: normal !important;
+    }
+    
+    .notification-item:last-child {
+      border-bottom: none;
     }
 
     .notification-item.unread {
-      background-color: #f0f7ff;
+      background-color: rgba(229, 168, 155, 0.08); /* faint accent tint */
     }
 
     .item-icon {
-      margin-right: 12px;
-      color: #666;
+      margin-right: 16px;
+      color: #777;
+    }
+    
+    .notification-item.unread .item-icon {
+      color: var(--accent-color); /* Highlight icon for unread */
     }
 
     .notif-content {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
     .notif-body {
       margin: 0;
-      font-size: 0.9rem;
-      color: var(--text-color);
+      font-size: 0.95rem;
+      color: #444;
+      line-height: 1.4;
     }
 
     .notif-time {
       font-size: 0.75rem;
       color: #999;
+      font-family: 'Roboto Mono', monospace;
     }
 
     .unread-dot {
@@ -150,23 +188,87 @@ import { MatBadgeModule } from '@angular/material/badge';
       height: 8px;
       background-color: var(--accent-color);
       border-radius: 50%;
-      margin-left: 8px;
-      margin-top: 6px;
+      margin-left: 12px;
+      margin-top: 8px;
     }
 
     .empty-state {
-      padding: 32px;
+      padding: 48px 24px;
       text-align: center;
-      color: #999;
-      font-size: 0.9rem;
+      color: #888;
+      font-style: italic;
+    }
+
+    /* Sidebar Button Styles (Preserved) */
+    .sidebar-nav-btn {
+       display: flex;
+       align-items: center;
+       gap: 0.75rem;
+       padding: 0.75rem 1rem;
+       width: 100%;
+       background: none;
+       border: none;
+       border-radius: 99px;
+       color: var(--text-secondary, #5c5c5c);
+       font-family: var(--font-heading);
+       font-weight: 600;
+       font-size: 1.1rem;
+       transition: all 0.2s ease;
+       cursor: pointer;
+       text-align: left;
+    }
+
+    .sidebar-nav-btn:hover {
+       background-color: rgba(0,0,0,0.03);
+       color: var(--text-color);
+    }
+
+    .sidebar-nav-btn .material-symbols-rounded {
+       font-size: 1.5rem;
+    }
+
+    .sidebar-nav-btn .nav-badge {
+       margin-left: auto;
+       background-color: var(--error-color);
+       color: white;
+       font-size: 0.75rem;
+       font-weight: 700;
+       padding: 0.15rem 0.5rem;
+       border-radius: 99px;
+    }
+    
+    .cursor-pointer {
+      cursor: pointer;
+    }
+
+    /* Mobile Bottom Sheet Override */
+    @media (max-width: 600px) {
+      .guide-themed-menu.mat-mdc-menu-panel {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        border-radius: 24px 24px 0 0 !important;
+        margin: 0 !important;
+        transform-origin: bottom !important;
+      }
+      
+      /* Only animate if supported by overlay configs, 
+         otherwise this just ensures placement. */
     }
   `]
 })
 export class NotificationBell {
   private notifService = inject(NotificationService);
 
+  showLabel = input<boolean>(false); // Used for sidebar display mode
+
   notifications = this.notifService.notifications;
   unreadCount = this.notifService.unreadCount;
+  // ... rest of class remains valid
 
   markAllRead() {
     this.notifService.markAllAsRead();

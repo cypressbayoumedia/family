@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 // Import the FamiliesService to get the current family ID
 import { Families } from '../../core/families'; // Adjust path
+import { AuthService } from '../../core/auth';
 
 @Component({
   selector: 'app-invite-members',
@@ -13,10 +14,21 @@ import { Families } from '../../core/families'; // Adjust path
 })
 export class InviteMembers {
   private familiesService = inject(Families);
+  private authService = inject(AuthService);
 
   // Expose the current family ID to the template
   familyId = this.familiesService.activeFamilyId;
   familyName = this.familiesService.activeFamily
+
+  // Check if current user is admin of active family
+  isAdmin = computed(() => {
+    const family = this.familiesService.activeFamily();
+    const user = this.authService.currentUser();
+    if (!family || !user) return false;
+    const member = family.members.find(m => m.uid === user.uid);
+    return member?.role === 'admin';
+  });
+
   // Signal to check if the Web Share API is available on this device
   canShare = signal<boolean>(!!navigator.share);
 
@@ -34,7 +46,7 @@ export class InviteMembers {
     const shareData = {
       title: 'Join our Familee!',
       text: `I'm setting up our private family space on The Familee! Let's have one central place for family stuff, away from public social media. Here’s our private link to join it's super quick!`,
-      url: `https://thefamilee.app/invited-to-join/${inviteCode}` 
+      url: `https://thefamilee.app/invited-to-join/${inviteCode}`
     };
 
     try {
@@ -50,7 +62,7 @@ export class InviteMembers {
    * The fallback method to copy the invite code to the clipboard.
    */
   copyToClipboard(): void {
-    const inviteCode = `https://thefamilee.app/invited-to-join/${this.familyId()}` 
+    const inviteCode = `https://thefamilee.app/invited-to-join/${this.familyId()}`
     if (!inviteCode) return;
 
     navigator.clipboard.writeText(inviteCode).then(() => {
