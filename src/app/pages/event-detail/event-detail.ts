@@ -52,6 +52,15 @@ export class EventDetail {
     }
   }
 
+  async deleteItem(item: EventItem) {
+    const eventId = this.eventId();
+    if (eventId && item.id) {
+      if (confirm('Are you sure you want to delete this item?')) {
+        await this.calendarService.deleteEventItem(eventId, item.id);
+      }
+    }
+  }
+
   toggleClaim(item: EventItem, claim: boolean) {
     const eventId = this.eventId();
     if (eventId && item.id) {

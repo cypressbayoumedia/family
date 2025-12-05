@@ -12,6 +12,7 @@ export interface EventItem {
   name: string;
   claimedByUserId: string | null;
   claimedByName: string | null;
+  createdBy?: string;
 }
 export interface ChatMessage {
   id?: string;
@@ -176,7 +177,20 @@ export class Calendar {
     const familyId = this.familiesService.activeFamilyId();
     if (!familyId) return;
     const col = collection(this.afs, `families/${familyId}/events/${eventId}/items`);
-    await addDoc(col, { name: itemName, claimedByUserId: null, claimedByName: null });
+    const user = this.authService.currentUser();
+    await addDoc(col, {
+      name: itemName,
+      claimedByUserId: null,
+      claimedByName: null,
+      createdBy: user?.uid
+    });
+  }
+
+  async deleteEventItem(eventId: string, itemId: string): Promise<void> {
+    const familyId = this.familiesService.activeFamilyId();
+    if (!familyId) return;
+    const docRef = doc(this.afs, `families/${familyId}/events/${eventId}/items/${itemId}`);
+    await deleteDoc(docRef);
   }
 
   async claimEventItem(eventId: string, itemId: string, claim: boolean): Promise<void> {

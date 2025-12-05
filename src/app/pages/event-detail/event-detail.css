@@ -126,6 +126,20 @@
   border: 1px solid var(--border-color);
 }
 
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.claim-btn {
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+
 .item-info {
   display: flex;
   flex-direction: column;

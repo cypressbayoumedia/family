@@ -76,14 +76,22 @@
               }
             </div>
 
-            @if (!item.claimedByUserId) {
-            <button class="button-primary button-small" (click)="toggleClaim(item, true)">Claim</button>
-            }
-            @if (item.claimedByUserId === currentUser()?.uid) {
-            <button class="icon-button button-small" (click)="toggleClaim(item, false)" title="Unclaim item">
-              <span class="material-symbols-rounded">close</span>
-            </button>
-            }
+            <div class="item-actions">
+              @if (!item.claimedByUserId) {
+              <button class="button-primary claim-btn" (click)="toggleClaim(item, true)">Claim</button>
+              }
+              @if (item.claimedByUserId === currentUser()?.uid) {
+              <button class="icon-button button-small" (click)="toggleClaim(item, false)" title="Unclaim item">
+                <span class="material-symbols-rounded">undo</span>
+              </button>
+              }
+
+              @if (event().createdBy === currentUser()?.uid || item.createdBy === currentUser()?.uid) {
+              <button class="icon-button button-small delete-btn" (click)="deleteItem(item)" title="Delete item">
+                <span class="material-symbols-rounded">delete</span>
+              </button>
+              }
+            </div>
           </li>
           } @empty {
           <li class="empty-list-item">No items have been added to the "To-Bring" list yet.</li>
