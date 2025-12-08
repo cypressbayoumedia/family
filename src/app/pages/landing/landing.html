@@ -1,14 +1,112 @@
-
-
 <div class="landing-page-wrapper">
-
-    <!-- HERO SECTION: The big promise -->
-    <section class="hero-section text-center">
-        <h1 class="hero-title">Tired of the family chaos across a dozen apps?</h1>
-        <p class="hero-subtitle">The Familee. brings everyone together in one private, secure home for your most important connections. No ads. No public feeds. Just family.</p>
-        <div class="cta-buttons">
-            <a routerLink="/signup" class="button button-primary">Start Your Family Circle for Free</a>
-            <!-- <a routerLink="/features" class="button-secondary">See How It Works</a> -->
+    <header class="landing-header">
+        <h1 class="logo"><img src="/the_familee_logo.svg" alt="App Logo" />The Familee.</h1>
+        <div class="header-actions">
+            <a routerLink="/login" class="login-link">Sign In</a>
         </div>
-        <p class="trust-signal">Free forever plan available for up to 10 members.</p>
+    </header>
+
+    <!-- 1. HERO SECTION -->
+    <section class="hero-section text-center">
+        <div class="hero-content">
+            <h1 class="hero-title">Bring Your Family Home.</h1>
+            <p class="hero-subtitle">The private, secure, and beautiful space for your family's most important moments.
+                No ads. No algorithms. Just love.</p>
+            <div class="cta-buttons">
+                <a routerLink="/signup" class="button button-primary">Start Your Circle</a>
+                <a routerLink="/login" class="button button-secondary">Sign In</a>
+            </div>
+            <p class="trust-signal">Free for families up to 10 members.</p>
+        </div>
+        <!-- <div class="hero-visual">
+            <img src="/assets/app-preview.png" alt="The Familee App Preview" class="hero-image-preview">
+        </div> -->
     </section>
+
+    <!-- 2. PROBLEM AGITATION -->
+    <section class="problem-section text-center">
+        <div class="icon-chaos-display">
+            <span class="material-symbols-rounded" style="font-size: 48px;">chat_bubble_outline</span>
+            <span class="material-symbols-rounded" style="font-size: 48px;">event_busy</span>
+            <span class="material-symbols-rounded" style="font-size: 48px;">image_not_supported</span>
+        </div>
+        <h2 class="section-title">Tired of the Digital Chaos?</h2>
+        <p class="section-intro">Group chats are messy. Social media is public. Calendars are disconnected. Your family
+            deserves a dedicated operating system.</p>
+    </section>
+
+    <!-- 3. FEATURES GRID -->
+    <section class="features-section text-center">
+        <h2 class="section-title">Everything You Need, In One Place</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="material-symbols-rounded feature-icon">inventory_2</span>
+                <h3>Heirloom Capsules</h3>
+                <p>Create digital time capsules for life's precious moments. Lock them until a future date or share them
+                    now.</p>
+            </div>
+            <div class="feature-card">
+                <span class="material-symbols-rounded feature-icon">calendar_month</span>
+                <h3>Unified Calendar</h3>
+                <p>Never miss a birthday, soccer game, or family dinner again. Syncs with everyone's personal calendars.
+                </p>
+            </div>
+            <div class="feature-card">
+                <span class="material-symbols-rounded feature-icon">forum</span>
+                <h3>Private Chat</h3>
+                <p>Secure, focused conversations without the noise of other messenger apps. Threaded and organized.</p>
+            </div>
+            <div class="feature-card">
+                <span class="material-symbols-rounded feature-icon">lock</span>
+                <h3>Private by Default</h3>
+                <p>Your data belongs to you. We don't sell it, we don't share it. Your family circle is a fortress.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. PRICING -->
+    <section class="pricing-section text-center">
+        <h2 class="section-title">Simple, Honest Pricing</h2>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Core</h3>
+                <div class="price">Free</div>
+                <p>Forever.</p>
+                <a routerLink="/signup" class="button button-secondary">Get Started</a>
+                <ul class="pricing-features">
+                    <li><span class="material-symbols-rounded">check</span> Up to 10 Family Members</li>
+                    <li><span class="material-symbols-rounded">check</span> Unlimited Chat</li>
+                    <li><span class="material-symbols-rounded">check</span> Shared Calendar</li>
+                    <li><span class="material-symbols-rounded">check</span> 1GB Capsule Storage</li>
+                </ul>
+            </div>
+            <div class="pricing-card featured">
+                <div class="featured-badge">MOST POPULAR</div>
+                <h3>Plus</h3>
+                <div class="price">$9.99<span class="price-period">/mo</span></div>
+                <p>or $99/year (Save 17%)</p>
+                <a routerLink="/signup" class="button button-primary">Get Plus</a>
+                <ul class="pricing-features">
+                    <li><span class="material-symbols-rounded">check</span> <strong>Unlimited</strong> Family Members
+                    </li>
+                    <li><span class="material-symbols-rounded">check</span> <strong>Unlimited</strong> Heirloom Capsules
+                    </li>
+                    <li><span class="material-symbols-rounded">check</span> <strong>Unlimited</strong> Admin Invites
+                    </li>
+                    <li><span class="material-symbols-rounded">check</span> Passwordless Onboarding</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. FINAL CTA -->
+    <section class="final-cta-section text-center">
+        <h2 class="hero-title" style="font-size: 2.5rem;">Start Your Legacy Today.</h2>
+        <p class="hero-subtitle">It takes 2 minutes to set up your private family circle.</p>
+        <div class="cta-buttons">
+            <a routerLink="/signup" class="button button-primary"
+                style="background: white; color: var(--text-color);">Create Account</a>
+        </div>
+    </section>
+
+</div>
