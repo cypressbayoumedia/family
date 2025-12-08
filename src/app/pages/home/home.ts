@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatBottomSheetModule, MatBottomSheet } from '@angular/material/bottom-sheet';
 
 // Core Services
 import { AuthService } from '../../core/auth';
@@ -24,6 +25,7 @@ import { CapsuleList } from '../../components/capsule-list/capsule-list';
 import { CapsuleCreate } from '../../components/capsule-create/capsule-create';
 import { NotificationBell } from '../../components/notification-bell/notification-bell';
 import { NotificationDrawer } from '../../components/notification-drawer/notification-drawer';
+import { MobileProfileSheet } from '../../components/mobile-profile-sheet/mobile-profile-sheet';
 
 @Component({
   selector: 'app-home',
@@ -37,6 +39,7 @@ import { NotificationDrawer } from '../../components/notification-drawer/notific
     MatBadgeModule,
     MatButtonModule,
     MatSidenavModule,
+    MatBottomSheetModule,
     // Components
     PostList,
     Landing,
@@ -55,9 +58,26 @@ export class Home {
   public uiService = inject(UiService);
   private calendarService = inject(Calendar);
   private capsulesService = inject(CapsulesService);
+  private bottomSheet = inject(MatBottomSheet);
 
   // Signals
   showCreateCapsuleModal = signal(false);
+
+  // View State
+  viewMode = signal<'feed' | 'capsules'>('feed');
+
+  constructor() {
+    // Initialize view from local storage
+    const saved = localStorage.getItem('homeViewPref');
+    if (saved === 'feed' || saved === 'capsules') {
+      this.viewMode.set(saved);
+    }
+  }
+
+  setViewMode(mode: 'feed' | 'capsules') {
+    this.viewMode.set(mode);
+    localStorage.setItem('homeViewPref', mode);
+  }
 
   // Data Signals
   capsules = toSignal(this.capsulesService.getActiveCapsules(), { initialValue: [] });
@@ -67,5 +87,9 @@ export class Home {
 
   switchFamily(familyId: string) {
     this.authService.switchActiveFamily(familyId);
+  }
+
+  openMobileProfile() {
+    this.bottomSheet.open(MobileProfileSheet);
   }
 }

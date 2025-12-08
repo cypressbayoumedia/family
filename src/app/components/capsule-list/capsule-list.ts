@@ -13,6 +13,7 @@ import { Families } from '../../core/families';
 })
 export class CapsuleList {
   capsules = input.required<Capsule[]>();
+  layout = input<'strip' | 'grid'>('strip');
   Date = Date; // Expose Date for template
 
   create = output<void>();

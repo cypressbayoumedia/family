@@ -88,28 +88,52 @@
       <main class="dashboard-main">
         <header class="feed-header">
           <h3>{{ familiesService.activeFamily()?.name }}</h3>
-          <!-- Mobile User Menu Trigger -->
-          <div class="mobile-user-menu">
-            <app-notification-bell></app-notification-bell>
-            <button class="user-menu-button" routerLink="/calendar">
-              <span class="material-symbols-rounded" [matBadge]="upcomingEventsCount() || 0"
-                [matBadgeHidden]="upcomingEventsCount() === 0" matBadgeColor="warn"
-                aria-label="Upcoming events">calendar_month</span>
-            </button>
-            <button class="user-menu-button" [matMenuTriggerFor]="userMenu" aria-label="Open user menu"
-              [matMenuTriggerData]="{name:  familiesService.activeFamily()?.name }">
-              <img
-                [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName"
-                class="user-avatar-icon" alt="User menu">
-            </button>
+          <div class="header-right">
+            <!-- View Toggle (Desktop & Mobile) -->
+            <div class="view-toggle">
+              <button class="toggle-btn" [class.active]="viewMode() === 'feed'" (click)="setViewMode('feed')"
+                title="Feed View">
+                <span class="material-symbols-rounded">view_stream</span>
+              </button>
+              <button class="toggle-btn" [class.active]="viewMode() === 'capsules'" (click)="setViewMode('capsules')"
+                title="Capsule Gallery">
+                <span class="material-symbols-rounded">grid_view</span>
+              </button>
+            </div>
+
+            <!-- Mobile User Menu Trigger -->
+            <div class="mobile-user-menu">
+              <app-notification-bell></app-notification-bell>
+              <button class="user-menu-button" routerLink="/calendar">
+                <span class="material-symbols-rounded" [matBadge]="upcomingEventsCount() || 0"
+                  [matBadgeHidden]="upcomingEventsCount() === 0" matBadgeColor="warn"
+                  aria-label="Upcoming events">calendar_month</span>
+              </button>
+              <button class="user-menu-button" (click)="openMobileProfile()" aria-label="Open profile menu">
+                <img
+                  [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName"
+                  class="user-avatar-icon" alt="User menu">
+              </button>
+            </div>
           </div>
         </header>
 
-        <!-- Story Capsules Strip -->
-        <app-capsule-list [capsules]="capsules()" (create)="showCreateCapsuleModal.set(true)">
-        </app-capsule-list>
+        @if (viewMode() === 'feed') {
 
         <app-post-list />
+        }
+
+        @if (viewMode() === 'capsules') {
+        <div class="capsule-gallery-container">
+          <div class="gallery-header">
+            <h2>Heirloom Capsules</h2>
+            <p>Your family's digital treasure chest.</p>
+          </div>
+          <!-- Grid Layout -->
+          <app-capsule-list [capsules]="capsules()" [layout]="'grid'" (create)="showCreateCapsuleModal.set(true)">
+          </app-capsule-list>
+        </div>
+        }
       </main>
 
       <!-- =============================================================== -->

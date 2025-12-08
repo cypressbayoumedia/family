@@ -139,10 +139,65 @@ body {
    z-index: 10;
 }
 
+/* ... Header Styles ... */
 .feed-header h3 {
    font-family: var(--font-heading);
    font-size: 1.25rem;
    margin: 0;
+}
+
+.header-right {
+   display: flex;
+   align-items: center;
+   gap: 16px;
+}
+
+.view-toggle {
+   display: flex;
+   background: rgba(0, 0, 0, 0.05);
+   padding: 4px;
+   border-radius: 8px;
+   gap: 4px;
+}
+
+.toggle-btn {
+   border: none;
+   background: none;
+   border-radius: 6px;
+   padding: 4px 8px;
+   cursor: pointer;
+   color: #777;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   transition: all 0.2s;
+}
+
+.toggle-btn:hover {
+   background: rgba(255, 255, 255, 0.5);
+}
+
+.toggle-btn.active {
+   background: #fff;
+   color: var(--accent-color);
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.capsule-gallery-container {
+   padding: 2rem;
+   text-align: center;
+}
+
+.gallery-header h2 {
+   font-family: var(--font-heading);
+   color: var(--text-color);
+   margin-bottom: 0.5rem;
+}
+
+.gallery-header p {
+   color: #666;
+   font-style: italic;
+   font-family: 'Georgia', serif;
 }
 
 .mobile-user-menu {
@@ -311,6 +366,29 @@ body {
       right: 0;
       width: 100%;
       z-index: 100;
+      padding: 0.75rem 1rem;
+      /* Reduce padding on mobile */
+      gap: 12px;
+      /* Ensure gap between title and actions */
+   }
+
+   .feed-header h3 {
+      font-size: 1rem;
+      /* Smaller font for mobile title */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+      /* Allow title to take available space but shrink if needed */
+      min-width: 0;
+      /* Crucial for ellipsis interactions in flex */
+   }
+
+   .header-right {
+      gap: 8px;
+      /* Tighter spacing for actions */
+      flex-shrink: 0;
+      /* Don't shrink the actions sidebar */
    }
 
    .mobile-user-menu {
@@ -321,4 +399,6 @@ body {
       width: auto;
       padding: 0.5rem;
    }
+
+   /* Hide desktop-only elements inside mobile header context if needed */
 }

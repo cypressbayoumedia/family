@@ -1,27 +1,32 @@
-<div class="capsules-strip">
+<div [class.capsules-strip]="layout() === 'strip'" [class.capsules-grid]="layout() === 'grid'">
+  <!-- Add New Card -->
   <button class="capsule-item add-new" (click)="create.emit()" [disabled]="isAtCapsuleLimit()"
     [title]="isAtCapsuleLimit() ? 'Upgrade to create more capsules' : 'Create a New Capsule'">
-    <span class="plus-icon">+</span>
+    <div class="capsule-cover">
+      <span class="plus-icon material-symbols-rounded">add</span>
+    </div>
     <span class="capsule-title">New Capsule</span>
   </button>
 
   @for (capsule of capsules(); track capsule.id) {
   <a [routerLink]="['/capsule', capsule.id]" class="capsule-item">
-    <img [src]="capsule.coverImageUrl || '/assets/placeholder-capsule.png'" alt="">
-    <div class="capsule-overlay">
-      <span class="capsule-title">{{ capsule.title }}</span>
-      <!-- Lock Indicator -->
-      @if (capsule.expiresAt && capsule.expiresAt.toMillis() < Date.now()) { <span class="status-badge locked">
+    <div class="capsule-cover">
+      <img [src]="capsule.coverImageUrl || '/assets/placeholder-capsule.png'" alt="">
+
+      <!-- Status Badge inside cover -->
+      @if (capsule.expiresAt && capsule.expiresAt.toMillis() < Date.now()) { <div class="status-badge locked">
         <span class="material-symbols-rounded">lock</span>
-        </span>
-        } @else {
-        <span class="status-badge active">
-          <span class="material-symbols-rounded">hourglass_top</span>
-        </span>
-        }
     </div>
-  </a>
-  }
+    } @else {
+    <!-- Optional: Active indicator or just clean image -->
+    <!-- <div class="status-badge active">
+          <span class="material-symbols-rounded">hourglass_top</span>
+        </div> -->
+    }
+</div>
+<span class="capsule-title">{{ capsule.title }}</span>
+</a>
+}
 </div>
 
 @if(isAtCapsuleLimit()) {
