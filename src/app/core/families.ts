@@ -107,15 +107,17 @@ export class Families {
     })
   );
 
-  private activeFamilyMembers$ = this.activeFamilyId$.pipe(
-    switchMap(familyId => {
-      if (!familyId) return of([]);
-      return runInInjectionContext(this.injector, () => {
-        const membersQuery = query(collection(this.firestore, 'users'), where('familyId', '==', familyId)).withConverter(familyMemberConverter);
-        return collectionData(membersQuery);
-      });
+  private activeFamilyMembers$ = this.activeFamily$.pipe(
+    switchMap(family => {
+      if (!family || !family.members || family.members.length === 0) return of([]);
+
+      const memberUids = family.members.map(m => m.uid);
+      // Note: 'in' query supports up to 30 values.
+      const usersRef = collection(this.firestore, 'users');
+      const q = query(usersRef, where('__name__', 'in', memberUids)).withConverter(familyMemberConverter);
+      return collectionData(q);
     })
-  )
+  );
 
   private allUserFamilies$ = this.user$.pipe(
     switchMap(user => {
@@ -210,6 +212,15 @@ export class Families {
     if (!familyId) throw new Error("Family must be selected.");
     const familyRef = doc(this.firestore, `families/${familyId}`);
     await updateDoc(familyRef, { name: newName });
+  }
+
+  async setActiveFamily(familyId: string): Promise<void> {
+    const user = this.authService.currentUser();
+    if (!user) throw new Error("User must be logged in.");
+
+    // Optimistic update or wait? Firestore is fast.
+    const userRef = doc(this.firestore, `users/${user.uid}`);
+    await updateDoc(userRef, { activeFamilyId: familyId });
   }
 
 }

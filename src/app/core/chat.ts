@@ -1,122 +1,178 @@
 import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
-import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, where, doc, getDoc, setDoc, updateDoc, writeBatch, Timestamp, FieldValue } from '@angular/fire/firestore';
-import { Observable, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Firestore, collection, addDoc, query, where, orderBy, collectionData, doc, setDoc, updateDoc, Timestamp, FirestoreDataConverter, DocumentData, QueryDocumentSnapshot, SnapshotOptions, serverTimestamp } from '@angular/fire/firestore';
+import { Observable, of, combineLatest } from 'rxjs';
+import { switchMap, map, take } from 'rxjs/operators';
 import { AuthService } from './auth';
-import { toObservable } from '@angular/core/rxjs-interop';
 
-// Interfaces for our chat data
-export interface Chat {
+export interface ChatChannel {
   id: string;
-  members: string[];
-  type: 'direct' | 'group';
-  lastMessage?: { text: string; createdAt: Timestamp };
-  // Add other fields you might want for display, like names and photos of members
+  type: 'direct' | 'group' | 'family';
+  memberIds: string[];
+  familyId?: string;
+  name?: string; // For groups or family chats
+  photoURL?: string; // For groups
+  lastMessage?: {
+    text: string;
+    senderId: string;
+    sentAt: Timestamp;
+    senderName?: string;
+  };
+  updatedAt: Timestamp;
+  createdBy: string;
 }
-export interface Message {
-  id?: string;
+
+export interface ChatMessage {
+  id: string;
   text: string;
   senderId: string;
-  senderName: string;
-  senderPhotoURL?: string | null;
+  senderName?: string; // Denormalized for ease
   createdAt: Timestamp;
+  readBy?: string[];
 }
 
-@Injectable({
-  providedIn: 'root'
-})
-export class Chat {
-  private afs = inject(Firestore);
-  private authService = inject(AuthService);
+// --- Converters ---
+const channelConverter: FirestoreDataConverter<ChatChannel> = {
+  toFirestore: (data: ChatChannel): DocumentData => ({ ...data }),
+  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions): ChatChannel => {
+    const data = snapshot.data(options)!;
+    return { id: snapshot.id, ...data } as ChatChannel;
+  }
+};
 
+const messageConverter: FirestoreDataConverter<ChatMessage> = {
+  toFirestore: (data: ChatMessage): DocumentData => ({ ...data }),
+  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions): ChatMessage => {
+    const data = snapshot.data(options)!;
+    return { id: snapshot.id, ...data } as ChatMessage;
+  }
+};
+
+@Injectable({ providedIn: 'root' })
+export class ChatService {
+  private afs = inject(Firestore);
+  private auth = inject(AuthService);
   private injector = inject(Injector);
 
-  private currentUser$ = toObservable(this.authService.currentUser);
+  // --- Channels ---
 
-  /**
-   * Gets a real-time stream of all chat rooms the current user is a member of.
-   */
-  getUserChats(): Observable<Chat[]> {
-    return this.currentUser$.pipe(
+  // Get all channels for current user
+  getMyChannels(): Observable<ChatChannel[]> {
+    return this.auth.user$.pipe(
       switchMap(user => {
         if (!user) return of([]);
         return runInInjectionContext(this.injector, () => {
-          const chatsCollection = collection(this.afs, 'chats');
-          const q = query(chatsCollection, where('members', 'array-contains', user.uid));
-          return collectionData(q, { idField: 'id' }) as Observable<Chat[]>;
+          const channelsRef = collection(this.afs, 'channels').withConverter(channelConverter);
+          // Query channels where memberIds contains my UID
+          const q = query(
+            channelsRef,
+            where('memberIds', 'array-contains', user.uid),
+            orderBy('updatedAt', 'desc')
+          );
+          return collectionData(q);
         });
       })
     );
   }
 
-  /**
-   * Gets a real-time stream of messages for a specific chat room.
-   */
-  getChatMessages(chatId: string): Observable<Message[]> {
-    if (!chatId) return of([]);
-    return runInInjectionContext(this.injector, () => {
-      const messagesCollection = collection(this.afs, `chats/${chatId}/messages`);
-      const q = query(messagesCollection, orderBy('createdAt', 'asc'));
-      return collectionData(q, { idField: 'id' }) as Observable<Message[]>;
-    });
+  // Get messages for a channel
+  getMessages(channelId: string): Observable<ChatMessage[]> {
+    if (!channelId) return of([]);
+    const messagesRef = collection(this.afs, `channels/${channelId}/messages`).withConverter(messageConverter);
+    const q = query(messagesRef, orderBy('createdAt', 'asc'));
+    return collectionData(q);
   }
 
-  /**
-   * Sends a new message and atomically updates the `lastMessage` on the parent chat.
-   */
-  async sendMessage(chatId: string, text: string): Promise<void> {
-    const user = this.authService.currentUser();
-    if (!user || !text.trim()) return;
+  // --- Actions ---
 
-    const messagesCollection = collection(this.afs, `chats/${chatId}/messages`);
-    const chatDoc = doc(this.afs, `chats/${chatId}`);
-
-    // Cast to any for write operation involving serverTimestamp
-    const newMessage: any = {
-      text,
-      senderId: user.uid,
-      senderName: user.displayName || 'Unknown User',
-      senderPhotoURL: user.photoURL || null,
-      createdAt: serverTimestamp()
-    };
-
-    // Use a batch write to do both operations at once
-    const batch = writeBatch(this.afs);
-    const newMessageRef = doc(messagesCollection); // Create a new doc reference
-
-    batch.set(newMessageRef, newMessage);
-    batch.update(chatDoc, {
-      lastMessage: { text, createdAt: serverTimestamp() }
-    });
-
-    await batch.commit();
-  }
-
-  /**
-   * Creates a new 1-to-1 chat if one doesn't already exist between the two users.
-   * Returns the ID of the new or existing chat.
-   */
   async createDirectChat(otherUserId: string): Promise<string> {
-    const user = this.authService.currentUser();
-    if (!user) throw new Error("User not logged in.");
+    const currentUser = this.auth.currentUser();
+    if (!currentUser) throw new Error('Must be logged in');
 
-    // Create a canonical ID to prevent duplicate chat rooms.
-    // The ID is always "lowerUID_higherUID".
-    const chatId = user.uid < otherUserId
-      ? `${user.uid}_${otherUserId}`
-      : `${otherUserId}_${user.uid}`;
+    // Use sorted UIDs for canonical ID
+    const uids = [currentUser.uid, otherUserId].sort();
+    const channelId = `dm_${uids[0]}_${uids[1]}`;
 
-    const chatDoc = doc(this.afs, `chats/${chatId}`);
-    const chatSnap = await getDoc(chatDoc);
+    const docRef = doc(this.afs, `channels/${channelId}`).withConverter(channelConverter);
 
-    // If the chat doesn't exist, create it.
-    if (!chatSnap.exists()) {
-      await setDoc(chatDoc, {
-        members: [user.uid, otherUserId],
-        type: 'direct'
-      });
-    }
+    // We use setDoc with merge = true so if it exists we just update it (or do nothing if we change nothing)
+    // But we want to ensure memberIds are set.
 
-    return chatId;
+    await setDoc(docRef, {
+      id: channelId,
+      type: 'direct',
+      memberIds: uids,
+      updatedAt: serverTimestamp() as Timestamp,
+      createdBy: currentUser.uid
+    } as ChatChannel, { merge: true });
+
+    return channelId;
+  }
+
+  async createGroupChat(memberIds: string[], name: string): Promise<string> {
+    const currentUser = this.auth.currentUser();
+    if (!currentUser) throw new Error('Must be logged in');
+
+    const allMembers = [...new Set([...memberIds, currentUser.uid])];
+
+    // Create new doc with auto-ID
+    const colRef = collection(this.afs, 'channels');
+    const docRef = await addDoc(colRef, {
+      type: 'group',
+      memberIds: allMembers,
+      name,
+      updatedAt: serverTimestamp(),
+      createdBy: currentUser.uid
+    });
+
+    return docRef.id;
+  }
+
+  async createFamilyChannel(familyId: string, familyName: string, memberIds: string[]): Promise<string> {
+    const channelId = `family_${familyId}`;
+    const docRef = doc(this.afs, `channels/${channelId}`);
+
+    // Always ensure all members are in the list
+    await setDoc(docRef, {
+      id: channelId,
+      type: 'family',
+      familyId,
+      name: familyName,
+      memberIds: memberIds,
+      updatedAt: serverTimestamp(),
+      createdBy: 'system'
+    }, { merge: true });
+
+    return channelId;
+  }
+
+  async sendMessage(channelId: string, text: string): Promise<void> {
+    const currentUser = this.auth.currentUser();
+    const userProfile = this.auth.userProfile();
+    if (!currentUser) throw new Error('Must be logged in');
+
+    const messagesRef = collection(this.afs, `channels/${channelId}/messages`);
+    const channelRef = doc(this.afs, `channels/${channelId}`);
+
+    const now = serverTimestamp();
+
+    // 1. Add message
+    await addDoc(messagesRef, {
+      text,
+      senderId: currentUser.uid,
+      senderName: userProfile?.name || currentUser.displayName || 'User',
+      createdAt: now,
+      readBy: [currentUser.uid]
+    });
+
+    // 2. Update channel lastMessage
+    await updateDoc(channelRef, {
+      lastMessage: {
+        text,
+        senderId: currentUser.uid,
+        senderName: userProfile?.name || currentUser.displayName || 'User',
+        sentAt: now
+      },
+      updatedAt: now
+    });
   }
 }

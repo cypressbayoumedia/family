@@ -2,7 +2,8 @@ import { Component, input, output, inject, signal, computed } from '@angular/cor
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Calendar, CalendarEvent, EventItem, ChatMessage } from '../../core/calendar';
+import { Calendar, CalendarEvent } from '../../core/calendar';
+import { EventService, EventItem, ChatMessage } from '../../core/event-features';
 import { AuthService } from '../../core/auth';
 import { Families, FamilyMember } from '../../core/families';
 import { of, switchMap } from 'rxjs';
@@ -18,6 +19,7 @@ export class EventDetail {
   close = output<void>();
 
   private calendarService = inject(Calendar);
+  private eventService = inject(EventService);
   private authService = inject(AuthService);
   private familiesService = inject(Families);
 
@@ -32,12 +34,12 @@ export class EventDetail {
   private eventId = computed(() => this.event().id);
 
   private items$ = toObservable(this.eventId).pipe(
-    switchMap(id => id ? this.calendarService.getEventItems(id) : of([]))
+    switchMap(id => id ? this.eventService.getEventItems(id) : of([]))
   );
   items = toSignal(this.items$, { initialValue: [] as EventItem[] });
 
   private chatMessages$ = toObservable(this.eventId).pipe(
-    switchMap(id => id ? this.calendarService.getEventChat(id) : of([]))
+    switchMap(id => id ? this.eventService.getEventChat(id) : of([]))
   );
   chatMessages = toSignal(this.chatMessages$, { initialValue: [] as ChatMessage[] });
 
@@ -47,7 +49,7 @@ export class EventDetail {
     const eventId = this.eventId();
     const itemName = this.newItemName().trim();
     if (eventId && itemName) {
-      await this.calendarService.addEventItem(eventId, itemName);
+      await this.eventService.addEventItem(eventId, itemName);
       this.newItemName.set('');
     }
   }
@@ -56,7 +58,7 @@ export class EventDetail {
     const eventId = this.eventId();
     if (eventId && item.id) {
       if (confirm('Are you sure you want to delete this item?')) {
-        await this.calendarService.deleteEventItem(eventId, item.id);
+        await this.eventService.deleteEventItem(eventId, item.id);
       }
     }
   }
@@ -64,7 +66,7 @@ export class EventDetail {
   toggleClaim(item: EventItem, claim: boolean) {
     const eventId = this.eventId();
     if (eventId && item.id) {
-      this.calendarService.claimEventItem(eventId, item.id, claim);
+      this.eventService.claimEventItem(eventId, item.id, claim);
     }
   }
 
@@ -72,7 +74,7 @@ export class EventDetail {
     const eventId = this.eventId();
     const text = this.chatInput().trim();
     if (eventId && text) {
-      await this.calendarService.postMessage(eventId, text);
+      await this.eventService.postMessage(eventId, text);
       this.chatInput.set('');
     }
   }

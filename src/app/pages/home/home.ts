@@ -8,12 +8,14 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 // Core Services
 import { AuthService } from '../../core/auth';
 import { Families } from '../../core/families';
 import { Calendar } from '../../core/calendar';
 import { CapsulesService } from '../../core/capsules';
+import { UiService } from '../../core/ui';
 
 // UI Components
 import { PostList } from '../../posts/post-list/post-list';
@@ -21,6 +23,7 @@ import { Landing } from '../landing/landing';
 import { CapsuleList } from '../../components/capsule-list/capsule-list';
 import { CapsuleCreate } from '../../components/capsule-create/capsule-create';
 import { NotificationBell } from '../../components/notification-bell/notification-bell';
+import { NotificationDrawer } from '../../components/notification-drawer/notification-drawer';
 
 @Component({
   selector: 'app-home',
@@ -33,12 +36,14 @@ import { NotificationBell } from '../../components/notification-bell/notificatio
     MatIconModule,
     MatBadgeModule,
     MatButtonModule,
+    MatSidenavModule,
     // Components
     PostList,
     Landing,
     CapsuleList,
     CapsuleCreate,
-    NotificationBell
+    NotificationBell,
+    NotificationDrawer
   ],
   providers: [AuthService, Families],
   templateUrl: './home.html',
@@ -47,6 +52,7 @@ import { NotificationBell } from '../../components/notification-bell/notificatio
 export class Home {
   public authService = inject(AuthService);
   public familiesService = inject(Families);
+  public uiService = inject(UiService);
   private calendarService = inject(Calendar);
   private capsulesService = inject(CapsulesService);
 

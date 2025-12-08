@@ -17,14 +17,14 @@ const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
 // A pipe function for redirecting logged-in users to the dashboard.
 const redirectLoggedInToDashboard = () => redirectLoggedInTo(['']);
 export const routes: Routes = [
-  { 
-    path: 'login', 
+  {
+    path: 'login',
     component: Login,
     canActivate: [AuthGuard], // Use the built-in AuthGuard
     data: { authGuardPipe: redirectLoggedInToDashboard } // Apply the redirect logic
   },
-  { 
-    path: 'signup', 
+  {
+    path: 'signup',
     component: Signup,
     canActivate: [AuthGuard], // Use the built-in AuthGuard
     data: { authGuardPipe: redirectLoggedInToDashboard } // Apply the redirect logic
@@ -38,19 +38,19 @@ export const routes: Routes = [
     loadComponent: () => import('./posts/post-create/post-create').then(m => m.PostCreate),
     canActivate: [AuthGuard], // Use the built-in AuthGuard
     data: { authGuardPipe: redirectUnauthorizedToLogin }
-  },{ 
+  }, {
     path: 'welcome',
     // Use `loadComponent` with a dynamic import
     loadComponent: () => import('./entry/welcome/welcome').then(m => m.Welcome),
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }
-  },{ 
+  }, {
     path: 'invite-members',
     // Use `loadComponent` with a dynamic import
     loadComponent: () => import('./components/invite-members/invite-members').then(m => m.InviteMembers),
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }
-  },{
+  }, {
     path: 'post/:postId', // The ':postId' is a dynamic parameter
     loadComponent: () => import('./posts/post-details/post-details').then(m => m.PostDetails),
     canActivate: [AuthGuard], // Protect this route
@@ -77,6 +77,12 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }
   },
+  {
+    path: 'chat',
+    loadComponent: () => import('./pages/chat/chat-page').then(m => m.ChatPage),
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },
 
   {
     path: 'profile',
@@ -89,7 +95,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/capsule-details/capsule-details').then(m => m.CapsuleDetails),
     canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin }
-  },{
+  }, {
     path: 'pricing',
     loadComponent: () => import('./pages/pricing/pricing').then(m => m.Pricing),
     canActivate: [AuthGuard],

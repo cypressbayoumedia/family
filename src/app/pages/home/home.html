@@ -6,166 +6,180 @@
 <p class="loading-indicator">Loading your Family Circle...</p>
 } @else {
 @if (authService.currentUser()) {
-<div class="dashboard-layout">
+<mat-sidenav-container class="dashboard-sidenav-container" fullscreen>
+  <mat-sidenav position="end" mode="over" [opened]="uiService.showNotificationDrawer()"
+    (closedStart)="uiService.closeNotificationDrawer()" style="width: 380px; max-width: 90vw;">
+    <app-notification-drawer></app-notification-drawer>
+  </mat-sidenav>
 
-  <!-- =============================================================== -->
-  <!-- LEFT SIDEBAR (Desktop Only)                                     -->
-  <!-- =============================================================== -->
-  <aside class="dashboard-sidebar">
-    <div class="sidebar-top">
-      <div class="sidebar-header">
-        <h1 class="logo"><img src="/the_familee_logo.svg" />The Familee.</h1>
-      </div>
-      <a routerLink="/create-post" class="button button-primary create-post-desktop">
-        <span class="material-symbols-rounded">add</span>
-        Create Post
-      </a>
-    </div>
-
-    <!-- Quick Navigation to fill whitespace -->
-    <nav class="sidebar-nav">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
-        <span class="material-symbols-rounded">home</span>
-        <span class="nav-label">Home</span>
-      </a>
-      <a routerLink="/calendar" routerLinkActive="active" class="nav-item">
-        <span class="material-symbols-rounded">calendar_month</span>
-        <span class="nav-label">Calendar</span>
-        @if (upcomingEventsCount() > 0) {
-        <span class="nav-badge">{{ upcomingEventsCount() }}</span>
-        }
-      </a>
-
-      <!-- Notifications Item -->
-      <app-notification-bell [showLabel]="true"></app-notification-bell>
-
-      <a routerLink="/invite-members" routerLinkActive="active" class="nav-item">
-        <span class="material-symbols-rounded">group_add</span>
-        <span class="nav-label">Members</span>
-      </a>
-      <a routerLink="/profile" routerLinkActive="active" class="nav-item">
-        <span class="material-symbols-rounded">account_circle</span>
-        <span class="nav-label">Profile</span>
-      </a>
-      <a routerLink="/manage-circles" routerLinkActive="active" class="nav-item">
-        <span class="material-symbols-rounded">settings</span>
-        <span class="nav-label">Settings</span>
-      </a>
-    </nav>
-
-    <div class="sidebar-actions">
-      <!-- Desktop User Menu Trigger -->
-      <div class="user-menu">
-        <button class="user-menu-button" [matMenuTriggerFor]="userMenu" aria-label="Open user menu"
-          [matMenuTriggerData]="{name: familiesService.activeFamily()?.name}">
-          <img
-            [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName"
-            class="user-avatar-icon" alt="User menu">
-          <div class="user-info-desktop">
-            <span class="user-name">{{ authService.currentUser()?.displayName }}</span>
+  <mat-sidenav-content>
+    <div class="dashboard-layout">
+      <!-- ... existing content ... -->
+      <!-- =============================================================== -->
+      <!-- LEFT SIDEBAR (Desktop Only)                                     -->
+      <!-- =============================================================== -->
+      <aside class="dashboard-sidebar">
+        <div class="sidebar-top">
+          <div class="sidebar-header">
+            <h1 class="logo"><img src="/the_familee_logo.svg" />The Familee.</h1>
           </div>
-          <span class="material-symbols-rounded more-icon-desktop">more_horiz</span>
+          <a routerLink="/create-post" class="button button-primary create-post-desktop">
+            <span class="material-symbols-rounded">add</span>
+            Create Post
+          </a>
+        </div>
+
+        <!-- Quick Navigation to fill whitespace -->
+        <nav class="sidebar-nav">
+          <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+            <span class="material-symbols-rounded">home</span>
+            <span class="nav-label">Home</span>
+          </a>
+          <a routerLink="/calendar" routerLinkActive="active" class="nav-item">
+            <span class="material-symbols-rounded">calendar_month</span>
+            <span class="nav-label">Calendar</span>
+            @if (upcomingEventsCount() > 0) {
+            <span class="nav-badge">{{ upcomingEventsCount() }}</span>
+            }
+          </a>
+
+          <!-- Notifications Item -->
+          <app-notification-bell [showLabel]="true"></app-notification-bell>
+
+          <a routerLink="/chat" routerLinkActive="active" class="nav-item">
+            <span class="material-symbols-rounded">chat</span>
+            <span class="nav-label">Chat</span>
+          </a>
+
+          <a routerLink="/invite-members" routerLinkActive="active" class="nav-item">
+            <span class="material-symbols-rounded">group_add</span>
+            <span class="nav-label">Members</span>
+          </a>
+          <a routerLink="/profile" routerLinkActive="active" class="nav-item">
+            <span class="material-symbols-rounded">account_circle</span>
+            <span class="nav-label">Profile</span>
+          </a>
+          <a routerLink="/manage-circles" routerLinkActive="active" class="nav-item">
+            <span class="material-symbols-rounded">settings</span>
+            <span class="nav-label">Settings</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-actions">
+          <!-- Desktop User Menu Trigger -->
+          <div class="user-menu">
+            <button class="user-menu-button" [matMenuTriggerFor]="userMenu" aria-label="Open user menu"
+              [matMenuTriggerData]="{name: familiesService.activeFamily()?.name}">
+              <img
+                [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName"
+                class="user-avatar-icon" alt="User menu">
+              <div class="user-info-desktop">
+                <span class="user-name">{{ authService.currentUser()?.displayName }}</span>
+              </div>
+              <span class="material-symbols-rounded more-icon-desktop">more_horiz</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- =============================================================== -->
+      <!-- CENTER COLUMN (Main Feed)                                       -->
+      <!-- =============================================================== -->
+      <main class="dashboard-main">
+        <header class="feed-header">
+          <h3>{{ familiesService.activeFamily()?.name }}</h3>
+          <!-- Mobile User Menu Trigger -->
+          <div class="mobile-user-menu">
+            <app-notification-bell></app-notification-bell>
+            <button class="user-menu-button" routerLink="/calendar">
+              <span class="material-symbols-rounded" [matBadge]="upcomingEventsCount() || 0"
+                [matBadgeHidden]="upcomingEventsCount() === 0" matBadgeColor="warn"
+                aria-label="Upcoming events">calendar_month</span>
+            </button>
+            <button class="user-menu-button" [matMenuTriggerFor]="userMenu" aria-label="Open user menu"
+              [matMenuTriggerData]="{name:  familiesService.activeFamily()?.name }">
+              <img
+                [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName"
+                class="user-avatar-icon" alt="User menu">
+            </button>
+          </div>
+        </header>
+
+        <!-- Story Capsules Strip -->
+        <app-capsule-list [capsules]="capsules()" (create)="showCreateCapsuleModal.set(true)">
+        </app-capsule-list>
+
+        <app-post-list />
+      </main>
+
+      <!-- =============================================================== -->
+      <!-- GLOBAL & MOBILE-ONLY ELEMENTS                                   -->
+      <!-- =============================================================== -->
+      <a routerLink="/create-post" class="mobile-fab">
+        <span class="material-symbols-rounded">add</span>
+      </a>
+
+      <!-- SINGLE MENU DEFINITION -->
+      <mat-menu #userMenu="matMenu" xPosition="before">
+        <ng-template matMenuContent let-name="name">
+          @if (familiesService.allUserFamilies().length > 1) {
+          <button mat-menu-item [matMenuTriggerFor]="familySwitcherMenu">
+            <mat-icon class="material-symbols-rounded">swap_horiz</mat-icon>
+            <span>Switch Family</span>
+            <br>
+            <span class="small-text">{{name}}</span>
+          </button>
+          <hr class="dropdown-divider">
+          }
+          <button mat-menu-item routerLink="/invite-members">
+            <mat-icon class="material-symbols-rounded">group_add</mat-icon>
+            <span>Invite Members</span>
+          </button>
+          <a mat-menu-item routerLink="/profile">
+            <mat-icon class="material-symbols-rounded">account_circle</mat-icon>
+            <span>My Profile</span>
+          </a>
+          <a mat-menu-item routerLink="/manage-circles">
+            <mat-icon class="material-symbols-rounded">settings</mat-icon>
+            <span>Manage Circles</span>
+          </a>
+          <a mat-menu-item routerLink="/calendar">
+            <mat-icon class="material-symbols-rounded" [matBadge]="upcomingEventsCount() || 0">calendar_month</mat-icon>
+            <span>Family Calendar</span>
+          </a>
+          <button mat-menu-item (click)="authService.signOut()">
+            <mat-icon class="material-symbols-rounded">logout</mat-icon>
+            <span>Sign Out</span>
+          </button>
+        </ng-template>
+      </mat-menu>
+
+      <!-- Family Switcher Submenu -->
+      <mat-menu #familySwitcherMenu="matMenu">
+        @for (family of familiesService.allUserFamilies(); track family.id) {
+        <button mat-menu-item (click)="switchFamily(family.id)">
+          @if (family.id === familiesService.activeFamily()?.id) {
+          <mat-icon class="material-symbols-rounded">check</mat-icon>
+          } @else {
+          <span class="mat-icon-spacer"></span>
+          }
+          <span>{{ family.name }}</span>
         </button>
+        }
+      </mat-menu>
+
+      <!-- Create Capsule Modal -->
+      @if (showCreateCapsuleModal()) {
+      <div class="modal-overlay" (click)="showCreateCapsuleModal.set(false)">
+        <div (click)="$event.stopPropagation()">
+          <app-capsule-create (close)="showCreateCapsuleModal.set(false)"></app-capsule-create>
+        </div>
       </div>
-    </div>
-  </aside>
-
-  <!-- =============================================================== -->
-  <!-- CENTER COLUMN (Main Feed)                                       -->
-  <!-- =============================================================== -->
-  <main class="dashboard-main">
-    <header class="feed-header">
-      <h3>{{ familiesService.activeFamily()?.name }}</h3>
-      <!-- Mobile User Menu Trigger -->
-      <div class="mobile-user-menu">
-        <app-notification-bell></app-notification-bell>
-        <button class="user-menu-button" routerLink="/calendar">
-          <span class="material-symbols-rounded" [matBadge]="upcomingEventsCount() || 0"
-            [matBadgeHidden]="upcomingEventsCount() === 0" matBadgeColor="warn"
-            aria-label="Upcoming events">calendar_month</span>
-        </button>
-        <button class="user-menu-button" [matMenuTriggerFor]="userMenu" aria-label="Open user menu"
-          [matMenuTriggerData]="{name:  familiesService.activeFamily()?.name }">
-          <img
-            [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName"
-            class="user-avatar-icon" alt="User menu">
-        </button>
-      </div>
-    </header>
-
-    <!-- Story Capsules Strip -->
-    <app-capsule-list [capsules]="capsules()" (create)="showCreateCapsuleModal.set(true)">
-    </app-capsule-list>
-
-    <app-post-list />
-  </main>
-
-  <!-- =============================================================== -->
-  <!-- GLOBAL & MOBILE-ONLY ELEMENTS                                   -->
-  <!-- =============================================================== -->
-  <a routerLink="/create-post" class="mobile-fab">
-    <span class="material-symbols-rounded">add</span>
-  </a>
-
-  <!-- SINGLE MENU DEFINITION -->
-  <mat-menu #userMenu="matMenu" xPosition="before">
-    <ng-template matMenuContent let-name="name">
-      @if (familiesService.allUserFamilies().length > 1) {
-      <button mat-menu-item [matMenuTriggerFor]="familySwitcherMenu">
-        <mat-icon class="material-symbols-rounded">swap_horiz</mat-icon>
-        <span>Switch Family</span>
-        <br>
-        <span class="small-text">{{name}}</span>
-      </button>
-      <hr class="dropdown-divider">
       }
-      <button mat-menu-item routerLink="/invite-members">
-        <mat-icon class="material-symbols-rounded">group_add</mat-icon>
-        <span>Invite Members</span>
-      </button>
-      <a mat-menu-item routerLink="/profile">
-        <mat-icon class="material-symbols-rounded">account_circle</mat-icon>
-        <span>My Profile</span>
-      </a>
-      <a mat-menu-item routerLink="/manage-circles">
-        <mat-icon class="material-symbols-rounded">settings</mat-icon>
-        <span>Manage Circles</span>
-      </a>
-      <a mat-menu-item routerLink="/calendar">
-        <mat-icon class="material-symbols-rounded" [matBadge]="upcomingEventsCount() || 0">calendar_month</mat-icon>
-        <span>Family Calendar</span>
-      </a>
-      <button mat-menu-item (click)="authService.signOut()">
-        <mat-icon class="material-symbols-rounded">logout</mat-icon>
-        <span>Sign Out</span>
-      </button>
-    </ng-template>
-  </mat-menu>
 
-  <!-- Family Switcher Submenu -->
-  <mat-menu #familySwitcherMenu="matMenu">
-    @for (family of familiesService.allUserFamilies(); track family.id) {
-    <button mat-menu-item (click)="switchFamily(family.id)">
-      @if (family.id === familiesService.activeFamily()?.id) {
-      <mat-icon class="material-symbols-rounded">check</mat-icon>
-      } @else {
-      <span class="mat-icon-spacer"></span>
-      }
-      <span>{{ family.name }}</span>
-    </button>
-    }
-  </mat-menu>
-
-  <!-- Create Capsule Modal -->
-  @if (showCreateCapsuleModal()) {
-  <div class="modal-overlay" (click)="showCreateCapsuleModal.set(false)">
-    <div (click)="$event.stopPropagation()">
-      <app-capsule-create (close)="showCreateCapsuleModal.set(false)"></app-capsule-create>
     </div>
-  </div>
-  }
-
-</div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
 } @else {
 <!-- Unauthenticated View -->
 <app-landing />

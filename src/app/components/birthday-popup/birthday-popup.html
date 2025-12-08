@@ -1,0 +1,17 @@
+<dialog #dialog class="birthday-dialog">
+    <div class="dialog-content">
+        <h2>🎉 When is your birthday?</h2>
+        <p>Let your circle know when to celebrate you! We'll add it to the family calendar.</p>
+
+        <div class="input-group">
+            <input type="date" [ngModel]="birthday()" (ngModelChange)="birthday.set($event)" required>
+        </div>
+
+        <div class="actions">
+            <button class="primary-btn" (click)="saveBirthday()" [disabled]="!birthday() || isSaving()">
+                {{ isSaving() ? 'Saving...' : 'Save Birthday' }}
+            </button>
+            <button class="text-btn" (click)="close()">Maybe later</button>
+        </div>
+    </div>
+</dialog>

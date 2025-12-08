@@ -18,10 +18,25 @@ import {
   Firestore,
   setDoc,
   updateDoc,
+  docData,
 } from '@angular/fire/firestore';
 import { getFunctions, httpsCallable } from '@angular/fire/functions';
 import { getStorage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 import { deleteUser } from '@angular/fire/auth';
+import { of, Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+
+export interface UserProfile {
+  uid: string;
+  email: string | null;
+  name: string | null;
+  photoURL?: string;
+  birthday?: string;
+  birthdayMonthDay?: string;
+  activeFamilyId?: string;
+  familyMemberships?: { familyId: string; role: string }[];
+  createdAt?: any; // or Timestamp
+}
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +50,14 @@ export class AuthService {
   public readonly user$ = authState(this.auth);
   public readonly currentUser = toSignal(this.user$, { initialValue: null });
   public readonly loading = signal<boolean>(false);
+
+  private readonly userProfile$ = this.user$.pipe(
+    switchMap(user => {
+      if (!user) return of(null);
+      return docData(doc(this.firestore, `users/${user.uid}`)) as Observable<UserProfile>;
+    })
+  );
+  public readonly userProfile = toSignal(this.userProfile$, { initialValue: null });
 
 
   constructor() {
@@ -50,7 +73,7 @@ export class AuthService {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
 
       await this.createUserProfile(userCredential.user, { name });
-       if(inviteId){
+      if (inviteId) {
         await this.switchActiveFamily(inviteId)
         await this.joinFamily(inviteId)
       }
@@ -109,7 +132,7 @@ export class AuthService {
     try {
       const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
 
-      if(inviteId){
+      if (inviteId) {
         await this.joinFamily(inviteId)
         await this.switchActiveFamily(inviteId)
       }
@@ -120,7 +143,7 @@ export class AuthService {
       console.error("Error during email sign in:", error);
       throw error;
     } finally {
-        this.loading.set(false);
+      this.loading.set(false);
     }
   }
 
@@ -140,7 +163,7 @@ export class AuthService {
         // This is a new user signing up with Google
         await this.createUserProfile(userCredential.user);
         // ADDED: Navigate the new user to the welcome page.
-        if(inviteId){
+        if (inviteId) {
           await this.joinFamily(inviteId)
           await this.switchActiveFamily(inviteId)
         }
@@ -148,7 +171,7 @@ export class AuthService {
       } else {
         // This is an existing user logging in with Google
         // ADDED: Navigate the existing user to the dashboard.
-        if(inviteId){
+        if (inviteId) {
           await this.joinFamily(inviteId)
           await this.switchActiveFamily(inviteId)
         }
@@ -250,9 +273,25 @@ export class AuthService {
       console.error("Error deleting account:", error);
       throw new Error("Account deletion failed. Please sign out and sign in again before retrying.");
     } finally {
-        this.loading.set(false);
+      this.loading.set(false);
     }
   }
 
   // ngOnDestroy is no longer needed because toSignal handles the subscription.
+
+  async updateBirthday(date: string): Promise<void> {
+    const user = this.currentUser();
+    if (!user) throw new Error("User must be logged in to update birthday.");
+
+    const birthdayDate = new Date(date);
+    const month = (birthdayDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = birthdayDate.getDate().toString().padStart(2, '0');
+    const birthdayMonthDay = `${month}-${day}`;
+
+    const userDocRef = doc(this.firestore, `users/${user.uid}`);
+    await updateDoc(userDocRef, {
+      birthday: date, // YYYY-MM-DD
+      birthdayMonthDay: birthdayMonthDay // MM-DD for easier querying
+    });
+  }
 }

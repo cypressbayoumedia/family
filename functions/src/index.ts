@@ -15,4 +15,5 @@ export * from './exchange_code';
 export * from './notifications';
 export * from './create_family';
 export * from './calendar_feed';
+export * from './birthday_notifications';
 // End of exports
