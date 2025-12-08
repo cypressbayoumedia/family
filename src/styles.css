@@ -306,6 +306,23 @@ a:hover {
   border-color: var(--text-color);
 }
 
+/* Vintage Bottom Sheet */
+.vintage-bottom-sheet {
+  background-color: var(--bg-color) !important;
+  /* FDFBF7 */
+  border-radius: 24px 24px 0 0 !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.vintage-bottom-sheet .mat-bottom-sheet-container {
+  background-color: transparent !important;
+  /* Allow parent bg to show */
+  box-shadow: none !important;
+  border-radius: 24px 24px 0 0 !important;
+  padding: 0 !important;
+  /* Reset padding if needed */
+}
+
 /* Modal styles */
 .modal-overlay {
   position: fixed;

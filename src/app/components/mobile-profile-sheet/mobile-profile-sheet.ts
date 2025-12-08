@@ -9,11 +9,11 @@ import { AuthService } from '../../core/auth';
 import { Families } from '../../core/families';
 
 @Component({
-    selector: 'app-mobile-profile-sheet',
-    standalone: true,
-    imports: [CommonModule, RouterModule, MatListModule, MatIconModule, MatButtonModule],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `
+  selector: 'app-mobile-profile-sheet',
+  standalone: true,
+  imports: [CommonModule, RouterModule, MatListModule, MatIconModule, MatButtonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <div class="sheet-header">
       <img [src]="authService.currentUser()?.photoURL || 'https://api.dicebear.com/9.x/glass/svg?seed=' + authService.currentUser()?.displayName" 
            class="sheet-avatar" alt="User avatar">
@@ -42,6 +42,10 @@ import { Families } from '../../core/families';
     <hr class="divider">
 
     <mat-nav-list>
+      <a mat-list-item routerLink="/chat" (click)="close()">
+        <mat-icon matListItemIcon class="material-symbols-rounded">chat</mat-icon>
+        <span matListItemTitle>Chat</span>
+      </a>
       <a mat-list-item routerLink="/invite-members" (click)="close()">
         <mat-icon matListItemIcon class="material-symbols-rounded">group_add</mat-icon>
         <span matListItemTitle>Invite Members</span>
@@ -67,7 +71,7 @@ import { Families } from '../../core/families';
       </button>
     </div>
   `,
-    styles: [`
+  styles: [`
     :host {
       display: block;
       padding-bottom: 24px;
@@ -161,21 +165,21 @@ import { Families } from '../../core/families';
   `]
 })
 export class MobileProfileSheet {
-    authService = inject(AuthService);
-    familiesService = inject(Families);
-    bottomSheetRef = inject(MatBottomSheetRef);
+  authService = inject(AuthService);
+  familiesService = inject(Families);
+  bottomSheetRef = inject(MatBottomSheetRef);
 
-    switchFamily(id: string) {
-        this.authService.switchActiveFamily(id);
-        this.bottomSheetRef.dismiss();
-    }
+  switchFamily(id: string) {
+    this.authService.switchActiveFamily(id);
+    this.bottomSheetRef.dismiss();
+  }
 
-    close() {
-        this.bottomSheetRef.dismiss();
-    }
+  close() {
+    this.bottomSheetRef.dismiss();
+  }
 
-    signOut() {
-        this.authService.signOut();
-        this.bottomSheetRef.dismiss();
-    }
+  signOut() {
+    this.authService.signOut();
+    this.bottomSheetRef.dismiss();
+  }
 }

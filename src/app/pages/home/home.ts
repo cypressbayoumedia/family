@@ -90,6 +90,8 @@ export class Home {
   }
 
   openMobileProfile() {
-    this.bottomSheet.open(MobileProfileSheet);
+    this.bottomSheet.open(MobileProfileSheet, {
+      panelClass: 'vintage-bottom-sheet'
+    });
   }
 }

@@ -60,6 +60,11 @@ export class AuthService {
   public readonly userProfile = toSignal(this.userProfile$, { initialValue: null });
 
 
+  getUserProfile(uid: string): Observable<UserProfile | undefined> {
+    return docData(doc(this.firestore, `users/${uid}`)) as Observable<UserProfile | undefined>;
+  }
+
+
   constructor() {
     // No subscription needed anymore, toSignal handles it.
   }

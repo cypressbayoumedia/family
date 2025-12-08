@@ -1,10 +1,10 @@
-import { Component, inject, output, signal, computed } from '@angular/core';
+import { Component, inject, output, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ChatService, ChatChannel } from '../../../core/chat';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { AuthService } from '../../../core/auth';
+import { AuthService, UserProfile } from '../../../core/auth';
 import { Families } from '../../../core/families';
 import { NewChatModalComponent } from '../new-chat-modal/new-chat-modal';
 
@@ -250,6 +250,45 @@ export class ChannelListComponent {
   showNewChat = signal(false);
   searchQuery = signal('');
 
+  // Local cache for users not in active family
+  resolvedUsers = signal<Record<string, UserProfile>>({});
+
+  constructor() {
+    effect(() => {
+      const channels = this.channels();
+      const myId = this.currentUser()?.uid;
+      const activeMembers = this.familiesService.activeFamilyMembers();
+
+      // Identify member IDs that are NOT in the active family and NOT yet resolved
+      const missingIds = new Set<string>();
+
+      channels.forEach(ch => {
+        if (ch.type === 'direct') {
+          const otherId = ch.memberIds.find(id => id !== myId);
+          if (otherId) {
+            const inFamily = activeMembers.some(m => m.uid === otherId);
+            const alreadyResolved = this.resolvedUsers()[otherId];
+            if (!inFamily && !alreadyResolved) {
+              missingIds.add(otherId);
+            }
+          }
+        }
+      });
+
+      // Fetch profiles for missing IDs
+      missingIds.forEach(uid => {
+        this.authService.getUserProfile(uid).subscribe(profile => {
+          if (profile) {
+            this.resolvedUsers.update(current => ({
+              ...current,
+              [uid]: profile
+            }));
+          }
+        });
+      });
+    });
+  }
+
   filteredChannels = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     const all = this.channels();
@@ -267,8 +306,18 @@ export class ChannelListComponent {
     if (channel.type === 'direct') {
       const myId = this.currentUser()?.uid;
       const otherId = channel.memberIds.find(id => id !== myId);
+
+      if (!otherId) return 'Unknown User';
+
+      // 1. Check Active Family
       const member = this.familiesService.activeFamilyMembers().find(m => m.uid === otherId);
-      return member ? member.name : 'Unknown User';
+      if (member) return member.name;
+
+      // 2. Check Resolved Users (friends/other families)
+      const resolved = this.resolvedUsers()[otherId];
+      if (resolved && resolved.name) return resolved.name;
+
+      return 'Unknown User';
     }
     return channel.name || 'Group Chat';
   }
