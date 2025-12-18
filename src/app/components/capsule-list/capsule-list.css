@@ -150,6 +150,24 @@
   font-weight: bold;
 }
 
+.status-badge.count-down {
+  width: auto;
+  min-width: 24px;
+  border-radius: 12px;
+  padding: 0 6px;
+  gap: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.status-badge.count-down .material-symbols-rounded {
+  font-size: 12px;
+}
+
+
 /* --- Text Styling --- */
 .capsule-title {
   font-size: 0.8rem;

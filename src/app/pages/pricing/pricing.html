@@ -21,7 +21,9 @@
         </div>
         <span class="billing-label" [class.active]="billingCycle() === 'year'"
           (click)="billingCycle.set('year')">Yearly</span>
-        <span class="save-badge" *ngIf="billingCycle() === 'year'">SAVE 17%</span>
+        @if (billingCycle() === 'year') {
+        <span class="save-badge">SAVE 17%</span>
+        }
       </div>
 
       <!-- Price -->
@@ -51,8 +53,11 @@
 
       <!-- CTA Button -->
       <button class="premium-button" (click)="upgrade()" [disabled]="isLoading()">
-        <span *ngIf="!isLoading()">Upgrade to Plus</span>
-        <span *ngIf="isLoading()" class="loader"></span>
+        @if (isLoading()) {
+        <span class="loader"></span>
+        } @else {
+        <span>Upgrade to Plus</span>
+        }
       </button>
 
       <p class="secure-text">

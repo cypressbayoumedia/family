@@ -14,14 +14,14 @@
       <img [src]="capsule.coverImageUrl || '/assets/placeholder-capsule.png'" alt="">
 
       <!-- Status Badge inside cover -->
-      @if (capsule.expiresAt && capsule.expiresAt.toMillis() < Date.now()) { <div class="status-badge locked">
+      @if (capsule.expiresAt && capsule.expiresAt.toMillis() < now()) { <div class="status-badge locked">
         <span class="material-symbols-rounded">lock</span>
     </div>
-    } @else {
-    <!-- Optional: Active indicator or just clean image -->
-    <!-- <div class="status-badge active">
-          <span class="material-symbols-rounded">hourglass_top</span>
-        </div> -->
+    } @else if (getCountdown(capsule); as timeLeft) {
+    <div class="status-badge active count-down">
+      <span class="material-symbols-rounded">timer</span>
+      <span>{{ timeLeft }}</span>
+    </div>
     }
 </div>
 <span class="capsule-title">{{ capsule.title }}</span>

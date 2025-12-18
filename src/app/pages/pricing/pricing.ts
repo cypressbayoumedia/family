@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 
 import { StripeService } from '../../core/stripe'; // Adjust path as needed
 
 @Component({
   selector: 'app-pricing',
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: './pricing.html',
   styleUrls: ['./pricing.css']
 })
@@ -29,11 +29,11 @@ export class Pricing {
   async upgrade(): Promise<void> {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    
-    const priceId = this.billingCycle() === 'month' 
-      ? this.monthlyPriceId 
+
+    const priceId = this.billingCycle() === 'month'
+      ? this.monthlyPriceId
       : this.yearlyPriceId;
-      
+
     try {
       await this.stripeService.redirectToCheckout(priceId);
     } catch (error: any) {
