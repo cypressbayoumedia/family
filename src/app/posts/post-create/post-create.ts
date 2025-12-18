@@ -1,13 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AudioWaveform } from '../../components/audio-waveform/audio-waveform';
 // Import the NEW, family-aware PostsService
 import { Posts } from '../../core/posts'; // Adjust path if needed
 import { RecordAudio } from '../../components/record-audio/record-audio';
 import { AuthService } from '../../core/auth';
 import { DoodleCreate } from '../../components/doodle-create/doodle-create';
+import { ShareHandlerService } from '../../core/share-handler.service';
 
 @Component({
   selector: 'app-post-create',
@@ -16,11 +17,13 @@ import { DoodleCreate } from '../../components/doodle-create/doodle-create';
   styleUrl: './post-create.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PostCreate implements OnDestroy {
+export class PostCreate implements OnInit, OnDestroy {
   // Inject the new PostsService
   private postsService = inject(Posts);
   private authService = inject(AuthService); // <-- Inject AuthService
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private shareHandler = inject(ShareHandlerService);
 
   // --- All your existing signals for content and media are perfect ---
   content = signal('');
@@ -34,6 +37,30 @@ export class PostCreate implements OnDestroy {
   showDoodleCanvas = signal(false);
   // Expose the currentUser signal directly for the template
   currentUser = this.authService.currentUser;
+
+  async ngOnInit(): Promise<void> {
+    // Check if opened via Share Target
+    const params = this.route.snapshot.queryParams;
+    if (params['shared'] === 'true') {
+      await this.handleSharedContent();
+    }
+  }
+
+  private async handleSharedContent(): Promise<void> {
+    const file = await this.shareHandler.checkForSharedFile();
+    if (file) {
+      this.imageFile.set(file);
+      this.imagePreviewUrl.set(URL.createObjectURL(file));
+    }
+
+    // Also check for text/title
+    const metadata = await this.shareHandler.checkForSharedMetadata();
+    if (metadata) {
+      if (metadata.text) this.content.set(metadata.text);
+      if (metadata.title && !metadata.text) this.content.set(metadata.title);
+    }
+  }
+
   /**
    * The new, robust addPost method that relies on the service to handle author info.
    */

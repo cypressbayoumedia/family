@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 
 import { CapsulesService } from '../../core/capsules';
+import { WakeLockService } from '../../core/wake-lock.service';
 
 @Component({
   selector: 'app-capsule-details',
@@ -27,10 +28,11 @@ import { CapsulesService } from '../../core/capsules';
   templateUrl: './capsule-details.html',
   styleUrl: './capsule-details.css'
 })
-export class CapsuleDetails {
+export class CapsuleDetails implements OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private capsulesService = inject(CapsulesService);
+  private wakeLock = inject(WakeLockService);
 
   showGuide = signal(false);
 
@@ -102,6 +104,13 @@ export class CapsuleDetails {
     setInterval(() => {
       this.now.set(Date.now());
     }, 60000);
+
+    // Request Wake Lock
+    this.wakeLock.requestLock();
+  }
+
+  ngOnDestroy(): void {
+    this.wakeLock.releaseLock();
   }
 
   showRecordAudio = signal(false);

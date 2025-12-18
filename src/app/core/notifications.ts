@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, inject, signal, computed, Injector, runInInjectionContext, effect } from '@angular/core';
 import { Firestore, collection, query, orderBy, limit, collectionData, doc, updateDoc, deleteDoc, Timestamp, FieldValue } from '@angular/fire/firestore';
 import { AuthService } from './auth';
 import { switchMap, of } from 'rxjs';
@@ -22,6 +22,23 @@ export class NotificationService {
     private auth = inject(AuthService);
 
     private injector = inject(Injector);
+
+    constructor() {
+        effect(() => {
+            const count = this.unreadCount();
+            if ('setAppBadge' in navigator) {
+                try {
+                    if (count > 0) {
+                        navigator.setAppBadge(count);
+                    } else {
+                        navigator.clearAppBadge();
+                    }
+                } catch (e) {
+                    console.error('Failed to set app badge', e);
+                }
+            }
+        });
+    }
 
     // Stream of notifications for the current user
     private notifications$ = toSignal(this.auth.user$.pipe(
