@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 
 import { AuthService } from './core/auth';
 import { Families } from './core/families';
+import { MessagingService } from './core/messaging';
 import { BirthdayPopupComponent } from './components/birthday-popup/birthday-popup';
 
 @Component({
@@ -21,6 +22,7 @@ export class AppRoot {
   private auth = inject(AuthService);
   private families = inject(Families);
   private router = inject(Router);
+  private messagingService = inject(MessagingService);
 
   @ViewChild(BirthdayPopupComponent) birthdayPopup!: BirthdayPopupComponent;
 
@@ -47,6 +49,9 @@ export class AppRoot {
   }
 
   constructor() {
+    // Request notification permission
+    this.messagingService.requestPermission();
+
     effect(() => {
       const user = this.auth.currentUser();
       const profile = this.auth.userProfile();
