@@ -6,6 +6,7 @@ import { AuthService } from './core/auth';
 import { Families } from './core/families';
 import { MessagingService } from './core/messaging';
 import { BirthdayPopupComponent } from './components/birthday-popup/birthday-popup';
+import { InstallPromptComponent } from './components/install-prompt/install-prompt';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,7 @@ import { BirthdayPopupComponent } from './components/birthday-popup/birthday-pop
     CommonModule,
     RouterOutlet,
     BirthdayPopupComponent,
+    InstallPromptComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
