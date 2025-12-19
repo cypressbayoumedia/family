@@ -3,18 +3,19 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-color, #ffffff);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-xl);
     z-index: 9999;
     /* Ensure it's on top */
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--border-color);
     animation: slideUp 0.3s ease-out;
+    color: var(--text-primary);
 }
 
 @media (min-width: 600px) {
@@ -23,8 +24,8 @@
         left: 24px;
         right: auto;
         width: 360px;
-        border-radius: 16px;
-        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
     }
 }
 
@@ -37,10 +38,11 @@
 .icon-wrapper {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     overflow: hidden;
-    background: #f0f0f0;
+    background: var(--bg-color);
     flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
 }
 
 .app-icon {
@@ -56,14 +58,16 @@
 }
 
 .title {
-    font-weight: 600;
+    font-family: var(--font-heading);
+    font-weight: 700;
     font-size: 16px;
-    color: #1a1a1a;
+    color: var(--text-primary);
 }
 
 .subtitle {
+    font-family: var(--font-body);
     font-size: 14px;
-    color: #666;
+    color: var(--text-secondary);
     line-height: 1.4;
 }
 
@@ -71,6 +75,18 @@
     display: flex;
     justify-content: flex-end;
     gap: 8px;
+}
+
+/* Button Overrides */
+.install-btn {
+    background-color: var(--primary-color) !important;
+    color: var(--surface-color) !important;
+    font-family: var(--font-heading) !important;
+}
+
+.dismiss-btn {
+    color: var(--text-secondary) !important;
+    font-family: var(--font-heading) !important;
 }
 
 @keyframes slideUp {

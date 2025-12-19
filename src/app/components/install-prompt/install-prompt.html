@@ -2,17 +2,17 @@
 <div class="install-banner">
     <div class="banner-content">
         <div class="icon-wrapper">
-            <img src="assets/icons/maskable_icon_x192.png" alt="App Icon" class="app-icon"
+            <img src="https://thefamilee.app/icons/maskable_icon_x192.png" alt="App Icon" class="app-icon"
                 onerror="this.src='assets/icons/icon-192x192.png'">
         </div>
         <div class="text-content">
-            <span class="title">Install The Familee</span>
+            <span class="title">Install The Familee.</span>
             <span class="subtitle">Add to your home screen for quick access.</span>
         </div>
     </div>
     <div class="actions">
-        <button mat-button (click)="pwaService.hidePromotion()">Not now</button>
-        <button mat-flat-button color="primary" (click)="pwaService.promptInstall()">Install</button>
+        <button mat-button class="dismiss-btn" (click)="pwaService.hidePromotion()">Not now</button>
+        <button mat-flat-button class="install-btn" (click)="pwaService.promptInstall()">Install</button>
     </div>
 </div>
 }
