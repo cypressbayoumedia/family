@@ -71,11 +71,14 @@ html {
   color: var(--text-color);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  /* Ensure full height */
 }
 
 body {
   margin: 0;
-  height: 100%;
+  min-height: 100dvh;
+  /* Use dynamic viewport height to cover safe areas */
   font-family: var(--font-heading) !important;
   /* Enforce Roboto Mono as requested */
   font-optical-sizing: auto;
