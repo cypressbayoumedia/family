@@ -1,5 +1,5 @@
 import { inject, Injectable, computed, Injector, runInInjectionContext } from '@angular/core';
-import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, doc, docData, Timestamp, FieldValue } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, serverTimestamp, query, orderBy, collectionData, doc, docData, Timestamp, FieldValue, deleteDoc } from '@angular/fire/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { Observable, of } from 'rxjs';
@@ -108,5 +108,10 @@ export class Posts {
     // Reference the correct subcollection for posts
     const postsCollection = collection(this.afs, `families/${familyId}/posts`);
     await addDoc(postsCollection, postData);
+  }
+  async deletePost(familyId: string, postId: string): Promise<void> {
+    if (!familyId || !postId) return;
+    const postRef = doc(this.afs, `families/${familyId}/posts/${postId}`);
+    await deleteDoc(postRef);
   }
 }

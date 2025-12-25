@@ -28,9 +28,31 @@
       </div>
     </div>
     <!-- Future: Options menu (delete, edit, etc.) -->
-    <button class="options-button" title="Post options">
-      <span class="material-symbols-rounded">more_horiz</span>
-    </button>
+    <div class="relative">
+      <button class="options-button" title="Post options" (click)="toggleMenu($event)">
+        <span class="material-symbols-rounded">more_horiz</span>
+      </button>
+
+      @if (menuOpen()) {
+      <!-- Backdrop to close menu when clicking outside -->
+      <div class="menu-backdrop" (click)="toggleMenu($event)"></div>
+
+      <div class="options-menu">
+        @if (canDelete()) {
+        <button class="menu-item delete" (click)="deletePost()">
+          <span class="material-symbols-rounded">delete</span>
+          Delete Post
+        </button>
+        } @else {
+        <!-- Use report button for non-authors -->
+        <button class="menu-item" (click)="toggleMenu($event)">
+          <span class="material-symbols-rounded">flag</span>
+          Report
+        </button>
+        }
+      </div>
+      }
+    </div>
   </div>
 
   <!-- BODY: Clickable content area for navigation -->
